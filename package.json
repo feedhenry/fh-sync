@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "5.13.1",
+  "version": "5.13.2",
   "description": "FeedHenry MBAAS Cloud APIs",
   "main": "lib/api.js",
   "dependencies": {
@@ -9,8 +9,8 @@
     "cycle": "1.0.3",
     "eyes": "0.1.8",
     "fh-db": "1.0.4",
-    "fh-mbaas-client": "0.12.0",
-    "fh-mbaas-express": "5.5.0",
+    "fh-mbaas-client": "0.15.0",
+    "fh-mbaas-express": "5.6.1",
     "fh-security": "0.2.0",
     "fh-statsc": "0.3.0",
     "lodash-contrib": "^393.0.1",
@@ -24,7 +24,7 @@
     "stack-trace": "0.0.9",
     "underscore": "1.7.0",
     "unifiedpush-node-sender": "0.12.0",
-    "winston": "0.6.2"
+    "winston": "0.8.0"
   },
   "devDependencies": {
     "express": "3.3.4",
@@ -41,7 +41,11 @@
   },
   "scripts": {
     "testwindows": "test_win.cmd",
-    "test": "cd node_modules/fh-security; npm install ursa; cd -; listing=$(ls -1 test/test_*); teststorun=$(echo $listing | tr -d '\n'); whiskey --tests \"$teststorun\" --global-setup-teardown \"test/setup.js\""
+    "test": "grunt"
   },
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:feedhenry/fh-mbaas-api.git"
+  }
 }

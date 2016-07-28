@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "5.13.2",
+  "version": "5.13.3",
   "description": "FeedHenry MBAAS Cloud APIs",
   "main": "lib/api.js",
   "dependencies": {
@@ -15,12 +15,12 @@
     "fh-statsc": "0.3.0",
     "lodash-contrib": "^393.0.1",
     "memcached": "^2.0.0",
-    "moment": "2.0.0",
+    "moment": "2.14.1",
     "mongodb-uri": "0.9.7",
     "optval": "1.0.1",
     "pkginfo": "0.2.3",
     "redis": "0.8.2",
-    "request": "2.12.0",
+    "request": "2.74.0",
     "stack-trace": "0.0.9",
     "underscore": "1.7.0",
     "unifiedpush-node-sender": "0.12.0",

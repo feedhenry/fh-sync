@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "5.13.4",
+  "version": "5.13.5",
   "dependencies": {
     "async": {
       "version": "0.2.9",
@@ -1490,9 +1490,9 @@
               }
             },
             "sshpk": {
-              "version": "1.9.0",
+              "version": "1.9.1",
               "from": "sshpk@>=1.7.0 <2.0.0",
-              "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.9.0.tgz",
+              "resolved": "https://registry.npmjs.org/sshpk/-/sshpk-1.9.1.tgz",
               "dependencies": {
                 "asn1": {
                   "version": "0.2.3",

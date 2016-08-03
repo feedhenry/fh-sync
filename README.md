@@ -9,6 +9,15 @@
 
 fh-mbaas-api provides FeedHenry MBaaS APIs to Node.js cloud apps.
 
+|                 | Project Info  |
+| --------------- | ------------- |
+| License:        | Apache License, Version 2.0  |
+| Build:          | npm  |
+| Documentation:  | http://docs.feedhenry.com/v3/api/cloud_api.html  |
+| Issue tracker:  | https://issues.jboss.org/projects/FH/summary  |
+| Mailing list:   | [feedhenry-dev](https://www.redhat.com/archives/feedhenry-dev/) ([subscribe](https://www.redhat.com/mailman/listinfo/feedhenry-dev))  |
+| IRC:            | [#feedhenry](https://webchat.freenode.net/?channels=feedhenry) channel in the [freenode](http://freenode.net/) network.  |
+
 #Usage
 fh-mbaas-api is included as standard with your cloud app code.
 

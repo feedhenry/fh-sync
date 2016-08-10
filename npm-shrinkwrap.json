@@ -23,9 +23,9 @@
       "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
     },
     "fh-db": {
-      "version": "1.1.1-114",
-      "from": "fh-db@1.1.1-114",
-      "resolved": "http://npm.skunkhenry.com/fh-db/-/fh-db-1.1.1-114.tgz",
+      "version": "1.1.1",
+      "from": "fh-db@1.1.1",
+      "resolved": "https://registry.npmjs.org/fh-db/-/fh-db-1.1.1.tgz",
       "dependencies": {
         "adm-zip": {
           "version": "0.4.7",

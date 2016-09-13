@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "5.13.11",
+  "version": "5.13.12",
   "dependencies": {
     "async": {
       "version": "0.2.9",
@@ -23,9 +23,9 @@
       "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
     },
     "fh-db": {
-      "version": "1.2.1",
-      "from": "fh-db@1.2.1",
-      "resolved": "https://registry.npmjs.org/fh-db/-/fh-db-1.2.1.tgz",
+      "version": "1.2.2",
+      "from": "fh-db@1.2.2",
+      "resolved": "https://npm.skunkhenry.com/fh-db/-/fh-db-1.2.2.tgz",
       "dependencies": {
         "adm-zip": {
           "version": "0.4.7",
@@ -568,9 +568,9 @@
       }
     },
     "fh-mbaas-express": {
-      "version": "5.6.1",
-      "from": "fh-mbaas-express@5.6.1",
-      "resolved": "https://registry.npmjs.org/fh-mbaas-express/-/fh-mbaas-express-5.6.1.tgz",
+      "version": "5.6.2",
+      "from": "fh-mbaas-express@5.6.2",
+      "resolved": "https://npm.skunkhenry.com/fh-mbaas-express/-/fh-mbaas-express-5.6.2.tgz",
       "dependencies": {
         "body-parser": {
           "version": "1.15.2",

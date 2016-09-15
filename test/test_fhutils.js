@@ -23,6 +23,7 @@ module.exports = {
       'x-fh-api-key': 'thedefaultapikey'
     });
   },
+
   'test addAppApiKeyHeader - with override': function () {
     var fhutils = new futils({
       APP_API_KEY_HEADER: 'x-fh-api-key',
@@ -44,6 +45,7 @@ module.exports = {
       'x-fh-api-key': customApiKey
     });
   },
+  
   'test urlPathJoin': function(finish) {
 
     assert.equal(fhutils.urlPathJoin('/p1', '/p2'),              "/p1/p2");

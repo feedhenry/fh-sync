@@ -24,10 +24,12 @@
     "stack-trace": "0.0.9",
     "underscore": "1.7.0",
     "unifiedpush-node-sender": "0.12.0",
-    "winston": "0.8.0"
+    "winston": "0.8.0",
+    "xtend": "4.0.1"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "clear-require": "1.0.1",
     "express": "3.3.4",
     "grunt": "^0.4.5",
     "grunt-fh-build": "^0.5.0",
@@ -38,6 +40,7 @@
     "nock": "0.22.1",
     "plato": "^1.0.1",
     "proxyquire": "1.4.0",
+    "sinon": "^1.17.5",
     "valid-url": "1.0.9"
   },
   "scripts": {

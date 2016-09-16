@@ -1,5 +1,5 @@
 {
-  "name": "fh-mbaas-api",
+  "name": "custom-fh-mbaas-api",
   "version": "5.13.11",
   "description": "FeedHenry MBAAS Cloud APIs",
   "main": "lib/api.js",
@@ -32,6 +32,7 @@
     "clear-require": "1.0.1",
     "express": "3.3.4",
     "grunt": "^0.4.5",
+    "grunt-cli": "^1.2.0",
     "grunt-fh-build": "^0.5.0",
     "istanbul": "0.2.14",
     "jshint": "^2.5.2",

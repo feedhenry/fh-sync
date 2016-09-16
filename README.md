@@ -48,6 +48,6 @@ npm install
 npm install -g grunt-cli
 ```
 
-Then to run the tests use ```grunt fh:test```
+Then to run the tests use ```npm test```
 
 On Windows, use ```npm run testwindows```

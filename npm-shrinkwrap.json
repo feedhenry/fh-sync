@@ -25,7 +25,7 @@
     "fh-db": {
       "version": "1.2.2",
       "from": "fh-db@1.2.2",
-      "resolved": "https://npm.skunkhenry.com/fh-db/-/fh-db-1.2.2.tgz",
+      "resolved": "https://registry.npmjs.org/fh-db/-/fh-db-1.2.2.tgz",
       "dependencies": {
         "adm-zip": {
           "version": "0.4.7",
@@ -136,7 +136,7 @@
             },
             "lodash": {
               "version": "4.15.0",
-              "from": "lodash@>=4.8.0 <5.0.0",
+              "from": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz",
               "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
             },
             "readable-stream": {
@@ -570,7 +570,7 @@
     "fh-mbaas-express": {
       "version": "5.6.2",
       "from": "fh-mbaas-express@5.6.2",
-      "resolved": "https://npm.skunkhenry.com/fh-mbaas-express/-/fh-mbaas-express-5.6.2.tgz",
+      "resolved": "https://registry.npmjs.org/fh-mbaas-express/-/fh-mbaas-express-5.6.2.tgz",
       "dependencies": {
         "body-parser": {
           "version": "1.15.2",
@@ -1252,9 +1252,9 @@
                   "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
                 },
                 "inherits": {
-                  "version": "2.0.1",
+                  "version": "2.0.3",
                   "from": "inherits@>=2.0.1 <2.1.0",
-                  "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.1.tgz"
+                  "resolved": "https://registry.npmjs.org/inherits/-/inherits-2.0.3.tgz"
                 },
                 "isarray": {
                   "version": "1.0.0",
@@ -1318,9 +1318,9 @@
               "resolved": "https://registry.npmjs.org/async/-/async-2.0.1.tgz",
               "dependencies": {
                 "lodash": {
-                  "version": "4.15.0",
+                  "version": "4.16.0",
                   "from": "lodash@>=4.8.0 <5.0.0",
-                  "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+                  "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.16.0.tgz"
                 }
               }
             }
@@ -1390,9 +1390,9 @@
               }
             },
             "is-my-json-valid": {
-              "version": "2.13.1",
+              "version": "2.14.0",
               "from": "is-my-json-valid@>=2.12.4 <3.0.0",
-              "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.13.1.tgz",
+              "resolved": "https://registry.npmjs.org/is-my-json-valid/-/is-my-json-valid-2.14.0.tgz",
               "dependencies": {
                 "generate-function": {
                   "version": "2.0.0",
@@ -1475,9 +1475,9 @@
               "resolved": "https://registry.npmjs.org/assert-plus/-/assert-plus-0.2.0.tgz"
             },
             "jsprim": {
-              "version": "1.3.0",
+              "version": "1.3.1",
               "from": "jsprim@>=1.2.2 <2.0.0",
-              "resolved": "https://registry.npmjs.org/jsprim/-/jsprim-1.3.0.tgz",
+              "resolved": "https://registry.npmjs.org/jsprim/-/jsprim-1.3.1.tgz",
               "dependencies": {
                 "extsprintf": {
                   "version": "1.0.2",
@@ -1485,9 +1485,9 @@
                   "resolved": "https://registry.npmjs.org/extsprintf/-/extsprintf-1.0.2.tgz"
                 },
                 "json-schema": {
-                  "version": "0.2.2",
-                  "from": "json-schema@0.2.2",
-                  "resolved": "https://registry.npmjs.org/json-schema/-/json-schema-0.2.2.tgz"
+                  "version": "0.2.3",
+                  "from": "json-schema@0.2.3",
+                  "resolved": "https://registry.npmjs.org/json-schema/-/json-schema-0.2.3.tgz"
                 },
                 "verror": {
                   "version": "1.3.6",
@@ -1573,14 +1573,14 @@
           "resolved": "https://registry.npmjs.org/json-stringify-safe/-/json-stringify-safe-5.0.1.tgz"
         },
         "mime-types": {
-          "version": "2.1.11",
+          "version": "2.1.12",
           "from": "mime-types@>=2.1.7 <2.2.0",
-          "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.11.tgz",
+          "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.12.tgz",
           "dependencies": {
             "mime-db": {
-              "version": "1.23.0",
-              "from": "mime-db@>=1.23.0 <1.24.0",
-              "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.23.0.tgz"
+              "version": "1.24.0",
+              "from": "mime-db@>=1.24.0 <1.25.0",
+              "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.24.0.tgz"
             }
           }
         },

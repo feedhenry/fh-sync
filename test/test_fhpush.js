@@ -100,7 +100,7 @@ describe('$fh.push', function () {
         expect(senderStub.send.getCall(0).args[0]).to.deep.equal(message);
         expect(senderStub.send.getCall(0).args[1]).to.deep.equal(options);
 
-        // Sender should be constructed only upon a call
+        // Sender should be constructed only upon a call - lazy load
         expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(1);
 
         done();
@@ -109,7 +109,9 @@ describe('$fh.push', function () {
   });
 
   describe('#getPushClient', function () {
-    it('should return a push function using custom options', function () {
+    it('should return a push function using custom options', function (done) {
+      senderStub.send.yields(null);
+
       var fhpush = mod(validCfg);
 
       var customOpts = {
@@ -120,28 +122,37 @@ describe('$fh.push', function () {
 
       var customPush = fhpush.getPushClient(customOpts);
 
+      var message = { alert: 'go raibh maith agat' };
+      var options = { broadcast: true };
+
       expect(customPush).to.be.a('function');
       expect(customPush).to.not.equal(fhpush); // should be a new instance
 
       // This should only ever be called on the first creation
       expect(utilStubs.getMillicoreProps.callCount).to.equal(1);
 
-
+      // Called each time we create a sender
       expect(utilStubs.addAppApiKeyHeader.callCount).to.equal(2);
 
-      // Should only be called once, to get our custom handler
-      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(1);
+      // Send a push using the custom sender
+      customPush(message, options, function (err) {
+        expect(err).to.not.exist;
 
-      // Verify our custom options are being used
-      var senderSettings = stubs[STUB_MAP.UPS].Sender.getCall(0).args[0];
-      expect(senderSettings).to.deep.equal({
-        url: 'https://fake-domain.feedhenry.com:4567/box/api/unifiedpush/mbaas/',
-        applicationId: 'fake',
-        masterSecret: 'fake',
-        headers: {
-          'X-Project-Id': customOpts.widget,
-          'X-App-Id': customOpts.instance
-        }
+        // Verify our custom options are being used
+        var senderSettings = stubs[STUB_MAP.UPS].Sender.getCall(0).args[0];
+
+        // Should have used our custom options
+        expect(senderSettings).to.deep.equal({
+          url: 'https://fake-domain.feedhenry.com:4567/box/api/unifiedpush/mbaas/',
+          applicationId: 'fake',
+          masterSecret: 'fake',
+          headers: {
+            'X-Project-Id': customOpts.widget,
+            'X-App-Id': customOpts.instance
+          }
+        });
+
+        done();
       });
 
     });

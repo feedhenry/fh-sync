@@ -14,7 +14,7 @@ describe('$fh.push', function () {
   };
 
   beforeEach(function () {
-    // Each test should start with fresh copies of deps 
+    // Each test should start with fresh copies of deps
     require('clear-require').all();
 
     senderStub = {
@@ -51,7 +51,7 @@ describe('$fh.push', function () {
       expect(mod(validCfg)).to.be.a('function');
       expect(utilStubs.getMillicoreProps.callCount).to.equal(1);
       expect(utilStubs.addAppApiKeyHeader.callCount).to.equal(1);
-      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(1);
+      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(0);
     });
 
     it('should return an error - missing "messsage"', function (done) {
@@ -93,10 +93,15 @@ describe('$fh.push', function () {
       var message = { alert: 'go raibh maith agat' };
       var options = { broadcast: true };
 
+      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(0);
+
       mod(validCfg)(message, options, function (err) {
         expect(err).to.not.exist;
         expect(senderStub.send.getCall(0).args[0]).to.deep.equal(message);
         expect(senderStub.send.getCall(0).args[1]).to.deep.equal(options);
+
+        // Sender should be constructed only upon a call
+        expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(1);
 
         done();
       });
@@ -121,13 +126,14 @@ describe('$fh.push', function () {
       // This should only ever be called on the first creation
       expect(utilStubs.getMillicoreProps.callCount).to.equal(1);
 
-      // Should have called all of these twice, once for the default $fh.push
-      // and a second time for our custom setup
+
       expect(utilStubs.addAppApiKeyHeader.callCount).to.equal(2);
-      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(2);
+
+      // Should only be called once, to get our custom handler
+      expect(stubs[STUB_MAP.UPS].Sender.callCount).to.equal(1);
 
       // Verify our custom options are being used
-      var senderSettings = stubs[STUB_MAP.UPS].Sender.getCall(1).args[0];
+      var senderSettings = stubs[STUB_MAP.UPS].Sender.getCall(0).args[0];
       expect(senderSettings).to.deep.equal({
         url: 'https://fake-domain.feedhenry.com:4567/box/api/unifiedpush/mbaas/',
         applicationId: 'fake',

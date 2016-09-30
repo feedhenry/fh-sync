@@ -8,4 +8,5 @@ before_install:
   - sudo apt-get install --assume-yes apache2-utils
   - npm install -g npm@2.13.5
   - npm install -g grunt-cli
+  - npm config set strict-ssl false
 install: npm install

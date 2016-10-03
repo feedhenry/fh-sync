@@ -140,9 +140,9 @@
       "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
     },
     "fh-db": {
-      "version": "1.2.2",
-      "from": "fh-db@1.2.2",
-      "resolved": "https://registry.npmjs.org/fh-db/-/fh-db-1.2.2.tgz",
+      "version": "1.2.3",
+      "from": "fh-db@1.2.3",
+      "resolved": "https://registry.npmjs.org/fh-db/-/fh-db-1.2.3.tgz",
       "dependencies": {
         "adm-zip": {
           "version": "0.4.7",

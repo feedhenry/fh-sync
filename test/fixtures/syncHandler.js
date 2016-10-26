@@ -14,7 +14,7 @@ exports.doRead = function(dataset_id, uid, cb) {
   return cb(null, {});
 };
 
-exports.listCollissions = function(dataset_id, uid, cb) {
+exports.listCollisions = function(dataset_id, uid, cb) {
   console.log("listCollisions : ", dataset_id, " :: ", uid);
   return cb(null, {});
 };

@@ -19,7 +19,6 @@ module.exports = function(grunt) {
     './test/test_fhutils.js',
     './test/test_fhact.js',
     './test/test_fhdb.js',
-    './test/test_fhfeed.js',
     './test/test_fhforms.js',
     './test/test_fhsec.js',
     './test/test_fhsession.js',
@@ -27,7 +26,6 @@ module.exports = function(grunt) {
     './test/test_cache.js',
     './test/test_redis.js',
     './test/test_sync.js',
-    /*'./test/test_web.js',*/
     './test/test_fhauth.js',
     './test/test_init.js',
     './test/test_log.js',

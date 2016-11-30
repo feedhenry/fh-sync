@@ -21,13 +21,13 @@ module.exports = {
   /**
    * @param  {object} finish
    */
-  getEnvModeLocal : function(finish) {
+  performAuthLocalDev : function(finish) {
     process.env.FH_USE_LOCAL_DB = 'true';
 
     var req = _.noop;
     var res = {body: 'test'};
 
-    $fh.auth.getEnvironmentMode(req, res, function(err, resp) {
+    $fh.auth.performAuth(req, res, function(err, resp) {
       assert.notEqual(resp.body, 'productionMode');
       finish();
     });
@@ -36,13 +36,13 @@ module.exports = {
   /**
    * @param  {object} finish
    */
-  getEnvModeRemote: function(finish) {
+  performAuthProductionDev: function(finish) {
     process.env.FH_USE_LOCAL_DB = '';
 
     var req = {body: 'test'};
     var res = _.noop;
 
-    $fh.auth.getEnvironmentMode(req, res, function(err, resp) {
+    $fh.auth.performAuth(req, res, function(err, resp) {
       assert.equal(resp.body, 'productionMode')
       finish();
     });

@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "6.0.3",
+  "version": "6.1.1",
   "dependencies": {
     "async": {
       "version": "0.2.9",
@@ -1042,7 +1042,7 @@
                   "dependencies": {
                     "core-util-is": {
                       "version": "1.0.2",
-                      "from": "core-util-is@>=1.0.0 <1.1.0",
+                      "from": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz",
                       "resolved": "https://registry.npmjs.org/core-util-is/-/core-util-is-1.0.2.tgz"
                     },
                     "isarray": {

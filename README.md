@@ -51,3 +51,14 @@ npm install -g grunt-cli
 Then to run the tests use ```npm test```
 
 On Windows, use ```npm run testwindows```
+
+If tests return session errors in relation to redis, like the following:
+
+```
+1)  test session no timeout:
+
+      Uncaught AssertionError: Error: Error: Ready check failed: ERR operation not permitted
+      + expected - actual
+```
+
+Ensure that the correct redis password is set - `export FH_REDIS_PASSWORD=feedhenry101`

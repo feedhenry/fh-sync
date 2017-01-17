@@ -61,4 +61,21 @@ If tests return session errors in relation to redis, like the following:
       + expected - actual
 ```
 
-Ensure that the correct redis password is set - `export FH_REDIS_PASSWORD=feedhenry101`
+Ensure that the correct redis password is set - `export FH_REDIS_PASSWORD=RedisPassword`
+
+# Caveats
+
+## Two sync loops per sync frequency
+Two sync loops may be invoked per sync frequency if the server-side sync frequency
+differs from the client-side frequency.
+
+This is because the client and server sync frequencies are set independently.
+Setting a long frequency on a client does not change the sync frequency on the
+server.
+
+The `syncFrequency` value of the dataset on the server should be set to the 
+`sync_frequency` value of the corresponding dataset on the client to avoid this.
+
+For example:
+  * `sync_frequency` on the client-side dataset is also set to 120 seconds.
+  * `syncFrequency` on the server-side dataset is set to 120 seconds.

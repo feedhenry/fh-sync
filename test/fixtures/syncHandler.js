@@ -36,4 +36,9 @@ exports.doCollision = function(dataset_id, hash, uid, pre, post) {
 
 exports.removeCollision = function(dataset_id, hash, cb) {
   return cb(null, {});
+};
+
+exports.doResponseInterceptor = function(dataset_id, params, cb) {
+  console.log("doResponseInterceptor : ", dataset_id, " :: ", params);
+  return cb(null, {});
 }

@@ -12,7 +12,8 @@ var map = {
   'setGlobalCollisionHandler': 'globalCollisionHandler',
   'setGlobalCollisionLister': 'globalCollisionLister',
   'setGlobalCollisionRemover': 'globalCollisionRemover',
-  'setGlobalRequestInterceptor': 'globalRequestInterceptor'
+  'setGlobalRequestInterceptor': 'globalRequestInterceptor',
+  'setGlobalResponseInterceptor': 'globalResponseInterceptor'
 };
 
 var tests = {

@@ -31,6 +31,7 @@ module.exports = {
       $fh.sync.handleCollision(dataset_id, dataHandler.doCollision);
       $fh.sync.listCollisions(dataset_id, dataHandler.listCollisions);
       $fh.sync.removeCollision(dataset_id, dataHandler.removeCollision);
+      $fh.sync.interceptResponse(dataset_id, dataHandler.doResponseInterceptor);
       finish();
     });
   },

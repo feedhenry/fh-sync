@@ -565,7 +565,7 @@
     "fh-mbaas-express": {
       "version": "5.6.9",
       "from": "fh-mbaas-express@5.6.9",
-      "resolved": "https://npm.skunkhenry.com/fh-mbaas-express/-/fh-mbaas-express-5.6.9.tgz",
+      "resolved": "https://registry.npmjs.org/fh-mbaas-express/-/fh-mbaas-express-5.6.9.tgz",
       "dependencies": {
         "body-parser": {
           "version": "1.15.2",

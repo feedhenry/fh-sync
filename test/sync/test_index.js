@@ -58,5 +58,48 @@ module.exports = {
       syncRecords.restore();
       return finish();
     });
+  },
+
+  'test connect arg validation' : function() {
+    assert.throws(function() {
+      sync.api.connect();
+    }, function(err) {
+      assert.equal(err.message, 'connect requires 3 arguments');
+      return true;
+    });
+
+    assert.throws(function() {
+      sync.api.connect('test_mongodb_url');
+    }, function(err) {
+      assert.equal(err.message, 'connect requires 3 arguments');
+      return true;
+    });
+
+    assert.throws(function() {
+      sync.api.connect('test_mongodb_url', 'test_redis_url');
+    }, function(err) {
+      assert.equal(err.message, 'connect requires 3 arguments');
+      return true;
+    });
+  },
+
+  'test start arg validation': function() {
+    assert.throws(function() {
+      sync.api.start();
+    }, function(err) {
+      assert.equal(err.message, 'start requires 1 argument');
+      return true;
+    });
+  },
+
+  'test start with connect not called': function(finish) {
+    sync.api.start(function(err) {
+      assert.equal(err, 'MongoDB Client & Redis Client are not connected. Ensure connect() is called before calling start');
+      finish();
+    });
+  },
+
+  'test start with connect called': function() {
+    // TODO
   }
 };

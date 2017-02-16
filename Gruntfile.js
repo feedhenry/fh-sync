@@ -15,6 +15,8 @@ module.exports = function(grunt) {
     return ['istanbul cover --dir cov-unit', test_runner, '--', testArgString].join(' ');
   }
 
+  // TODO: move these to use the grunt-mocha-test plugin
+
   var tests = [    /* If updating this list of tests, also update test_win.cmd for Windows */
     './test/test_fhutils.js',
     './test/test_fhact.js',
@@ -37,13 +39,22 @@ module.exports = function(grunt) {
 
   // Just set shell commands for running different types of tests
   grunt.initConfig({
+    mochaTest: {
+      integration: {
+        options: {
+          ui: 'exports',
+          reporter: 'spec'
+        },
+        src: ['integration/**/*.js']
+      }
+    },
 
     // These are the properties that grunt-fh-build will use
-
     unit: _.map(unit_args, makeUnits),
     unit_cover: _.map(unit_args, makeUnitCovers)
   });
 
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-fh-build');
   grunt.registerTask('default', ['fh:default']);
 };

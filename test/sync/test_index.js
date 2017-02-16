@@ -64,21 +64,21 @@ module.exports = {
     assert.throws(function() {
       sync.api.connect();
     }, function(err) {
-      assert.equal(err.message, 'connect requires 3 arguments');
+      assert.equal(err.message, 'connect requires 4 arguments');
       return true;
     });
 
     assert.throws(function() {
       sync.api.connect('test_mongodb_url');
     }, function(err) {
-      assert.equal(err.message, 'connect requires 3 arguments');
+      assert.equal(err.message, 'connect requires 4 arguments');
       return true;
     });
 
     assert.throws(function() {
       sync.api.connect('test_mongodb_url', 'test_redis_url');
     }, function(err) {
-      assert.equal(err.message, 'connect requires 3 arguments');
+      assert.equal(err.message, 'connect requires 4 arguments');
       return true;
     });
   },

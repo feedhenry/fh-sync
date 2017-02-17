@@ -22,6 +22,30 @@
       "from": "eyes@0.1.8",
       "resolved": "https://registry.npmjs.org/eyes/-/eyes-0.1.8.tgz"
     },
+    "fh-component-metrics": {
+      "version": "2.4.0",
+      "from": "fh-component-metrics@latest",
+      "resolved": "https://registry.npmjs.org/fh-component-metrics/-/fh-component-metrics-2.4.0.tgz",
+      "dependencies": {
+        "async": {
+          "version": "2.0.1",
+          "from": "https://registry.npmjs.org/async/-/async-2.0.1.tgz",
+          "resolved": "https://registry.npmjs.org/async/-/async-2.0.1.tgz",
+          "dependencies": {
+            "lodash": {
+              "version": "4.15.0",
+              "from": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz",
+              "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.15.0.tgz"
+            }
+          }
+        },
+        "lodash": {
+          "version": "4.3.0",
+          "from": "https://registry.npmjs.org/lodash/-/lodash-4.3.0.tgz",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.3.0.tgz"
+        }
+      }
+    },
     "fh-db": {
       "version": "1.4.4",
       "from": "fh-db@1.4.4",

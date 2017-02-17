@@ -2,7 +2,7 @@ var assert = require('assert');
 var sinon = require('sinon');
 var syncProcessor = require('../../lib/sync/sync-processor');
 
-var syncCache = {
+var syncStorage = {
   saveLastSyncDataset: sinon.stub()
 };
 
@@ -22,7 +22,7 @@ var hashProvider = {
 
 module.exports = {
   'test sync request processor': function(done) {
-    var processor = syncProcessor(syncCache, dataHandler, metricsClient, hashProvider);
+    var processor = syncProcessor(syncStorage, dataHandler, metricsClient, hashProvider);
     var job = {
       payload: {
         dataset_id: 'testDataset'
@@ -36,14 +36,14 @@ module.exports = {
     };
 
     dataHandler.doList.yieldsAsync(null, records);
-    syncCache.saveLastSyncDataset.yieldsAsync();
+    syncStorage.saveLastSyncDataset.yieldsAsync();
 
     processor(job, function(err){
       assert.ok(!err);
       assert.ok(dataHandler.doList.calledOnce);
       assert.ok(dataHandler.doList.calledWith(job.payload.dataset_id, {}, {}));
-      assert.ok(syncCache.saveLastSyncDataset.calledOnce);
-      assert.ok(syncCache.saveLastSyncDataset.calledWith(job.payload.dataset_id, "abc"));
+      assert.ok(syncStorage.saveLastSyncDataset.calledOnce);
+      assert.ok(syncStorage.saveLastSyncDataset.calledWith(job.payload.dataset_id, "abc"));
       done();
     });
   }

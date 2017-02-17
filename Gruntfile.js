@@ -33,7 +33,8 @@ module.exports = function(grunt) {
     './test/test_fhpush.js',
     './test/sync/test_mongodbQueue.js',
     './test/sync/test_index.js',
-    './test/sync/test_worker.js'
+    './test/sync/test_worker.js',
+    './test/sync/test_sync_processor.js'
   ];
   var unit_args = _.map(tests, makeTestArgs);
   var test_runner = '_mocha';

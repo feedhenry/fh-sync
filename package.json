@@ -23,7 +23,7 @@
     "optval": "1.0.1",
     "pkginfo": "0.2.3",
     "redis": "0.8.2",
-    "request": "2.81.0",
+    "redlock": "^2.1.0",
     "stack-trace": "0.0.9",
     "underscore": "1.7.0",
     "unifiedpush-node-sender": "0.12.1",

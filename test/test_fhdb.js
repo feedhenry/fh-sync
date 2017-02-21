@@ -58,7 +58,8 @@ module.exports = {
       // this is called 2 times:
       // - for sync connection
       // - when calling fh.db
-      sinon.assert.calledTwice(databaseConnectionStringStub);
+      // - in fh.bootstrap
+      sinon.assert.calledThrice(databaseConnectionStringStub);
       finish();
     });
   },

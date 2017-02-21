@@ -4,7 +4,7 @@
   "description": "FeedHenry MBAAS Cloud APIs",
   "main": "lib/api.js",
   "dependencies": {
-    "async": "0.2.9",
+    "async": "2.1.5",
     "colors": "0.6.2",
     "cycle": "1.0.3",
     "eyes": "0.1.8",
@@ -24,6 +24,7 @@
     "pkginfo": "0.2.3",
     "redis": "0.8.2",
     "redlock": "^2.1.0",
+    "request": "2.74.0",
     "stack-trace": "0.0.9",
     "underscore": "1.7.0",
     "unifiedpush-node-sender": "0.12.1",

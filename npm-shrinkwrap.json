@@ -3,9 +3,16 @@
   "version": "6.1.8",
   "dependencies": {
     "async": {
-      "version": "0.2.9",
-      "from": "async@0.2.9",
-      "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
+      "version": "2.1.5",
+      "from": "async@2.1.5",
+      "resolved": "https://registry.npmjs.org/async/-/async-2.1.5.tgz",
+      "dependencies": {
+        "lodash": {
+          "version": "4.17.4",
+          "from": "lodash@>=4.14.0 <5.0.0",
+          "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.17.4.tgz"
+        }
+      }
     },
     "colors": {
       "version": "0.6.2",
@@ -24,7 +31,7 @@
     },
     "fh-component-metrics": {
       "version": "2.4.0",
-      "from": "fh-component-metrics@latest",
+      "from": "fh-component-metrics@>=2.4.0 <3.0.0",
       "resolved": "https://registry.npmjs.org/fh-component-metrics/-/fh-component-metrics-2.4.0.tgz",
       "dependencies": {
         "async": {
@@ -523,6 +530,11 @@
       "from": "fh-mbaas-express@5.6.10",
       "resolved": "https://registry.npmjs.org/fh-mbaas-express/-/fh-mbaas-express-5.6.10.tgz",
       "dependencies": {
+        "async": {
+          "version": "0.2.9",
+          "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
+          "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
+        },
         "body-parser": {
           "version": "1.17.1",
           "from": "https://registry.npmjs.org/body-parser/-/body-parser-1.17.1.tgz",
@@ -1092,7 +1104,14 @@
     "fh-statsc": {
       "version": "0.3.0",
       "from": "fh-statsc@0.3.0",
-      "resolved": "https://registry.npmjs.org/fh-statsc/-/fh-statsc-0.3.0.tgz"
+      "resolved": "https://registry.npmjs.org/fh-statsc/-/fh-statsc-0.3.0.tgz",
+      "dependencies": {
+        "async": {
+          "version": "0.2.9",
+          "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
+          "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
+        }
+      }
     },
     "lodash-contrib": {
       "version": "393.0.1",
@@ -1330,6 +1349,7 @@
           "resolved": "https://registry.npmjs.org/forever-agent/-/forever-agent-0.6.1.tgz"
         },
         "form-data": {
+<<<<<<< HEAD
           "version": "2.1.2",
           "from": "form-data@>=2.1.1 <2.2.0",
           "resolved": "https://registry.npmjs.org/form-data/-/form-data-2.1.2.tgz",
@@ -1340,6 +1360,11 @@
               "resolved": "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz"
             }
           }
+=======
+          "version": "1.0.1",
+          "from": "form-data@>=1.0.0-rc4 <1.1.0",
+          "resolved": "https://registry.npmjs.org/form-data/-/form-data-1.0.1.tgz"
+>>>>>>> update the sync scheduler, make some improvements to the sync processor as well
         },
         "har-validator": {
           "version": "4.2.1",
@@ -1604,6 +1629,11 @@
       "from": "winston@0.8.0",
       "resolved": "https://registry.npmjs.org/winston/-/winston-0.8.0.tgz",
       "dependencies": {
+        "async": {
+          "version": "0.2.10",
+          "from": "async@>=0.2.0 <0.3.0",
+          "resolved": "https://registry.npmjs.org/async/-/async-0.2.10.tgz"
+        },
         "pkginfo": {
           "version": "0.3.1",
           "from": "pkginfo@>=0.3.0 <0.4.0",

@@ -23,6 +23,10 @@ var hashProvider = {
   }
 };
 
+var metricsClient = {
+  gauge: sinon.stub()
+};
+
 function resetStubs() {
   syncStorage.saveUpdate.reset();
   dataHandler.handleCollision.reset();
@@ -30,10 +34,11 @@ function resetStubs() {
   dataHandler.doRead.reset();
   dataHandler.doUpdate.reset();
   dataHandler.doDelete.reset();
+  metricsClient.gauge.reset();
 }
 
 var DATASETID = "testPendingChangeDataset";
-var pendingProcessorImpl = pendingProcessor(syncStorage, dataHandler, hashProvider);
+var pendingProcessorImpl = pendingProcessor(syncStorage, dataHandler, hashProvider, metricsClient);
 
 module.exports = {
   'beforeEach': function(){
@@ -62,6 +67,7 @@ module.exports = {
       assert.ok(syncStorage.saveUpdate.calledOnce);
       var expectedFields = {type: pendingProcessor.SYNC_UPDATE_TYPES.APPLIED, uid: 'serveruid', hash: pending.payload.hash};
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match(expectedFields)));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -87,6 +93,7 @@ module.exports = {
       assert.ok(syncStorage.saveUpdate.calledOnce);
       var expectedFields = {type: pendingProcessor.SYNC_UPDATE_TYPES.FAILED, uid: 'clientuid', hash: pending.payload.hash};
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match(expectedFields)));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -118,6 +125,7 @@ module.exports = {
       assert.ok(syncStorage.saveUpdate.calledOnce);
       var expectedFields = {type: pendingProcessor.SYNC_UPDATE_TYPES.APPLIED, uid: pending.payload.uid, hash: pending.payload.hash};
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match(expectedFields)));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -147,6 +155,7 @@ module.exports = {
       assert.ok(syncStorage.saveUpdate.calledOnce);
       var expectedFields = {type: pendingProcessor.SYNC_UPDATE_TYPES.APPLIED, uid: pending.payload.uid, hash: pending.payload.hash};
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match(expectedFields)));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -179,6 +188,7 @@ module.exports = {
       assert.ok(dataHandler.handleCollision.calledWith(DATASETID, pending.payload.meta_data, sinon.match(expectedCollision)));
       assert.ok(syncStorage.saveUpdate.calledOnce);
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.COLLISION})));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -206,6 +216,7 @@ module.exports = {
       assert.ok(dataHandler.handleCollision.notCalled);
       assert.ok(dataHandler.doDelete.calledWith(DATASETID, pending.payload.uid, pending.payload.meta_data));
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.APPLIED})));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -232,6 +243,7 @@ module.exports = {
       assert.ok(dataHandler.handleCollision.notCalled);
       assert.ok(syncStorage.saveUpdate.called);
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.APPLIED})));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -261,6 +273,7 @@ module.exports = {
       var expectedCollision = {uid: pending.payload.uid, hash: '2', pre: pending.payload.pre};
       assert.ok(dataHandler.handleCollision.calledWith(DATASETID, pending.payload.meta_data, sinon.match(expectedCollision)));
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.COLLISION})));
+      assert.ok(metricsClient.gauge.calledOnce);
       done();
     });
   },
@@ -283,6 +296,7 @@ module.exports = {
       assert.ok(dataHandler.doRead.notCalled);
       assert.ok(syncStorage.saveUpdate.calledOnce);
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({msg: 'crashed'})));
+      assert.ok(metricsClient.gauge.notCalled);
       done();
     });
   }

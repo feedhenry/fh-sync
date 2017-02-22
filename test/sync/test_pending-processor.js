@@ -47,6 +47,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "CREATE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testCreationSuccess',
         uid: 'clientuid',
         post: {'a': '1'}
@@ -72,6 +73,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "CREATE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testCreationSuccess',
         uid: 'clientuid',
         post: {'a': '1'}
@@ -96,6 +98,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "UPDATE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testUpdateSuccess',
         uid: 'updateuid',
         pre: {'a': '0'},
@@ -126,6 +129,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "UPDATE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testUpdateIgnored',
         uid: 'updateuid',
         pre: {'a': '0'},
@@ -154,6 +158,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "UPDATE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testUpdateCollision',
         uid: 'updateuid',
         pre: {'a': '0'},
@@ -185,6 +190,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "DELETE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testDeleteSuccess',
         uid: 'deleteuid',
         pre: {'a': '0'}
@@ -211,6 +217,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "DELETE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testDeleteSuccess',
         uid: 'deleteuid',
         pre: {'a': '0'}
@@ -236,6 +243,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "DELETE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testDeleteSuccess',
         uid: 'deleteuid',
         pre: {'a': '0'}
@@ -264,6 +272,7 @@ module.exports = {
         datasetId: DATASETID,
         action: "DELETE",
         meta_data: {},
+        cuid: 'testCuid',
         hash: 'testRetry',
         uid: 'deleteuid',
       }

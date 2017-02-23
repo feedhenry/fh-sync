@@ -9,7 +9,7 @@ var interceptors = {
 
 var syncStorage = {
   upsertDatasetClient: sinon.stub(),
-  listUpdatesForClient: sinon.stub()
+  listUpdates: sinon.stub()
 };
 
 var ackQueue = {
@@ -32,7 +32,7 @@ var resetStubs = function(){
   interceptors.requestInterceptor.reset();
   interceptors.responseInterceptor.reset();
   syncStorage.upsertDatasetClient.reset();
-  syncStorage.listUpdatesForClient.reset();
+  syncStorage.listUpdates.reset();
   ackQueue.addMany.reset();
   ackQueue.addMany.reset();
 };
@@ -77,7 +77,7 @@ module.exports = {
     interceptors.requestInterceptor.yieldsAsync();
     interceptors.responseInterceptor.yieldsAsync();
     syncStorage.upsertDatasetClient.yieldsAsync(null, {globalHash: globalHash});
-    syncStorage.listUpdatesForClient.yieldsAsync(null, updates);
+    syncStorage.listUpdates.yieldsAsync(null, updates);
     ackQueue.addMany.yieldsAsync();
     pendingQueue.addMany.yieldsAsync();
     apiSync(DATASETID, params, function(err, res){
@@ -99,8 +99,8 @@ module.exports = {
       assert.equal(pendingItems[0].cuid, params.__fh.cuid);
       assert.ok(pendingItems[0].meta_data);
 
-      assert.ok(syncStorage.listUpdatesForClient.calledOnce);
-      assert.ok(syncStorage.listUpdatesForClient.calledWith(DATASETID, params.__fh.cuid));
+      assert.ok(syncStorage.listUpdates.calledOnce);
+      assert.ok(syncStorage.listUpdates.calledWith(DATASETID, {cuid: params.__fh.cuid}));
 
       assert.ok(interceptors.responseInterceptor.calledOnce);
 

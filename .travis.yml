@@ -22,7 +22,6 @@ matrix:
   # Include an updated job, with the acceptance tests. This way we're not
   # running the 4.4.3 build twice with one build including acceptance tests.
   - node_js: "4.4.3"
-    services: docker
     script:
       - npm link
       - git clone https://github.com/feedhenry/sync-acceptance-testing.git

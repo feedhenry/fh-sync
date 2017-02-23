@@ -37,7 +37,8 @@ module.exports = function(grunt) {
     './test/sync/test_sync-processor.js',
     './test/sync/test_sync-scheduler.js',
     './test/sync/test_ack-processor.js',
-    './test/sync/test_pending-processor.js'
+    './test/sync/test_pending-processor.js',
+    './test/sync/test_hashProvider.js'
   ];
   var unit_args = _.map(tests, makeTestArgs);
   var test_runner = '_mocha';

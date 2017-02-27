@@ -3,7 +3,8 @@ var sinon = require('sinon');
 var syncSchedulerModule = require('../../lib/sync/sync-scheduler');
 
 var lockProvider = {
-  acquire: sinon.stub()
+  acquire: sinon.stub(),
+  release: sinon.stub()
 };
 var lock = {
   release: sinon.stub()
@@ -53,7 +54,7 @@ module.exports = {
     };
 
     lockProvider.acquire.yieldsAsync(null, lock);
-    lock.release.yieldsAsync();
+    lockProvider.release.yieldsAsync();
 
     //the first dataset client is due to sync, and the second dataset client should be deactivated
     var datasetClients = [{
@@ -112,7 +113,7 @@ module.exports = {
     };
 
     lockProvider.acquire.yieldsAsync(null, lock);
-    lock.release.yieldsAsync();
+    lockProvider.release.yieldsAsync();
     var datasetClients = [];
     syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
     syncQueue.addMany.yieldsAsync();

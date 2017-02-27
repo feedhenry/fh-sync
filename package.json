@@ -18,6 +18,7 @@
     "memcached": "^2.0.0",
     "moment": "2.15.2",
     "mongodb": "2.1.18",
+    "mongodb-lock": "git://github.com/aidenkeating/mongodb-lock.git#mongodb-2.x-client-support",
     "mongodb-queue": "2.2.0",
     "mongodb-uri": "0.9.7",
     "optval": "1.0.1",

@@ -1239,6 +1239,11 @@
         }
       }
     },
+    "mongodb-lock": {
+      "version": "0.3.0",
+      "from": "git://github.com/aidenkeating/mongodb-lock.git#mongodb-2.x-client-support",
+      "resolved": "git://github.com/aidenkeating/mongodb-lock.git#b651361295dad56fb90837dd4ae334b7302c5b63"
+    },
     "mongodb-queue": {
       "version": "2.2.0",
       "from": "https://registry.npmjs.org/mongodb-queue/-/mongodb-queue-2.2.0.tgz",

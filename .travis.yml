@@ -4,6 +4,8 @@ node_js:
   - "0.10"
   - "4.4.3"
 sudo: required
+services:
+ - docker
 before_install:
   - sudo apt-get update
   - sudo apt-get install --assume-yes apache2-utils
@@ -11,7 +13,6 @@ before_install:
   - npm install -g grunt-cli
   - npm config set strict-ssl false
 install: npm install
-
 matrix:
   # The acceptance tests only work with node 4 or higher.
   exclude:
@@ -29,3 +30,6 @@ matrix:
       - npm install
       - npm link fh-mbaas-api
       - npm test
+script:
+  - npm run test
+  - npm run integration

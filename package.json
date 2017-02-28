@@ -52,7 +52,9 @@
   "scripts": {
     "testwindows": "test_win.cmd",
     "test": "grunt fh:unit",
-    "integration": "grunt mochaTest:integration"
+    "preintegration": "./scripts/preintegration.sh",
+    "integration": "grunt mochaTest:integration",
+    "postintegration": "./scripts/postintegration.sh"
   },
   "license": "Apache-2.0",
   "repository": {

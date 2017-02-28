@@ -10,7 +10,7 @@ var DATASETCLIENTS_COLLECTION = storageModule.DATASETCLIENTS_COLLECTION;
 var RECORDS_COLLECTION = storageModule.getDatasetRecordsCollectionName(DATASETID);
 var UPDATES_COLLECTION = storageModule.getDatasetUpdatesCollectionName(DATASETID);
 
-var MONGODB_URL = "mongodb://0.0.0.0:27017/test";
+var MONGODB_URL = "mongodb://127.0.0.1:27017/test";
 
 var datasetClient1 = {
   id: 'storageIntegrationTestId1',

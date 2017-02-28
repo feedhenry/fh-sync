@@ -6,18 +6,14 @@ var id = 'datahandler_test';
 var queryParams = {};
 var metaData = {};
 var stubUid = '58b3d9efde2810043a0ac99d';
+var retObject = {'_id': stubUid, 'name': 'Fletch'};
 
 // stubs when there is no real MongoDB
 var collectionStub = {
   insertOne: sinon.stub().yields(null, {
-    result: { ok: 1, n: 1},
-    ops: [{'_id': stubUid, 'name': 'Fletch'}],
-    connection: null,
-    insertedCount: 1,
-    insertedId: stubUid}),
+    ops: [retObject]}),
   find: sinon.stub().returns({
-    toArray: sinon.stub().yields(null, [
-      {"_id": stubUid, 'name': 'Fletch'}]),
+    toArray: sinon.stub().yields(null, [retObject]),
   }),
   findOne: sinon.stub().yields(null, {
     "_id": stubUid
@@ -32,10 +28,18 @@ var dbStub = {
   collection: sinon.stub().withArgs(id).returns(collectionStub)
 };
 
+function resetStubUid() {
+  retObject._id = stubUid;
+}
+
 var url = 'mongodb://localhost:27017/dataHandlersTest';
 var MongoClient = require('mongodb').MongoClient;
 
 module.exports = {
+
+  'beforeEach': function(){
+    resetStubUid();
+  },
 
   'test defaultDataHandlers module constructor': function(done) {
     assert.throws(function() {
@@ -43,7 +47,6 @@ module.exports = {
     }, function(err) {
       assert.equal(err.message, 'MongoDB instance must be passed to module.');
       done();
-      collectionStub.insertOne.reset();
       return true;
     });
   },
@@ -71,6 +74,7 @@ module.exports = {
       var data = {'name': 'Fletch'};
       dataHandlers.doCreate(id, data, metaData, function(err, res) {
         var uid = res.uid || stubUid;
+        resetStubUid();
         dataHandlers.doList(id, queryParams, metaData, function(err, res) {
           assert.ok(!err);
           assert.ok(res);
@@ -107,7 +111,7 @@ module.exports = {
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
         var uid = res.uid || stubUid;
-        dataHandlers.doUpdate(id, uid, {name: "Doe"}, metaData, function(err) {
+        dataHandlers.doUpdate(id, uid, {name: "Fletch"}, metaData, function(err) {
           assert.ok(!err);
           db.collection(id).drop();
           done();
@@ -137,11 +141,11 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Doe'}, function(err, res) {
+      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
+        var uid = res.uid || stubUid;
         assert.ok(!err);
-        assert.equal(res.result.ok, 1);
-        assert.equal(res.insertedCount, 1);
-        assert.ok(res.insertedId);
+        assert.ok(res.uid);
+        assert.equal(res.data.name, 'Fletch');
         db.collection(id + '_collision').drop();
         done();
       });
@@ -153,9 +157,14 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Doe'}, function(err, res) {
+      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
+        var uid = res.uid || stubUid;
         assert.ok(!err);
+        resetStubUid();
         dataHandlers.listCollisions(id, metaData, function(err, res) {
+          assert.ok(res);
+          assert.ok(res[uid]);
+          assert.equal(res[uid].name, 'Fletch');
           db.collection(id + '_collision').drop();
           done();
         });
@@ -168,12 +177,10 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Doe'}, function(err, res) {
+      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
         assert.ok(!err);
         var uid = res.insertedId;
         dataHandlers.removeCollision(id, uid, metaData, function(err, res) {
-          assert.equal(res.result.ok, 1);
-          assert.equal(res.result.n, 1);
           db.collection(id + '_collision').drop();
           done();
         });

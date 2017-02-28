@@ -20,7 +20,7 @@ var collectionStub = {
   findOne: sinon.stub().callsArgWith(1, null, {
     "_id": '58b3d9efde2810043a0ac99d'
   }),
-  update: sinon.stub().callsArgWith(2, null),
+  updateOne: sinon.stub().callsArgWith(2, null),
   remove: sinon.stub().callsArgWith(1, null, {
     result: { ok: 1, n: 1}
   }),

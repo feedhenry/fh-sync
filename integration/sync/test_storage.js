@@ -86,156 +86,158 @@ module.exports = {
       });
     });
   },
-  'test dataset client create and list': function(done){
-    async.series([
-      async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
-      async.apply(storage.upsertDatasetClient, datasetClient2.id, datasetClient2)
-    ], function(err){
-      assert.ok(!err);
-      
-      storage.listDatasetClients(function(err, savedDatasetClients){
+  'test storage functions': {
+    'test dataset client create and list': function(done){
+      async.series([
+        async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
+        async.apply(storage.upsertDatasetClient, datasetClient2.id, datasetClient2)
+      ], function(err){
         assert.ok(!err);
-        assert.equal(savedDatasetClients.length, 2);
-        done();
-      })
-    });
-  },
-  'test dataset client update': function(done) {
-    var datasetClientUpdateFields = {
-      props: {syncRunning: true},
-      metaData: {token: 'testToken'}
-    };
-    async.series([
-      async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
-      async.apply(storage.updateDatasetClient, datasetClient1.id, datasetClientUpdateFields)
-    ], function(err){
-      assert.ok(!err);
-      var col = mongodb.collection(DATASETCLIENTS_COLLECTION);
-      col.findOne({id: datasetClient1.id}, function(err, updated){
+        
+        storage.listDatasetClients(function(err, savedDatasetClients){
+          assert.ok(!err);
+          assert.equal(savedDatasetClients.length, 2);
+          done();
+        })
+      });
+    },
+    'test dataset client update': function(done) {
+      var datasetClientUpdateFields = {
+        props: {syncRunning: true},
+        metaData: {token: 'testToken'}
+      };
+      async.series([
+        async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
+        async.apply(storage.updateDatasetClient, datasetClient1.id, datasetClientUpdateFields)
+      ], function(err){
         assert.ok(!err);
-        assert.equal(updated.id, datasetClient1.id);
-        assert.equal(updated.props.syncRunning, datasetClientUpdateFields.props.syncRunning);
-        assert.equal(updated.metaData.token, datasetClientUpdateFields.metaData.token);
-        assert.deepEqual(updated.queryParams, datasetClient1.queryParams);
-        assert.deepEqual(updated.config, datasetClient1.config);
+        var col = mongodb.collection(DATASETCLIENTS_COLLECTION);
+        col.findOne({id: datasetClient1.id}, function(err, updated){
+          assert.ok(!err);
+          assert.equal(updated.id, datasetClient1.id);
+          assert.equal(updated.props.syncRunning, datasetClientUpdateFields.props.syncRunning);
+          assert.equal(updated.metaData.token, datasetClientUpdateFields.metaData.token);
+          assert.deepEqual(updated.queryParams, datasetClient1.queryParams);
+          assert.deepEqual(updated.config, datasetClient1.config);
+          done();
+        });
+      });
+    },
+    'test dataset client remove': function(done) {
+      async.series([
+        async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
+        async.apply(storage.upsertDatasetClient, datasetClient2.id, datasetClient2),
+        async.apply(storage.removeDatasetClients, [datasetClient1])
+      ], function(err){
+        assert.ok(!err);
+        
+        storage.listDatasetClients(function(err, savedDatasetClients){
+          assert.ok(!err);
+          assert.equal(savedDatasetClients.length, 1);
+          done();
+        });
+      });
+    },
+    'test operations on dataset client with records': function(done) {
+      var records = [{
+        uid: '1',
+        hash: 'a',
+        data: {
+          '1': 'a'
+        }
+      }, {
+        uid: '2',
+        hash: 'b',
+        data: {
+          '2': 'b'
+        }
+      }];
+      var updateRecords = [{
+        uid: '1',
+        hash: 'c',
+        data: {
+          '1': 'c'
+        }
+      }];
+      async.series([
+        function createDatasetClient(callback){
+          storage.upsertDatasetClient(datasetClient1.id, datasetClient1, function(err, created){
+            assert.ok(!err);
+            assert.ok(created);
+            callback();
+          });
+        },
+        async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {props: {syncCompleted: true}}, records),
+        function checkRecordsAreCreatedForDatasetClient(callback){
+          storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
+            assert.ok(!err);
+            assert.equal(datasetClient.props.syncCompleted, true);
+            assert.equal(datasetClient.records.length, 2);
+            assert.equal(datasetClient.recordUids.length, 2);
+            var record1 = _.findWhere(datasetClient.records, {uid: '1'});
+            var record2 = _.findWhere(datasetClient.records, {uid: '2'});
+            recordMatch(record1, records[0]);
+            recordMatch(record2, records[1]);
+            callback();
+          });
+        },
+        async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {}, updateRecords),
+        function checkRecordIsRemovedFromTheDatasetClient(callback) {
+          storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
+            assert.ok(!err);
+            assert.equal(datasetClient.records.length, 1);
+            assert.equal(datasetClient.recordUids.length, 1);
+            var updateRecord = _.findWhere(datasetClient.records, {uid: '1'});
+            recordMatch(updateRecord, updateRecords[0]);
+            callback();
+          });
+        },
+        async.apply(storage.removeDatasetClients, [datasetClient1]),
+        function checkDatasetClientIsDeleted(callback) {
+          storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
+            assert.ok(!err);
+            assert.ok(!datasetClient);
+            callback();
+          });
+        },
+        function checkRecordIsDeleted(callback) {
+          var recordCollection = mongodb.collection(RECORDS_COLLECTION);
+          recordCollection.findOne({uid: records[0].uid}, function(err, found){
+            assert.ok(!err);
+            assert.ok(!found);
+            callback();
+          });
+        }
+      ], function(err){
+        assert.ok(!err);
         done();
       });
-    });
-  },
-  'test dataset client remove': function(done) {
-    async.series([
-      async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
-      async.apply(storage.upsertDatasetClient, datasetClient2.id, datasetClient2),
-      async.apply(storage.removeDatasetClients, [datasetClient1])
-    ], function(err){
-      assert.ok(!err);
-      
-      storage.listDatasetClients(function(err, savedDatasetClients){
+    },
+    'test operations on the sync updates': function(done) {
+      async.series([
+        async.apply(storage.saveUpdate, DATASETID, ack1),
+        async.apply(storage.saveUpdate, DATASETID, ack2),
+        function checkSyncUpdatesCreated(callback) {
+          storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
+            assert.ok(!err);
+            assert.equal(updates.length, 2);
+            callback();
+          });
+        },
+        async.apply(storage.findAndDeleteUpdate, DATASETID, ack1),
+        function checkSyncUpdatesRemoved(callback) {
+          storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
+            assert.ok(!err);
+            assert.equal(updates.length, 1);
+            delete updates[0]._id;
+            assert.deepEqual(updates[0], ack2);
+            callback();
+          });
+        }
+      ], function(err){
         assert.ok(!err);
-        assert.equal(savedDatasetClients.length, 1);
         done();
       });
-    });
-  },
-  'test operations on dataset client with records': function(done) {
-    var records = [{
-      uid: '1',
-      hash: 'a',
-      data: {
-        '1': 'a'
-      }
-    }, {
-      uid: '2',
-      hash: 'b',
-      data: {
-        '2': 'b'
-      }
-    }];
-    var updateRecords = [{
-      uid: '1',
-      hash: 'c',
-      data: {
-        '1': 'c'
-      }
-    }];
-    async.series([
-      function createDatasetClient(callback){
-        storage.upsertDatasetClient(datasetClient1.id, datasetClient1, function(err, created){
-          assert.ok(!err);
-          assert.ok(created);
-          callback();
-        });
-      },
-      async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {props: {syncCompleted: true}}, records),
-      function checkRecordsAreCreatedForDatasetClient(callback){
-        storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
-          assert.ok(!err);
-          assert.equal(datasetClient.props.syncCompleted, true);
-          assert.equal(datasetClient.records.length, 2);
-          assert.equal(datasetClient.recordUids.length, 2);
-          var record1 = _.findWhere(datasetClient.records, {uid: '1'});
-          var record2 = _.findWhere(datasetClient.records, {uid: '2'});
-          recordMatch(record1, records[0]);
-          recordMatch(record2, records[1]);
-          callback();
-        });
-      },
-      async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {}, updateRecords),
-      function checkRecordIsRemovedFromTheDatasetClient(callback) {
-        storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
-          assert.ok(!err);
-          assert.equal(datasetClient.records.length, 1);
-          assert.equal(datasetClient.recordUids.length, 1);
-          var updateRecord = _.findWhere(datasetClient.records, {uid: '1'});
-          recordMatch(updateRecord, updateRecords[0]);
-          callback();
-        });
-      },
-      async.apply(storage.removeDatasetClients, [datasetClient1]),
-      function checkDatasetClientIsDeleted(callback) {
-        storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
-          assert.ok(!err);
-          assert.ok(!datasetClient);
-          callback();
-        });
-      },
-      function checkRecordIsDeleted(callback) {
-        var recordCollection = mongodb.collection(RECORDS_COLLECTION);
-        recordCollection.findOne({uid: records[0].uid}, function(err, found){
-          assert.ok(!err);
-          assert.ok(!found);
-          callback();
-        });
-      }
-    ], function(err){
-      assert.ok(!err);
-      done();
-    });
-  },
-  'test operations on the sync updates': function(done) {
-    async.series([
-      async.apply(storage.saveUpdate, DATASETID, ack1),
-      async.apply(storage.saveUpdate, DATASETID, ack2),
-      function checkSyncUpdatesCreated(callback) {
-        storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
-          assert.ok(!err);
-          assert.equal(updates.length, 2);
-          callback();
-        });
-      },
-      async.apply(storage.findAndDeleteUpdate, DATASETID, ack1),
-      function checkSyncUpdatesRemoved(callback) {
-        storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
-          assert.ok(!err);
-          assert.equal(updates.length, 1);
-          delete updates[0]._id;
-          assert.deepEqual(updates[0], ack2);
-          callback();
-        });
-      }
-    ], function(err){
-      assert.ok(!err);
-      done();
-    });
+    }
   }
 };

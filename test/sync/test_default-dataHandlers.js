@@ -10,6 +10,7 @@ var metaData = {};
 var collectionStub = {
   insertOne: sinon.stub().yields(null, {
     result: { ok: 1, n: 1},
+    ops: [ {'_id': '58b3d9efde2810043a0ac99d', 'name': 'Fletch'}],
     connection: null,
     insertedCount: 1,
     insertedId: '58b3d9efde2810043a0ac99d'}),
@@ -49,11 +50,11 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
+      var data = {'name': 'Fletch'};
+      dataHandlers.doCreate(id, data, metaData, function(err, res) {
         assert.ok(!err);
-        assert.equal(res.result.ok, 1);
-        assert.equal(res.insertedCount, 1);
-        assert.ok(res.insertedId);
+        assert.ok(res.uid);
+        assert.equal(res.data.name, 'Fletch');
         db.collection(id).drop();
         done();
       });
@@ -83,7 +84,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.insertedId;
+        var uid = res.uid;
         dataHandlers.doRead(id, uid, metaData, function(err, res) {
           assert.ok(!err);
           assert.ok(res._id);
@@ -100,7 +101,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.insertedId;
+        var uid = res.uid;
         dataHandlers.doUpdate(id, uid, {name: "Doe"}, metaData, function(err) {
           assert.ok(!err);
           db.collection(id).drop();
@@ -116,7 +117,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.insertedId;
+        var uid = res.uid;
         dataHandlers.doDelete(id, uid, metaData, function(err, res) {
           assert.ok(!err);
           db.collection(id).drop();

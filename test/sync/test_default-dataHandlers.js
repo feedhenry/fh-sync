@@ -5,21 +5,22 @@ var defaultDataHandlersModule = require('../../lib/sync/default-dataHandlers.js'
 var id = 'datahandler_test';
 var queryParams = {};
 var metaData = {};
+var stubUid = '58b3d9efde2810043a0ac99d';
 
 // stubs when there is no real MongoDB
 var collectionStub = {
   insertOne: sinon.stub().yields(null, {
     result: { ok: 1, n: 1},
-    ops: [ {'_id': '58b3d9efde2810043a0ac99d', 'name': 'Fletch'}],
+    ops: [{'_id': stubUid, 'name': 'Fletch'}],
     connection: null,
     insertedCount: 1,
-    insertedId: '58b3d9efde2810043a0ac99d'}),
+    insertedId: stubUid}),
   find: sinon.stub().returns({
-    toArray: sinon.stub().yields(null, [{
-      "_id": '58b3d9efde2810043a0ac99d'}]),
+    toArray: sinon.stub().yields(null, [
+      {"_id": stubUid, 'name': 'Fletch'}]),
   }),
   findOne: sinon.stub().yields(null, {
-    "_id": '58b3d9efde2810043a0ac99d'
+    "_id": stubUid
   }),
   updateOne: sinon.stub().yields(null),
   remove: sinon.stub().callsArgWith(1, null, {
@@ -42,6 +43,7 @@ module.exports = {
     }, function(err) {
       assert.equal(err.message, 'MongoDB instance must be passed to module.');
       done();
+      collectionStub.insertOne.reset();
       return true;
     });
   },
@@ -66,11 +68,14 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.insertedId;
+      var data = {'name': 'Fletch'};
+      dataHandlers.doCreate(id, data, metaData, function(err, res) {
+        var uid = res.uid || stubUid;
         dataHandlers.doList(id, queryParams, metaData, function(err, res) {
           assert.ok(!err);
-          assert.ok(res[0]);
+          assert.ok(res);
+          assert.ok(res[uid]);
+          assert.equal(res[uid].name, 'Fletch');
           db.collection(id).drop();
           done();
         });
@@ -84,7 +89,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.uid;
+        var uid = res.uid || stubUid;
         dataHandlers.doRead(id, uid, metaData, function(err, res) {
           assert.ok(!err);
           assert.ok(res._id);
@@ -101,7 +106,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.uid;
+        var uid = res.uid || stubUid;
         dataHandlers.doUpdate(id, uid, {name: "Doe"}, metaData, function(err) {
           assert.ok(!err);
           db.collection(id).drop();
@@ -117,7 +122,7 @@ module.exports = {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
       dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
-        var uid = res.uid;
+        var uid = res.uid || stubUid;
         dataHandlers.doDelete(id, uid, metaData, function(err, res) {
           assert.ok(!err);
           db.collection(id).drop();

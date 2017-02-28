@@ -42,7 +42,8 @@ module.exports = function(grunt) {
     './test/sync/test_api-sync.js',
     './test/sync/test_dataHandlers.js',
     './test/sync/test_api-syncRecords.js',
-    './test/sync/test_default-dataHandlers.js'
+    './test/sync/test_default-dataHandlers.js',
+    './test/sync/test_interceptors.js'
   ];
   var unit_args = _.map(tests, makeTestArgs);
   var test_runner = '_mocha';

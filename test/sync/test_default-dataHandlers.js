@@ -8,19 +8,19 @@ var metaData = {};
 
 // stubs when there is no real MongoDB
 var collectionStub = {
-  insertOne: sinon.stub().callsArgWith(1, null, {
+  insertOne: sinon.stub().yields(null, {
     result: { ok: 1, n: 1},
     connection: null,
     insertedCount: 1,
     insertedId: '58b3d9efde2810043a0ac99d'}),
   find: sinon.stub().returns({
-    toArray: sinon.stub().callsArgWith(0, null, [{
+    toArray: sinon.stub().yields(null, [{
       "_id": '58b3d9efde2810043a0ac99d'}]),
   }),
-  findOne: sinon.stub().callsArgWith(1, null, {
+  findOne: sinon.stub().yields(null, {
     "_id": '58b3d9efde2810043a0ac99d'
   }),
-  updateOne: sinon.stub().callsArgWith(2, null),
+  updateOne: sinon.stub().yields(null),
   remove: sinon.stub().callsArgWith(1, null, {
     result: { ok: 1, n: 1}
   }),

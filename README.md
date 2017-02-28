@@ -41,6 +41,8 @@ Legacy Rhino functions have been deprecated. These are listed below - with their
 * $fh.stringify  **JSON.stringify**
 
 #Tests
+In order to run the tests, please make sure you have [Docker](https://www.docker.com/) installed.
+
 Before running tests do:
 
 ```
@@ -51,17 +53,6 @@ npm install -g grunt-cli
 Then to run the tests use ```npm test```
 
 On Windows, use ```npm run testwindows```
-
-If tests return session errors in relation to redis, like the following:
-
-```
-1)  test session no timeout:
-
-      Uncaught AssertionError: Error: Error: Ready check failed: ERR operation not permitted
-      + expected - actual
-```
-
-Ensure that the correct redis password is set - `export FH_REDIS_PASSWORD=RedisPassword`
 
 # Caveats
 

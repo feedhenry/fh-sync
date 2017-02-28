@@ -32,4 +32,3 @@ matrix:
       - npm test
 script:
   - npm run test
-  - npm run integration

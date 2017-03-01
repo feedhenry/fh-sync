@@ -22,8 +22,8 @@ module.exports = {
     });
     var syncMock = {
       api: {
-        connect: sinon.stub().callsArgAsync(2),
-        stopAll: sinon.stub().callsArgAsync(0)
+        connect: sinon.stub().yieldsAsync(),
+        stopAll: sinon.stub().yieldsAsync()
       }
     };
 
@@ -74,8 +74,8 @@ module.exports = {
     });
     var syncMock = {
       api: {
-        connect: sinon.stub().callsArgAsync(2),
-        stopAll: sinon.stub().callsArgAsync(0)
+        connect: sinon.stub().yieldsAsync(),
+        stopAll: sinon.stub().yieldsAsync()
       }
     };
 

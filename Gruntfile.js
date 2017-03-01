@@ -57,7 +57,7 @@ module.exports = function(grunt) {
           ui: 'exports',
           reporter: 'spec'
         },
-        src: ['integration/**/*.js']
+        src: ['integration/**/test*.js']
       }
     },
 

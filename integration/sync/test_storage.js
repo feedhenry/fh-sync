@@ -3,12 +3,12 @@ var MongoClient = require('mongodb').MongoClient;
 var async = require('async');
 var assert = require('assert');
 var _ = require('underscore');
+var helper = require('./helper');
 
 var DATASETID = "storageIntegrationTest";
 
 var DATASETCLIENTS_COLLECTION = storageModule.DATASETCLIENTS_COLLECTION;
 var RECORDS_COLLECTION = storageModule.getDatasetRecordsCollectionName(DATASETID);
-var UPDATES_COLLECTION = storageModule.getDatasetUpdatesCollectionName(DATASETID);
 
 var MONGODB_URL = "mongodb://127.0.0.1:27017/test";
 
@@ -62,31 +62,17 @@ function recordMatch(expect, actual) {
 }
 
 module.exports = {
-  'before': function(done) {
-    MongoClient.connect(MONGODB_URL, function(err, db){
-      if (err) {
-        console.log('mongodb connection error', err);
-        return done(err);
-      }
-      mongodb = db;
-      storage = storageModule(mongodb);
-      async.each([DATASETCLIENTS_COLLECTION, RECORDS_COLLECTION, UPDATES_COLLECTION], function(collection, cb){
-        mongodb.dropCollection(collection, function(err){
-          if (err && err.message === 'ns not found'){
-            return cb();
-          } else {
-            return cb(err);
-          }
-        });
-      }, function(err){
-        if (err) {
-          console.log('failed to drop collection', err);
-        }
-        done(err);
-      });
-    });
-  },
   'test storage functions': {
+    'before': function(done) {
+      helper.resetDb(MONGODB_URL, DATASETID, function(err, db){
+        if (err) {
+          return done(err);
+        }
+        mongodb = db;
+        storage = storageModule(mongodb);
+        done();
+      });
+    },
     'test dataset client create and list': function(done){
       async.series([
         async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),

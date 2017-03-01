@@ -116,7 +116,6 @@ module.exports = {
         async.apply(storage.removeDatasetClients, [datasetClient1])
       ], function(err){
         assert.ok(!err);
-        
         storage.listDatasetClients(function(err, savedDatasetClients){
           assert.ok(!err);
           assert.equal(savedDatasetClients.length, 1);

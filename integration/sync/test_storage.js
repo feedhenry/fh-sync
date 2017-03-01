@@ -10,7 +10,7 @@ var DATASETID = "storageIntegrationTest";
 var DATASETCLIENTS_COLLECTION = storageModule.DATASETCLIENTS_COLLECTION;
 var RECORDS_COLLECTION = storageModule.getDatasetRecordsCollectionName(DATASETID);
 
-var MONGODB_URL = "mongodb://127.0.0.1:27017/test";
+var MONGODB_URL = "mongodb://127.0.0.1:27017/test_storage";
 
 var datasetClient1 = {
   id: 'storageIntegrationTestId1',
@@ -152,6 +152,21 @@ module.exports = {
             callback();
           });
         },
+        async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {props: {syncCompleted: true}}, records),
+        function checkRecordsAreCreatedForDatasetClient(callback){
+          storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
+            assert.ok(!err);
+            assert.equal(datasetClient.props.syncCompleted, true);
+            assert.equal(datasetClient.records.length, 2);
+            assert.equal(datasetClient.recordUids.length, 2);
+            var record1 = _.findWhere(datasetClient.records, {uid: '1'});
+            var record2 = _.findWhere(datasetClient.records, {uid: '2'});
+            recordMatch(record1, records[0]);
+            recordMatch(record2, records[1]);
+            callback();
+          });
+        },
+        //run it again, there should be no change to the data
         async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {props: {syncCompleted: true}}, records),
         function checkRecordsAreCreatedForDatasetClient(callback){
           storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){

@@ -1,5 +1,6 @@
 var MongoClient = require('mongodb').MongoClient;
 var storageModule = require('../../lib/sync/storage');
+var async = require('async');
 
 /**
  * 
@@ -18,8 +19,8 @@ function resetDb(dburl, datasetId, cb){
       console.log('mongodb connection error', err);
       return done(err);
     }
-    async.each([DATASETCLIENTS_COLLECTION, RECORDS_COLLECTION, UPDATES_COLLECTION, datasetId], function(collection, cb){
-      mongodb.dropCollection(collection, function(err){
+    async.each([DATASETCLIENTS_COLLECTION, RECORDS_COLLECTION, UPDATES_COLLECTION, datasetId, 'fhsync_ack_queue', 'fhsync_pending_queue', 'fhsync_queue', 'fhsync_locks'], function(collection, cb){
+      db.dropCollection(collection, function(err){
         if (err && err.message === 'ns not found'){
           return cb();
         } else {

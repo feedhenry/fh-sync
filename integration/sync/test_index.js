@@ -12,7 +12,7 @@ module.exports = {
       // assume redis & mongodb on localhost with default ports
 
       // mongodb://localhost:50000,localhost:50001/myproject
-      var mongoDBUrl = 'mongodb://127.0.0.1:27017';
+      var mongoDBUrl = 'mongodb://127.0.0.1:27017/test';
 
       sync.api.connect(mongoDBUrl, null, {}, function(err, mongoDbClient, redisClient) {
         assert.ok(!err, util.inspect(err));

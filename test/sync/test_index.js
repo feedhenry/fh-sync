@@ -44,22 +44,6 @@ module.exports = {
     });
   },
 
-  'test invoke with valid fn': function(finish) {
-    // stub the syncRecords function so we can make sure its called
-    var syncRecords = sinon.stub(sync, "syncRecords");
-    syncRecords.callsArgWithAsync(2, null, {});
-    var params = {
-      fn: 'syncRecords'
-    };
-    sync.api.invoke('test_dataset_id', params, function(err, data) {
-      assert.ok(!err, err);
-      sinon.assert.calledOnce(syncRecords);
-      sinon.assert.calledWith(syncRecords, 'test_dataset_id', params);
-      syncRecords.restore();
-      return finish();
-    });
-  },
-
   'test connect arg validation' : function() {
     assert.throws(function() {
       sync.api.connect();

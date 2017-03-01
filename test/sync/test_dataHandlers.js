@@ -7,12 +7,12 @@ var queryParams = {};
 var metaData = {};
 
 var defaultHandlers = {
-  listHandler: sinon.stub().yields(),
-  createHandler: sinon.stub().yields(),
-  readHandler: sinon.stub().yields(),
-  updateHandler: sinon.stub().yields(),
-  deleteHandler: sinon.stub().yields(),
-  collisionHandler: sinon.stub().yields(),
+  doList: sinon.stub().yields(),
+  doCreate: sinon.stub().yields(),
+  doRead: sinon.stub().yields(),
+  doUpdate: sinon.stub().yields(),
+  doDelete: sinon.stub().yields(),
+  handleCollision: sinon.stub().yields(),
 }
 
 module.exports = {
@@ -103,7 +103,7 @@ module.exports = {
   'test set default listHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.doList(id, queryParams, metaData, function(err, records) {
-      assert.ok(defaultHandlers.listHandler.called);
+      assert.ok(defaultHandlers.doList.called);
       done();
     });
   },
@@ -111,7 +111,7 @@ module.exports = {
   'test set default createHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.doCreate(id, queryParams, metaData, function(err, records) {
-      assert.ok(defaultHandlers.createHandler.called);
+      assert.ok(defaultHandlers.doCreate.called);
       done();
     });
   },
@@ -119,7 +119,7 @@ module.exports = {
   'test set default readHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.doRead(id, '123', metaData, function(err, records) {
-      assert.ok(defaultHandlers.readHandler.called);
+      assert.ok(defaultHandlers.doRead.called);
       done();
     });
   },
@@ -127,7 +127,7 @@ module.exports = {
   'test set default updateHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.doUpdate(id, '123', 'pendingChange', metaData, function(err) {
-      assert.ok(defaultHandlers.updateHandler.called);
+      assert.ok(defaultHandlers.doUpdate.called);
       done();
     });
   },
@@ -135,7 +135,7 @@ module.exports = {
   'test set default deleteHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.doDelete(id, '123', metaData, function(err) {
-      assert.ok(defaultHandlers.deleteHandler.called);
+      assert.ok(defaultHandlers.doDelete.called);
       done();
     });
   },
@@ -143,7 +143,7 @@ module.exports = {
   'test set default collisionHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
     dataHandlers.handleCollision(id, metaData, [],  function(err) {
-      assert.ok(defaultHandlers.collisionHandler.called);
+      assert.ok(defaultHandlers.handleCollision.called);
       done();
     });
   }

@@ -20,6 +20,7 @@ function resetDb(dburl, datasetId, cb){
       return done(err);
     }
     async.each([DATASETCLIENTS_COLLECTION, RECORDS_COLLECTION, UPDATES_COLLECTION, datasetId, 'fhsync_ack_queue', 'fhsync_pending_queue', 'fhsync_queue', 'fhsync_locks'], function(collection, cb){
+      console.log("dropping collection: " + collection);
       db.dropCollection(collection, function(err){
         if (err && err.message === 'ns not found'){
           return cb();

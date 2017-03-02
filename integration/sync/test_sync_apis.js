@@ -77,8 +77,9 @@ module.exports = {
           sync.api.invoke(DATASETID, params, function(err, response){
             assert.ok(!err);
             assert.ok(response.hash);
-            assert.ok(response.updates.hashes.applied['a1']);
-            ack = response.updates.hashes.applied['a1'];
+            assert.ok(response.updates.hashes);
+            assert.ok(response.updates.applied['a1']);
+            ack = response.updates.applied['a1'];
             callback();
           });
         },

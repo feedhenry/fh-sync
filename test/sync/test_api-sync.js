@@ -106,8 +106,8 @@ module.exports = {
 
       assert.equal(res.hash, globalHash);
       assert.ok(res.updates.hashes);
-      assert.ok(res.updates.hashes.applied);
-      assert.ok(res.updates.hashes.applied.updatehash);
+      assert.ok(res.updates.applied);
+      assert.ok(res.updates.applied.updatehash);
       done();
     });
   }

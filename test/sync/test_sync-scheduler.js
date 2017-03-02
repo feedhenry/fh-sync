@@ -136,5 +136,21 @@ module.exports = {
     lockProvider.acquire.reset();
     lockProvider.acquire.yieldsAsync();
     testNoLock(done);
+  },
+
+  'test stop sync scheduler': function(done) {
+    lockProvider.acquire.reset();
+    lockProvider.acquire.yieldsAsync();
+    var SyncScheduler = syncSchedulerModule(lockProvider, syncStorage, metricsClient).SyncScheduler;
+    var scheduler = new SyncScheduler({}, {timeBetweenChecks: 50});
+    sinon.spy(scheduler, 'start');
+    scheduler.start();
+    setTimeout(function(){
+      scheduler.stop();
+      setTimeout(function(){
+        assert.equal(scheduler.start.callCount, 1);
+        done();
+      }, 20);
+    }, 40);
   }
 };

@@ -213,6 +213,21 @@ module.exports = {
         done();
       });
     },
+    'test update many dataset clients': function(done) {
+      async.series([
+        async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),
+        async.apply(storage.upsertDatasetClient, datasetClient2.id, datasetClient2),
+        async.apply(storage.updateManyDatasetClients, {}, {stopped: true}),
+      ], function(err){
+        assert.ok(!err);
+        storage.listDatasetClients(function(err, savedDatasetClients){
+          assert.ok(!err);
+          assert.equal(savedDatasetClients[0].stopped, true);
+          assert.equal(savedDatasetClients[1].stopped, true);
+          done();
+        });
+      });
+    },
     'test operations on the sync updates': function(done) {
       async.series([
         async.apply(storage.saveUpdate, DATASETID, ack1),

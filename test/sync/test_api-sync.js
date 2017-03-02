@@ -9,7 +9,8 @@ var interceptors = {
 
 var syncStorage = {
   upsertDatasetClient: sinon.stub(),
-  listUpdates: sinon.stub()
+  listUpdates: sinon.stub(),
+  readDatasetClient: sinon.stub()
 };
 
 var ackQueue = {
@@ -33,6 +34,7 @@ var resetStubs = function(){
   interceptors.responseInterceptor.reset();
   syncStorage.upsertDatasetClient.reset();
   syncStorage.listUpdates.reset();
+  syncStorage.readDatasetClient.reset();
   ackQueue.addMany.reset();
   ackQueue.addMany.reset();
 };
@@ -76,6 +78,7 @@ module.exports = {
 
     interceptors.requestInterceptor.yieldsAsync();
     interceptors.responseInterceptor.yieldsAsync();
+    syncStorage.readDatasetClient.yieldsAsync();
     syncStorage.upsertDatasetClient.yieldsAsync(null, {globalHash: globalHash});
     syncStorage.listUpdates.yieldsAsync(null, updates);
     ackQueue.addMany.yieldsAsync();

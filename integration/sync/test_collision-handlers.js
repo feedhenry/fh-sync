@@ -36,6 +36,9 @@ module.exports = {
         return done(err);
       });
     },
+    'after': function(done) {
+      sync.api.stopAll(done);
+    },
     'afterEach': function(done) {
       mongodb.dropCollection(DATASETID + '_collision');
       dataHandlers = dataHandlersModule({
@@ -107,33 +110,31 @@ module.exports = {
           });
         });
       });
+    },
+    'test public api list collisions': function(done) {
+      var collisionData = getCollisionData();
+      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err) {
+        assert.ok(!err);
+        sync.api.invoke(DATASETID, { fn: 'listCollisions' }, function(err, res) {
+          var collision = _.values(res)[0];
+          assert.equal(1, _.size(res));
+          assert.deepEqual(collisionData, collision);
+          done(err);
+        });
+      });     
+    },
+    'test public api remove collisions': function(done) {
+      var collisionData = getCollisionData();
+      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+        assert.ok(!err);
+        sync.api.invoke(DATASETID, { fn: 'removeCollision', hash: collisionData.hash }, function(err, res) {
+          dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
+            assert.equal(0, _.size(res));
+            assert.deepEqual({}, res);
+            done(err);
+          });
+        });
+      });
     }
-    //This is causing the build failing ATM, because we can't reset the sync loop.
-    //Will remove the comments once we have implemented stop & stopAll
-    // 'test public api list collisions': function(done) {
-    //   var collisionData = getCollisionData();
-    //   dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err) {
-    //     assert.ok(!err);
-    //     sync.api.invoke(DATASETID, { fn: 'listCollisions' }, function(err, res) {
-    //       var collision = _.values(res)[0];
-    //       assert.equal(1, _.size(res));
-    //       assert.deepEqual(collisionData, collision);
-    //       done(err);
-    //     });
-    //   });     
-    // },
-    // 'test public api remove collisions': function(done) {
-    //   var collisionData = getCollisionData();
-    //   dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
-    //     assert.ok(!err);
-    //     sync.api.invoke(DATASETID, { fn: 'removeCollision', hash: collisionData.hash }, function(err, res) {
-    //       dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
-    //         assert.equal(0, _.size(res));
-    //         assert.deepEqual({}, res);
-    //         done(err);
-    //       });
-    //     });
-    //   });
-    // }
   }
 };

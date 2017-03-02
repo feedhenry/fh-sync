@@ -5,7 +5,8 @@ var syncRecordsModule = require('../../lib/sync/api-syncRecords');
 
 var syncStorage = {
   readDatasetClientWithRecords: sinon.stub(),
-  listUpdates: sinon.stub()
+  listUpdates: sinon.stub(),
+  readDatasetClient: sinon.stub()
 };
 
 var pendingQueue = {
@@ -52,6 +53,7 @@ module.exports = {
       post: 'd4'
     }];
 
+    syncStorage.readDatasetClient.yieldsAsync(null, {});
     syncStorage.readDatasetClientWithRecords.yieldsAsync(null, datasetClientsWithRecords);
     syncStorage.listUpdates.yieldsAsync(null, appliedUpdates);
     pendingQueue.search.yieldsAsync(null, pendingChanges);

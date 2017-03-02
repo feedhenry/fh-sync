@@ -33,6 +33,9 @@ module.exports = {
         async.apply(sync.api.connect, mongoDBUrl, null, null)
       ], done);
     },
+    'after': function(done) {
+      sync.api.stopAll(done);
+    },
     'invoke sync': function(done) {
       var params = {
         fn: 'sync',

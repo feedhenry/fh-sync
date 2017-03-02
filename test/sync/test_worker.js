@@ -4,7 +4,6 @@ var Worker = require('../../lib/sync/worker');
 var metricsKeys = require('../../lib/sync/sync-metrics').KEYS;
 
 var processor = function(task, finish) {
-  console.log("processing job", task);
   task.processed = true;
   setTimeout(finish, 0);
 };
@@ -47,5 +46,22 @@ module.exports = {
       assert.equal(counters[metricsKeys.WORKER_JOB_FAILURE_COUNT], undefined);
       done();
     }, 50);
+  },
+  'test_queue_worker stop': function(done) {
+    var q = {
+      get: sinon.stub(),
+      ack: sinon.stub()
+    };
+    var task1 = {id: 1};
+    q.get.onFirstCall().yields(null, task1);
+    var worker = new Worker(q, processor, metrics, {interval: 50});
+    worker.work();
+    setTimeout(function(){
+      worker.stop();
+      setTimeout(function(){
+        assert.ok(q.get.calledOnce);
+        done();
+      }, 20);
+    }, 40)
   }
 };

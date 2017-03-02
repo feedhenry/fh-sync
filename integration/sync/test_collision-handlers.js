@@ -1,9 +1,10 @@
-var MongoClient = require('mongodb').MongoClient;
+var async = require('async');
 var assert = require('assert');
 var sinon = require('sinon');
 var _ = require('underscore');
 var defaultDataHandlersModule = require('../../lib/sync/default-dataHandlers');
 var dataHandlersModule = require('../../lib/sync/dataHandlers');
+var sync = require('../../lib/sync/');
 
 var DATASETID = "collisionHandlersTest";
 var MONGODB_URL = "mongodb://127.0.0.1:27017/test";
@@ -25,12 +26,8 @@ function getCollisionData() {
 module.exports = {
   'test collision handlers': {
     'before': function(done) {
-      MongoClient.connect(MONGODB_URL, function(err, db){
-        if (err) {
-          console.log('mongodb connection error', err);
-          return done(err);
-        }
-        mongodb = db;
+      sync.api.connect(MONGODB_URL, null, {}, function(err, mongoClient, redisClient) {
+        mongodb = mongoClient;
         mongodb.dropCollection(DATASETID + '_collision');
         defaultHandlers = defaultDataHandlersModule(mongodb);
         dataHandlers = dataHandlersModule({
@@ -53,7 +50,6 @@ module.exports = {
         dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
           var collision = _.values(res)[0];
           assert.equal(1, _.size(res));
-          assert.equal(collisionData.hash, collision.hash);
           assert.deepEqual(collisionData, collision);
           done(err);
         });
@@ -63,10 +59,9 @@ module.exports = {
       var collisionData = getCollisionData();
       dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
         dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
-          var collisionId = Object.keys(res)[0];
           var collision = _.values(res)[0];
           assert.equal(1, _.size(res));
-          dataHandlers.removeCollision(DATASETID, collisionId, {}, function(err, res) {
+          dataHandlers.removeCollision(DATASETID, collision.hash, {}, function(err, res) {
             dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
               assert.ok(!err);
               assert.equal(0, _.size(res));
@@ -100,15 +95,40 @@ module.exports = {
     'test custom remove collision': function(done) {
       var customHandler = sinon.spy(defaultHandlers, 'removeCollision');
       dataHandlers.removeCollisionHandler(DATASETID, customHandler);
-
       var collisionData = getCollisionData();
+
       dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
-        dataHandlers.removeCollision(DATASETID, res.uid, {}, function(err) {
+        dataHandlers.removeCollision(DATASETID, collisionData.hash, {}, function(err) {
           assert.ok(!err);
           dataHandlers.listCollisions(DATASETID, {}, function(err) {
             assert.ok(!err);
             assert.ok(customHandler.calledOnce);
             return done();
+          });
+        });
+      });
+    },
+    'test public api list collisions': function(done) {
+      var collisionData = getCollisionData();
+      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err) {
+        assert.ok(!err);
+        sync.api.invoke(DATASETID, { fn: 'listCollisions' }, function(err, res) {
+          var collision = _.values(res)[0];
+          assert.equal(1, _.size(res));
+          assert.deepEqual(collisionData, collision);
+          done(err);
+        });
+      });     
+    },
+    'test public api remove collisions': function(done) {
+      var collisionData = getCollisionData();
+      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+        assert.ok(!err);
+        sync.api.invoke(DATASETID, { fn: 'removeCollision', hash: collisionData.hash }, function(err, res) {
+          dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
+            assert.equal(0, _.size(res));
+            assert.deepEqual({}, res);
+            done(err);
           });
         });
       });

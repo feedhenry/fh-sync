@@ -96,7 +96,7 @@ module.exports = {
         var uid = res.uid || stubUid;
         dataHandlers.doRead(id, uid, metaData, function(err, res) {
           assert.ok(!err);
-          assert.ok(res._id);
+          assert.ok(!res._id);
           db.collection(id).drop();
           done();
         });

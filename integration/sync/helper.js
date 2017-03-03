@@ -53,7 +53,7 @@ function insertDocsToDb(dburl, collectionName, docs, cb) {
       if (err) {
         return cb(err);
       }
-      return cb();
+      return cb(null, result);
     });
   });
 }

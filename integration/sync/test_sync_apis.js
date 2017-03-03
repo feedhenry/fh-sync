@@ -12,10 +12,13 @@ var DATASETID = 'syncIntegrationTest';
 var TESTCUID = 'syncIntegrationTestCuid';
 
 var mongodb;
+var recordBUid;
+var recordCUid;
 
 module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
+      sync.api.setConfig({workerInterval: 100, schedulerInterval: 200});
       sync.api.init(DATASETID, {syncFrequency: 1}, function(){});
       sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
       sync.api.setLogLevel(syncUitl.SYNC_LOGGER, {logLevel: 'debug'});
@@ -29,7 +32,20 @@ module.exports = {
             return callback();
           });
         },
-        async.apply(helper.insertDocsToDb, mongoDBUrl, DATASETID, [{'b': '2', 'user': '1'}, {'c': '3', 'user': '1'}]),
+        function createRecords(callback) {
+          helper.insertDocsToDb(mongoDBUrl, DATASETID, [{'b': '2', 'user': '1'}, {'c': '3', 'user': '1'}], function(err, result){
+            if (err) {
+              return callback(err);
+            }
+            if (result.insertedIds) {
+              recordBUid = result.insertedIds[0].toString();
+              recordCUid = result.insertedIds[1].toString();
+              return callback();
+            } else {
+              return callback(new Error('no insertedIds found'));
+            }
+          });
+        },
         async.apply(sync.api.connect, mongoDBUrl, null, null)
       ], done);
     },
@@ -52,9 +68,29 @@ module.exports = {
             'a': '1',
             'user': '1'
           }
+        }, {
+          action: 'update',
+          hash: 'b1',
+          uid: recordBUid,
+          pre: {
+            'b': '2', 
+            'user': '1'
+          },
+          post: {
+            'b': '2b',
+            'user': '1'
+          }
+        }, {
+          action: 'delete',
+          hash: 'c1',
+          uid: recordCUid,
+          pre: {
+            'c': '3', 
+            'user': '1'
+          }
         }]
       };
-      var ack;
+      var ackA, ackB, ackC;
       async.series([
         function invokeSync(callback) {
           sync.api.invoke(DATASETID, params, function(err, response){
@@ -64,7 +100,7 @@ module.exports = {
           });
         },
         function waitForSyncLoopComplete(callback){
-          setTimeout(callback, 3000);
+          setTimeout(callback, 500);
         },
         function checkDataCreated(callback) {
           //at this point, data should be created in db
@@ -75,6 +111,24 @@ module.exports = {
             callback();
           });
         },
+        function checkDataUpdated(callback) {
+          //at this point, data should be created in db
+          var collection = mongodb.collection(DATASETID);
+          collection.findOne({'b':'2b'}, function(err, found){
+            assert.ok(!err);
+            assert.ok(found);
+            callback();
+          });
+        },
+        function checkDataDeleted(callback) {
+          //at this point, data should be created in db
+          var collection = mongodb.collection(DATASETID);
+          collection.findOne({'c':'3'}, function(err, found){
+            assert.ok(!err);
+            assert.ok(!found);
+            callback();
+          });
+        },
         function receiveAck(callback) {
           params.pending = [];
           sync.api.invoke(DATASETID, params, function(err, response){
@@ -82,12 +136,16 @@ module.exports = {
             assert.ok(response.hash);
             assert.ok(response.updates.hashes);
             assert.ok(response.updates.applied['a1']);
-            ack = response.updates.applied['a1'];
+            assert.ok(response.updates.applied['b1']);
+            assert.ok(response.updates.applied['c1']);
+            ackA = response.updates.applied['a1'];
+            ackB = response.updates.applied['b1'];
+            ackC = response.updates.applied['c1'];
             callback();
           });
         },
         function sendAck(callback) {
-          params.acknowledgements = [ack];
+          params.acknowledgements = [ackA, ackB, ackC];
           sync.api.invoke(DATASETID, params, function(err, response){
             assert.ok(!err);
             callback();
@@ -104,23 +162,39 @@ module.exports = {
             clientRecs: {}
           };
           //the hash value is wrong, so there should be an update
-          syncRecordsParams.clientRecs[ack.uid] = "wronghash";
+          syncRecordsParams.clientRecs[ackA.uid] = "wronghash";
           sync.api.invoke(DATASETID, syncRecordsParams, function(err, response){
             assert.ok(!err);
             assert.ok(response.hash);
             assert.ok(response.create);
             assert.ok(response.update);
-            assert.equal(_.size(response.create), 2);
+            assert.equal(_.size(response.create), 1);
             assert.equal(_.size(response.update), 1);
             callback();
           });
         },
         function waitForAckToBeProcessed(callback) {
-          setTimeout(callback, 1000);
+          setTimeout(callback, 500);
         },
-        function makeSureAckProcessed(callback) {
+        function makeSureAckAProcessed(callback) {
           var col = mongodb.collection(storageModule.getDatasetUpdatesCollectionName(DATASETID));
-          col.findOne({cuid: ack.cuid, hash: ack.hash}, function(err, found){
+          col.findOne({cuid: ackA.cuid, hash: ackA.hash}, function(err, found){
+            assert.ok(!err);
+            assert.ok(!found);
+            callback();
+          });
+        },
+        function makeSureAckBProcessed(callback) {
+          var col = mongodb.collection(storageModule.getDatasetUpdatesCollectionName(DATASETID));
+          col.findOne({cuid: ackB.cuid, hash: ackB.hash}, function(err, found){
+            assert.ok(!err);
+            assert.ok(!found);
+            callback();
+          });
+        },
+        function makeSureAckCProcessed(callback) {
+          var col = mongodb.collection(storageModule.getDatasetUpdatesCollectionName(DATASETID));
+          col.findOne({cuid: ackC.cuid, hash: ackC.hash}, function(err, found){
             assert.ok(!err);
             assert.ok(!found);
             callback();

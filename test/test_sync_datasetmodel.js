@@ -71,7 +71,10 @@ var tests = {
 
     var expectedHash = '1234567890';
 
-    function hasher (/* record */) {
+    function hasher (rec, uid) {
+      expect(rec).to.be.an('object');
+      expect(uid).to.be.a('string');
+
       // Obviously a terrible idea...
       return expectedHash;
     }
@@ -107,9 +110,9 @@ var tests = {
       }
     };
 
-    function hasher (record) {
+    function hasher (record, uid) {
       // Obviously a terrible idea, but proves the concept
-      return JSON.stringify(record);
+      return JSON.stringify(record) + uid;
     }
 
     mod.setGlobalHashHandler(hasher);
@@ -120,11 +123,11 @@ var tests = {
       expect(res.records).to.deep.equal({
         rec1: {
           data: records.rec1,
-          hash: hasher(records.rec1) // should match generated hash if our handler was used
+          hash: hasher(records.rec1, 'rec1') // should match generated hash if our handler was used
         },
         rec2: {
           data: records.rec2,
-          hash: hasher(records.rec2) // should match generated hash if our handler was used
+          hash: hasher(records.rec2, 'rec2') // should match generated hash if our handler was used
         }
       });
     });

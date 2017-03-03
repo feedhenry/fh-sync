@@ -67,22 +67,6 @@ module.exports = {
     });
   },
 
-  'test start arg validation': function() {
-    assert.throws(function() {
-      sync.api.start();
-    }, function(err) {
-      assert.equal(err.message, 'start requires 1 argument');
-      return true;
-    });
-  },
-
-  'test start with connect not called': function(finish) {
-    sync.api.start(function(err) {
-      assert.equal(err, 'MongoDB Client & Redis Client are not connected. Ensure connect() is called before calling start');
-      finish();
-    });
-  },
-
   'test start with connect called': function() {
     // TODO
   }

@@ -66,14 +66,14 @@ module.exports = {
       return true;
     });
   },
-  
+
   'test public APIs': function() {
     assert.equal(typeof sync.api.init, 'function');
     assert.equal(typeof sync.api.invoke, 'function');
     assert.equal(typeof sync.api.stop, 'function');
     assert.equal(typeof sync.api.stopAll, 'function');
     assert.equal(typeof sync.api.connect, 'function');
-    assert.equal(typeof sync.api.start, 'function');
+    assert.equal(typeof sync.api.setConfig, 'function');
     assert.equal(typeof sync.api.setLogLevel, 'function');
     assert.equal(typeof sync.api.toJSON, 'function');
     assert.equal(typeof sync.api.globalInterceptRequest, 'function');

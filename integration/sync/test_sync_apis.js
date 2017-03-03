@@ -18,7 +18,7 @@ var recordCUid;
 module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
-      sync.api.setConfig({workerInterval: 100, schedulerInterval: 200});
+      sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock'});
       sync.api.init(DATASETID, {syncFrequency: 1}, function(){});
       sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
       sync.api.setLogLevel(syncUitl.SYNC_LOGGER, {logLevel: 'debug'});

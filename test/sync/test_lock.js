@@ -12,7 +12,8 @@ var codeName = 'lockCode';
 var mockMongoLock = function() {
   return {
     release: sinon.stub().yields(null, true),
-    acquire: sinon.stub().yields(null, codeName)
+    acquire: sinon.stub().yields(null, codeName),
+    ensureIndexes: sinon.stub().yieldsAsync()
   }
 }
 

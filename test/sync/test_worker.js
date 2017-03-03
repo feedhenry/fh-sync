@@ -24,7 +24,8 @@ module.exports = {
   'test_queue_worker': function(done) {
     var q = {
       get: sinon.stub(),
-      ack: sinon.stub()
+      ack: sinon.stub(),
+      size: sinon.spy()
     };
     var task1 = {id: 1};
     var task2 = {id: 2};
@@ -50,7 +51,8 @@ module.exports = {
   'test_queue_worker stop': function(done) {
     var q = {
       get: sinon.stub(),
-      ack: sinon.stub()
+      ack: sinon.stub(),
+      size: sinon.spy()
     };
     var task1 = {id: 1};
     q.get.onFirstCall().yields(null, task1);

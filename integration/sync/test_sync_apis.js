@@ -19,10 +19,11 @@ module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
       sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock'});
-      sync.api.init(DATASETID, {syncFrequency: 1}, function(){});
       sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
       sync.api.setLogLevel(syncUitl.SYNC_LOGGER, {logLevel: 'debug'});
       async.series([
+        async.apply(sync.api.connect, mongoDBUrl, null, null),
+        async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),
         function resetdb(callback) {
           helper.resetDb(mongoDBUrl, DATASETID, function(err, db){
             if (err) {
@@ -151,6 +152,9 @@ module.exports = {
             callback();
           });
         },
+        function waitForAckToBeProcessed(callback) {
+          setTimeout(callback, 1100);
+        },
         function syncRecords(callback) {
           var syncRecordsParams = {
             fn: 'syncRecords',
@@ -172,9 +176,6 @@ module.exports = {
             assert.equal(_.size(response.update), 1);
             callback();
           });
-        },
-        function waitForAckToBeProcessed(callback) {
-          setTimeout(callback, 500);
         },
         function makeSureAckAProcessed(callback) {
           var col = mongodb.collection(storageModule.getDatasetUpdatesCollectionName(DATASETID));

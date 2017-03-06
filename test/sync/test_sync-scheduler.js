@@ -12,7 +12,8 @@ var lock = {
 
 var syncStorage = {
   listDatasetClients: sinon.stub(),
-  removeDatasetClients: sinon.stub()
+  removeDatasetClients: sinon.stub(),
+  updateDatasetClient: sinon.stub()
 };
 
 var metricsClient = {
@@ -64,10 +65,8 @@ module.exports = {
       config: {
         syncFrequency: 1
       },
-      props: {
-        syncLoopStart: new Date().getTime() - 2000,
-        syncLoopEnd: new Date().getTime() - 1001
-      }
+      syncLoopStart: new Date().getTime() - 2000,
+      syncLoopEnd: new Date().getTime() - 1001
     }, {
       datasetId: 'testDataset',
       queryParams: {"user": "user2"},
@@ -75,16 +74,25 @@ module.exports = {
       config: {
         clientSyncTimeout: 1
       },
-      props: {
-        syncLoopStart: new Date().getTime() - 2000,
-        syncLoopEnd: new Date().getTime() - 1001,
-        lastAccessed: new Date().getTime() - 1001
-      }
+      syncLoopStart: new Date().getTime() - 2000,
+      syncLoopEnd: new Date().getTime() - 1001,
+      lastAccessed: new Date().getTime() - 1001
+    }, {
+      datasetId: 'testDataset',
+      queryParams: {"user": "user3"},
+      metaData: {},
+      config: {
+        clientSyncTimeout: 1
+      },
+      syncLoopStart: new Date().getTime() - 2000,
+      syncLoopEnd: new Date().getTime() - 1001,
+      syncScheduled: Date.now() - 200
     }];
 
     syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
     syncQueue.addMany.yieldsAsync();
     syncStorage.removeDatasetClients.yieldsAsync();
+    syncStorage.updateDatasetClient.yieldsAsync();
 
     var scheduler = new SyncScheduler(syncQueue, {timeBetweenChecks: 2000}); //only run the sync loop once
     scheduler.start();
@@ -96,6 +104,8 @@ module.exports = {
       var datasetClientsToSync = syncQueue.addMany.args[0][0];
       assert.equal(datasetClientsToSync.length, 1);
       assert.equal(datasetClientsToSync[0].queryParams.user, "user1");
+
+      assert.ok(syncStorage.updateDatasetClient.calledOnce);
 
       assert.ok(syncStorage.removeDatasetClients.calledOnce);
       var datasetClientsToRemove = syncStorage.removeDatasetClients.args[0][0];
@@ -116,6 +126,7 @@ module.exports = {
     lockProvider.release.yieldsAsync();
     var datasetClients = [];
     syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
+    syncStorage.updateDatasetClient.yieldsAsync();
     syncQueue.addMany.yieldsAsync();
     syncStorage.removeDatasetClients.yieldsAsync();
     var scheduler = new SyncScheduler(syncQueue, {timeBetweenChecks: 100});

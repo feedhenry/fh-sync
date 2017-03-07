@@ -8,7 +8,7 @@ module.exports = {
     var metrics = {gauge: function(){}};
     var MongodbQueue = require('../../lib/sync/mongodbQueue');
     var queue = new MongodbQueue('test', metrics, {mongodb: {}});
-    ['create', 'add', 'get', 'ack', 'ping', 'total', 'size', 'inFlight', 'done', 'clean'].forEach(function(method){
+    ['create', 'add', 'get', 'ack', 'ping', 'total', 'size', 'inFlight', 'done', 'clean', 'prune', 'startPruneJob'].forEach(function(method){
       assert.equal(typeof queue[method], 'function');
     });
     done();

@@ -22,6 +22,7 @@
     "mongodb-queue": "2.2.0",
     "mongodb-uri": "0.9.7",
     "optval": "1.0.1",
+    "parse-duration": "0.1.1",
     "pkginfo": "0.2.3",
     "redis": "^2.6.5",
     "request": "2.74.0",

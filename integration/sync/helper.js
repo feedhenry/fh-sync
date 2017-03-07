@@ -17,11 +17,11 @@ function resetDb(dburl, datasetId, cb){
   MongoClient.connect(dburl, function(err, db){
     if (err) {
       console.log('mongodb connection error', err);
-      return done(err);
+      return cb(err);
     }
     async.each([DATASETCLIENTS_COLLECTION, RECORDS_COLLECTION, UPDATES_COLLECTION, datasetId, 'fhsync_ack_queue', 'fhsync_pending_queue', 'fhsync_queue', 'fhsync_locks'], function(collection, cb){
       db.dropCollection(collection, function(err){
-        if (err && err.message === 'ns not found'){
+        if (!err ||  (err && err.message === 'ns not found')){
           return cb();
         } else {
           return cb(err);
@@ -32,6 +32,21 @@ function resetDb(dburl, datasetId, cb){
         console.log('failed to drop collection', err);
       }
       cb(err, db);
+    });
+  });
+}
+
+function dropCollection(dbUrl, collectionName, cb) {
+  MongoClient.connect(dbUrl, function(err, db){
+    if (err) {
+      return cb(err);
+    }
+    db.dropCollection(collectionName, function(err) {
+      if (!err || (err && err.message === 'ns not found')){
+        return cb(null, db);
+      } else {
+        return cb(err);
+      }
     });
   });
 }
@@ -60,5 +75,6 @@ function insertDocsToDb(dburl, collectionName, docs, cb) {
 
 module.exports = {
   resetDb: resetDb,
-  insertDocsToDb: insertDocsToDb
+  insertDocsToDb: insertDocsToDb,
+  dropCollection: dropCollection
 };

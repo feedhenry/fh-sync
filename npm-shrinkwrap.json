@@ -1240,9 +1240,9 @@
       }
     },
     "mongodb-lock": {
-      "version": "0.3.0",
-      "from": "git://github.com/aidenkeating/mongodb-lock.git#mongodb-2.x-client-support",
-      "resolved": "git://github.com/aidenkeating/mongodb-lock.git#b651361295dad56fb90837dd4ae334b7302c5b63"
+      "version": "0.4.0",
+      "from": "git://github.com/aidenkeating/mongodb-lock.git#add_remove_expired_option",
+      "resolved": "git://github.com/aidenkeating/mongodb-lock.git#77c47d316fa2c9b28a357534a9a2c752f4628794"
     },
     "mongodb-queue": {
       "version": "2.2.0",

@@ -18,7 +18,7 @@
     "memcached": "^2.0.0",
     "moment": "2.15.2",
     "mongodb": "2.1.18",
-    "mongodb-lock": "git://github.com/aidenkeating/mongodb-lock.git#add_remove_expired_option",
+    "mongodb-lock": "0.4.0",
     "mongodb-queue": "2.2.0",
     "mongodb-uri": "0.9.7",
     "optval": "1.0.1",

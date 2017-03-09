@@ -12,7 +12,6 @@ var lock = {
 
 var syncStorage = {
   listDatasetClients: sinon.stub(),
-  removeDatasetClients: sinon.stub(),
   updateDatasetClient: sinon.stub()
 };
 
@@ -91,7 +90,6 @@ module.exports = {
 
     syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
     syncQueue.addMany.yieldsAsync();
-    syncStorage.removeDatasetClients.yieldsAsync();
     syncStorage.updateDatasetClient.yieldsAsync();
 
     var scheduler = new SyncScheduler(syncQueue, {timeBetweenChecks: 2000}); //only run the sync loop once
@@ -106,11 +104,6 @@ module.exports = {
       assert.equal(datasetClientsToSync[0].queryParams.user, "user1");
 
       assert.ok(syncStorage.updateDatasetClient.calledOnce);
-
-      assert.ok(syncStorage.removeDatasetClients.calledOnce);
-      var datasetClientsToRemove = syncStorage.removeDatasetClients.args[0][0];
-      assert.equal(datasetClientsToRemove.length, 1);
-      assert.equal(datasetClientsToRemove[0].queryParams.user, "user2");
 
       done();
     }, 1500);
@@ -128,7 +121,6 @@ module.exports = {
     syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
     syncStorage.updateDatasetClient.yieldsAsync();
     syncQueue.addMany.yieldsAsync();
-    syncStorage.removeDatasetClients.yieldsAsync();
     var scheduler = new SyncScheduler(syncQueue, {timeBetweenChecks: 100});
     scheduler.start();
     setTimeout(function(){

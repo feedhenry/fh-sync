@@ -80,5 +80,28 @@ module.exports = {
       assert.equal(_.keys(response.delete)[0], '3');
       done();
     });
+  },
+
+  'test when sync loop not completed': function(done) {
+    var datasetClientsWithRecords = {
+      syncCompleted: false
+    };
+
+    var clientRecords = {};
+
+    var syncRecords = syncRecordsModule(syncStorage, pendingQueue);
+    var params = {
+      clientRecs: clientRecords,
+      _fh: {
+        cuid: 'testcuid'
+      }
+    };
+
+    syncStorage.readDatasetClient.yieldsAsync(null, {});
+    syncStorage.readDatasetClientWithRecords.yieldsAsync(null, datasetClientsWithRecords);
+    syncRecords('testSyncRecordsDataset', params, function(err, response){
+      assert.ok(!err);
+      done();
+    });
   }
 };

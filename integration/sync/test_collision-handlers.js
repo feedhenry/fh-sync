@@ -40,11 +40,12 @@ module.exports = {
       sync.api.stopAll(done);
     },
     'afterEach': function(done) {
-      mongodb.dropCollection(DATASETID + '_collision');
       dataHandlers = dataHandlersModule({
         defaultHandlers: defaultDataHandlersModule(mongodb)
       });
-      return done();
+      mongodb.dropCollection(DATASETID + '_collision', function(){
+        return done();
+      });
     },
     'test default create and list collisions': function(done) {
       var collisionData = getCollisionData();

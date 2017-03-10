@@ -3,7 +3,7 @@ var assert = require('assert');
 var util = require('util');
 var async = require('async');
 var helper = require('./helper');
-var syncUitl = require('../../lib/sync/util');
+var syncUtil = require('../../lib/sync/util');
 var storageModule = require('../../lib/sync/storage');
 var _ = require('underscore');
 
@@ -20,7 +20,7 @@ module.exports = {
     'before': function(done) {
       sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock'});
       sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
-      sync.api.setLogLevel(syncUitl.SYNC_LOGGER, {logLevel: 'debug'});
+      sync.api.setLogLevel(syncUtil.SYNC_LOGGER, {logLevel: 'debug'});
       async.series([
         async.apply(sync.api.connect, mongoDBUrl, null, null),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),
@@ -74,7 +74,7 @@ module.exports = {
           hash: 'b1',
           uid: recordBUid,
           pre: {
-            'b': '2', 
+            'b': '2',
             'user': '1'
           },
           post: {
@@ -86,7 +86,7 @@ module.exports = {
           hash: 'c1',
           uid: recordCUid,
           pre: {
-            'c': '3', 
+            'c': '3',
             'user': '1'
           }
         }]

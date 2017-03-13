@@ -109,6 +109,19 @@ module.exports = {
         });
       });
     },
+    'test dataset client update when null': function(done) {
+      var datasetClientUpdateFields = {
+        props: {syncRunning: true},
+        metaData: {token: 'testToken'}
+      };
+      async.series([
+        async.apply(storage.updateDatasetClient, 'invalid_id', datasetClientUpdateFields),
+      ], function(err){
+        assert.ok(err);
+        assert.equal(err.message, 'DatasetClient not found for id invalid_id');
+        done();
+      });
+    },
     'test dataset client remove': function(done) {
       async.series([
         async.apply(storage.upsertDatasetClient, datasetClient1.id, datasetClient1),

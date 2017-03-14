@@ -1,5 +1,6 @@
 var assert = require('assert');
 var sinon = require('sinon');
+var _ = require('underscore');
 var apiSyncModule = require('../../lib/sync/api-sync');
 
 var interceptors = {
@@ -72,6 +73,11 @@ module.exports = {
       'hash': 'updatehash',
       'action': 'update',
       'uid': 'updateuid'
+    }, {
+      'type': 'applied',
+      'hash': 'ackhash',
+      'uid': 'ackuid',
+      'action': 'create'
     }];
 
     var globalHash = "globalHash";
@@ -110,6 +116,7 @@ module.exports = {
       assert.equal(res.hash, globalHash);
       assert.ok(res.updates.hashes);
       assert.ok(res.updates.applied);
+      assert.equal(_.size(res.updates.applied), 1);
       assert.ok(res.updates.applied.updatehash);
       done();
     });

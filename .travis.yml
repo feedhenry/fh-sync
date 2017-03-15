@@ -1,8 +1,4 @@
 language: node_js
-services: mongodb
-node_js:
-  - "0.10"
-  - "4.4.3"
 sudo: required
 services:
  - docker
@@ -15,14 +11,13 @@ before_install:
 install: npm install
 matrix:
   # The acceptance tests only work with node 4 or higher.
-  exclude:
-  # Remove the original job for node 4.4.3, without the acceptance tests.
-  - node_js: "4.4.3"
   include:
-  # Include an updated job, with the acceptance tests. This way we're not
-  # running the 4.4.3 build twice with one build including acceptance tests.
+  - node_js: "0.10"
+    script: npm test
+  # Include sync acceptance tests for node 4
   - node_js: "4.4.3"
     script:
+      - npm test
       - npm link
       - git clone https://github.com/feedhenry/sync-acceptance-testing.git
       - cd sync-acceptance-testing

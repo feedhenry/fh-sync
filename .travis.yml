@@ -1,7 +1,10 @@
 language: node_js
 sudo: required
+node_js:
+  - "0.10"
+  - "4.4.3"
 services:
- - docker
+  - docker
 before_install:
   - sudo apt-get update
   - sudo apt-get install --assume-yes apache2-utils
@@ -9,15 +12,15 @@ before_install:
   - npm install -g grunt-cli
   - npm config set strict-ssl false
 install: npm install
+script:
+  - npm test
 matrix:
-  # The acceptance tests only work with node 4 or higher.
   include:
-  - node_js: "0.10"
-    script: npm test
   # Include sync acceptance tests for node 4
   - node_js: "4.4.3"
+    services:
+    - docker
     script:
-      - npm test
       - npm link
       - git clone https://github.com/feedhenry/sync-acceptance-testing.git
       - cd sync-acceptance-testing

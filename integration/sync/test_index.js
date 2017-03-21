@@ -16,9 +16,14 @@ module.exports = {
       sync.api.stopAll(done);
     },
     'should connect ok': function(finish) {
+      var readyEmitted = false;
+      sync.api.getEventEmitter().on('sync:ready', function onSyncReady() {
+        readyEmitted = true;
+      });
       // assume redis & mongodb on localhost with default ports
       sync.api.connect(mongoDBUrl, null, {}, function(err, mongoDbClient, redisClient) {
         assert.ok(!err, util.inspect(err));
+        assert.ok(readyEmitted, 'Expected sync:ready event to be emitted');
         var mClient = mongoDbClient;
         var rClient = redisClient;
         assert.ok(mongoDbClient);

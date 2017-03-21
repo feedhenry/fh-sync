@@ -23,7 +23,8 @@ module.exports = {
     var syncMock = {
       api: {
         connect: sinon.stub().yieldsAsync(),
-        stopAll: sinon.stub().yieldsAsync()
+        stopAll: sinon.stub().yieldsAsync(),
+        setEventEmitter: sinon.stub()
       }
     };
 
@@ -59,7 +60,7 @@ module.exports = {
       // - for sync connection
       // - when calling fh.db
       // - in fh.bootstrap
-      sinon.assert.calledThrice(databaseConnectionStringStub);
+      sinon.assert.calledTwice(databaseConnectionStringStub);
       finish();
     });
   },
@@ -75,7 +76,8 @@ module.exports = {
     var syncMock = {
       api: {
         connect: sinon.stub().yieldsAsync(),
-        stopAll: sinon.stub().yieldsAsync()
+        stopAll: sinon.stub().yieldsAsync(),
+        setEventEmitter: sinon.stub()
       }
     };
 

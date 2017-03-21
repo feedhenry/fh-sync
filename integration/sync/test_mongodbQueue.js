@@ -1,5 +1,5 @@
 var MongodbQueue = require('../../lib/sync/mongodbQueue');
-var metrics = require('../../lib/sync/sync-metrics').init();
+var metrics = require('../../lib/sync/sync-metrics').init({}, null);
 var async = require('async');
 var assert = require('assert');
 var helper = require('./helper');

@@ -21,7 +21,7 @@ module.exports = {
         readyEmitted = true;
       });
       // assume redis & mongodb on localhost with default ports
-      sync.api.connect(mongoDBUrl, null, {}, function(err, mongoDbClient, redisClient) {
+      sync.api.connect(mongoDBUrl, {}, null, function(err, mongoDbClient, redisClient) {
         assert.ok(!err, util.inspect(err));
         assert.ok(readyEmitted, 'Expected sync:ready event to be emitted');
         var mClient = mongoDbClient;
@@ -65,7 +65,7 @@ module.exports = {
         }]
       };
       async.series([
-        async.apply(sync.api.connect, mongoDBUrl, null, {}),
+        async.apply(sync.api.connect, mongoDBUrl, {}, null),
         async.apply(sync.api.init, DATASETID, {}),
         async.apply(sync.api.invoke, DATASETID, params),
         async.apply(sync.api.stop, DATASETID),

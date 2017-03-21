@@ -26,7 +26,7 @@ function getCollisionData() {
 module.exports = {
   'test collision handlers': {
     'before': function(done) {
-      sync.api.connect(MONGODB_URL, null, {}, function(err, mongoClient, redisClient) {
+      sync.api.connect(MONGODB_URL, {}, null, function(err, mongoClient, redisClient) {
         mongodb = mongoClient;
         mongodb.dropCollection(DATASETID + '_collision');
         defaultHandlers = defaultDataHandlersModule(mongodb);

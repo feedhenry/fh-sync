@@ -1,4 +1,4 @@
-#Overview
+# Overview
 
 [![npm package](https://nodei.co/npm/fh-mbaas-api.png?downloads=true&downloadRank=true&stars=true)](https://nodei.co/npm/fh-mbaas-api/)
 
@@ -18,7 +18,7 @@ fh-mbaas-api provides FeedHenry MBaaS APIs to Node.js cloud apps.
 | Mailing list:   | [feedhenry-dev](https://www.redhat.com/archives/feedhenry-dev/) ([subscribe](https://www.redhat.com/mailman/listinfo/feedhenry-dev))  |
 | IRC:            | [#feedhenry](https://webchat.freenode.net/?channels=feedhenry) channel in the [freenode](http://freenode.net/) network.  |
 
-#Usage
+# Usage
 fh-mbaas-api is included as standard with your cloud app code.
 
 For custom apps, add the module via npm by running the following for the root of your app
@@ -29,10 +29,10 @@ npm install --save fh-mbaas-api
 
 This will install the latest version of fh-mbaas-api and save the installed version in your package.json
 
-#Documentation
+# Documentation
 Documentation for the $fh cloud API is maintained at the [FeedHenry API Docs.](http://docs.feedhenry.com/v3/api/cloud_api.html)
 
-#Deprecated
+# Deprecated
 Legacy Rhino functions have been deprecated. These are listed below - with their replacements **in bold**. All replacements listed but '$fh.web' have drop-in replacements available.  
 
 * $fh.web -> **[request](https://github.com/mikeal/request)**

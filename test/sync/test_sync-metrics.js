@@ -8,7 +8,7 @@ var tagValues = ['tag1', 'tag2', 'tag3'];
 function generateValueData(size, tagName) {
   var dataArr = [];
   for (var i =0; i <= size -1; i++) {
-    var data = {fields: {value: Math.floor(Math.random() * 1e5)}, ts: Date.now() - Math.floor(Math.random() * 1e5)};
+    var data = {fields: {value: Math.floor(Math.random() * 1e5)}, ts: Date.now()};
     data.tags = {};
     data.tags[tagName] = tagValues[i%tagValues.length];
     dataArr.push(JSON.stringify(data));

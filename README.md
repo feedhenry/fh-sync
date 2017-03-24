@@ -71,11 +71,12 @@ For example:
   * `sync_frequency` on the client-side dataset is also set to 120 seconds.
   * `syncFrequency` on the server-side dataset is set to 120 seconds.
 
-## Sync API logging
+## API logging
 
-The Sync API logs messages at debug level, except in error scenarios
- where additional context is available that can't easily be passed to
- the calling code.  This idea comes from the
- [level suggestions for libraries in the Bunyan project](https://github.com/trentm/node-bunyan#level-suggestions).
- Users of the Sync API can then enable debug-level logging if they
- would like to see more output.
+Users of the fh-mbaas-api can then enable logging if they would like to see more output. This is useful for debugging purposes.
+It's possible to pass environment variables to enable the logging according the rules specified for [debug](https://www.npmjs.com/package/debug) module:
+  
+```
+DEBUG="fh-mbaas-api:*" ./yourscript 
+```
+If `DEBUG_COLORS=0` is passed also it will print log messages with proper timestamps. This is automatically enabled outside properly supported terminal.

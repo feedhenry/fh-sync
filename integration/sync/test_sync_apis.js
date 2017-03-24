@@ -8,6 +8,7 @@ var storageModule = require('../../lib/sync/storage');
 var _ = require('underscore');
 
 var mongoDBUrl = 'mongodb://127.0.0.1:27017/test_sync_api';
+var redisUrl = 'redis://127.0.0.1:6379';
 var DATASETID = 'syncIntegrationTest';
 var TESTCUID = 'syncIntegrationTestCuid';
 
@@ -18,9 +19,9 @@ var recordCUid;
 module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
-      sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock'});
+      sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock', useCache: true});
       async.series([
-        async.apply(sync.api.connect, mongoDBUrl, null, null),
+        async.apply(sync.api.connect, mongoDBUrl, null, redisUrl),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),
         function resetdb(callback) {
           helper.resetDb(mongoDBUrl, DATASETID, function(err, db){

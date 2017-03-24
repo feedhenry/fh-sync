@@ -1,4 +1,5 @@
 var storageModule = require('../../lib/sync/storage');
+var cacheClientModule = require('../../lib/sync/sync-cache');
 var MongoClient = require('mongodb').MongoClient;
 var async = require('async');
 var assert = require('assert');
@@ -64,12 +65,13 @@ function recordMatch(expect, actual) {
 module.exports = {
   'test storage functions': {
     'before': function(done) {
+      var cacheClient = cacheClientModule();
       helper.resetDb(MONGODB_URL, DATASETID, function(err, db){
         if (err) {
           return done(err);
         }
         mongodb = db;
-        storage = storageModule(mongodb);
+        storage = storageModule(mongodb, cacheClient);
         done();
       });
     },

@@ -5,6 +5,7 @@ var util = require('util');
 var async = require('async');
 
 var mongoDBUrl = 'mongodb://127.0.0.1:27017/test_index';
+var redisUrl = 'redis://127.0.0.1:6379';
 var DATASETID = 'testSyncInitStop';
 
 module.exports = {
@@ -21,12 +22,13 @@ module.exports = {
         readyEmitted = true;
       });
       // assume redis & mongodb on localhost with default ports
-      sync.api.connect(mongoDBUrl, {}, null, function(err, mongoDbClient, redisClient) {
+      sync.api.connect(mongoDBUrl, {}, redisUrl, function(err, mongoDbClient, redisClient) {
         assert.ok(!err, util.inspect(err));
         assert.ok(readyEmitted, 'Expected sync:ready event to be emitted');
         var mClient = mongoDbClient;
         var rClient = redisClient;
         assert.ok(mongoDbClient);
+        assert.ok(rClient);
 
         async.series([function testMongoDBConnection(cb) {
           var testValue = 'test value ' + Date.now();

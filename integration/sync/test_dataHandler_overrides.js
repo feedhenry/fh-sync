@@ -12,7 +12,7 @@ var TESTCUID = 'syncDataHandlerOverridesTestCuid';
 module.exports = {
   'test dataHandler overrides': {
     'beforeEach': function(done) {
-      sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:datahandler:lock'});
+      sync.api.setConfig({pendingWorkerInterval: 100, ackWorkerInterval: 100, syncWorkerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:datahandler:lock'});
       async.series([
         async.apply(helper.resetDb, MONGODB_URL, DATASETID),
         async.apply(sync.api.connect, MONGODB_URL, null, null)

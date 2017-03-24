@@ -1,5 +1,5 @@
 var assert = require('assert');
-var sync = require('../../lib/sync/index.js')
+var sync = require('../../lib/sync/index.js');
 var sinon = require('sinon');
 
 module.exports = {
@@ -74,7 +74,6 @@ module.exports = {
     assert.equal(typeof sync.api.stopAll, 'function');
     assert.equal(typeof sync.api.connect, 'function');
     assert.equal(typeof sync.api.setConfig, 'function');
-    assert.equal(typeof sync.api.setLogLevel, 'function');
     assert.equal(typeof sync.api.toJSON, 'function');
     assert.equal(typeof sync.api.globalInterceptRequest, 'function');
     assert.equal(typeof sync.api.globalInterceptResponse, 'function');

@@ -29,7 +29,6 @@ module.exports = function(grunt) {
     './test/test_redis.js',
     './test/test_fhauth.js',
     './test/test_init.js',
-    './test/test_log.js',
     './test/test_fhpush.js',
     './test/sync/test_mongodbQueue.js',
     './test/sync/test_index.js',

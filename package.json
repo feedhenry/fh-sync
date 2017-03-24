@@ -7,6 +7,7 @@
     "async": "2.1.5",
     "colors": "0.6.2",
     "cycle": "1.0.3",
+    "debug": "2.6.3",
     "eyes": "0.1.8",
     "fh-db": "1.4.4",
     "fh-component-metrics": "2.6.0",

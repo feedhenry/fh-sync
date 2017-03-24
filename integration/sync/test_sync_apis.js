@@ -19,8 +19,6 @@ module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
       sync.api.setConfig({workerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock'});
-      sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
-      sync.api.setLogLevel(syncUtil.SYNC_LOGGER, {logLevel: 'debug'});
       async.series([
         async.apply(sync.api.connect, mongoDBUrl, null, null),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),

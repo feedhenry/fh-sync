@@ -1,4 +1,3 @@
-
 // Copyright (c) FeedHenry 2011
 var util = require('util'),
 ditchMock = require('./fixtures/db'),

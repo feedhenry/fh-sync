@@ -23,7 +23,6 @@ module.exports = {
     stubs[STUB_NAMES.DB] = sinon.stub().returns(db);
     stubs[STUB_NAMES.SYNC_UTIL] = {
       ensureHandlerIsFunction: sinon.stub(),
-      doLog: sinon.stub(),
       setLogger: sinon.spy()
     };
     stubs[STUB_NAMES.DATA_MODEL] = {

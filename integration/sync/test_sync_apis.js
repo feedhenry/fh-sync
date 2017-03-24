@@ -20,8 +20,6 @@ module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
       sync.api.setConfig({syncWorkerInterval: 100, pendingWorkerInterval: 100, ackWorkerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock', useCache: true});
-      sync.api.setLogLevel(DATASETID, {logLevel: 'debug'});
-      sync.api.setLogLevel(syncUtil.SYNC_LOGGER, {logLevel: 'debug'});
       async.series([
         async.apply(sync.api.connect, mongoDBUrl, null, redisUrl),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),

@@ -18,7 +18,7 @@ function getCollisionData() {
     pre: { test: 'test1' },
     post: { test: 'test2' },
     hash: 'testhash',
-    ts: Date.now(),
+    timestamp: Date.now(),
     uid: 'testUid'
   };
 }
@@ -49,7 +49,7 @@ module.exports = {
     },
     'test default create and list collisions': function(done) {
       var collisionData = getCollisionData();
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         assert.ok(!err);
         dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
           var collision = _.values(res)[0];
@@ -61,7 +61,7 @@ module.exports = {
     },
     'test default removing collisions': function(done) {
       var collisionData = getCollisionData();
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         dataHandlers.listCollisions(DATASETID, {}, function(err, res) {
           var collision = _.values(res)[0];
           assert.equal(1, _.size(res));
@@ -81,7 +81,7 @@ module.exports = {
       dataHandlers.collisionHandler(DATASETID, customHandler);
 
       var collisionData = getCollisionData();
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         assert.ok(!err);
         assert.ok(customHandler.calledOnce);
         return done();
@@ -101,7 +101,7 @@ module.exports = {
       dataHandlers.removeCollisionHandler(DATASETID, customHandler);
       var collisionData = getCollisionData();
 
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         dataHandlers.removeCollision(DATASETID, collisionData.hash, {}, function(err) {
           assert.ok(!err);
           dataHandlers.listCollisions(DATASETID, {}, function(err) {
@@ -114,7 +114,7 @@ module.exports = {
     },
     'test public api list collisions': function(done) {
       var collisionData = getCollisionData();
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         assert.ok(!err);
         sync.api.invoke(DATASETID, { fn: 'listCollisions' }, function(err, res) {
           var collision = _.values(res)[0];
@@ -126,7 +126,7 @@ module.exports = {
     },
     'test public api remove collisions': function(done) {
       var collisionData = getCollisionData();
-      dataHandlers.handleCollision(DATASETID, {}, collisionData, function(err, res) {
+      dataHandlers.handleCollision(DATASETID, collisionData.hash, collisionData.timestamp, collisionData.uid, collisionData.pre, collisionData.post, {}, function(err, res) {
         assert.ok(!err);
         sync.api.invoke(DATASETID, { fn: 'removeCollision', hash: collisionData.hash }, function(err, res) {
           dataHandlers.listCollisions(DATASETID, {}, function(err, res) {

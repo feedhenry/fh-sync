@@ -141,11 +141,13 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
+      var timestamp = Date.now();
+      dataHandlers.handleCollision(id, null, timestamp, null, {}, {}, metaData, function(err, res) {
         var uid = res.uid || stubUid;
         assert.ok(!err);
         assert.ok(res.uid);
-        assert.equal(res.data.name, 'Fletch');
+        assert.ok(res.data);
+        assert.equal(res.data.timestamp, timestamp);
         db.collection(id + '_collision').drop();
         done();
       });
@@ -157,14 +159,15 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
+      var timestamp = Date.now();
+      dataHandlers.handleCollision(id, null, timestamp, null, {}, {}, metaData, function(err, res) {
         var uid = res.uid || stubUid;
         assert.ok(!err);
         resetStubUid();
         dataHandlers.listCollisions(id, metaData, function(err, res) {
           assert.ok(res);
           assert.ok(res[uid]);
-          assert.equal(res[uid].name, 'Fletch');
+          assert.equal(res[uid].timestamp, timestamp);
           db.collection(id + '_collision').drop();
           done();
         });
@@ -177,7 +180,7 @@ module.exports = {
     MongoClient.connect(url, function(err, db) {
       db = err ? dbStub : db;
       var dataHandlers = defaultDataHandlersModule(db);
-      dataHandlers.handleCollision(id, metaData, {'name': 'Fletch'}, function(err, res) {
+      dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
         assert.ok(!err);
         var uid = res.insertedId;
         dataHandlers.removeCollision(id, uid, metaData, function(err, res) {

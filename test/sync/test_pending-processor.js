@@ -184,8 +184,7 @@ module.exports = {
       assert.ok(dataHandler.doRead.calledOnce);
       assert.ok(dataHandler.doUpdate.notCalled);
       assert.ok(dataHandler.handleCollision.calledOnce);
-      var expectedCollision = {uid: pending.payload.uid, hash: '2', pre: pending.payload.pre, post: pending.payload.post, timestamp: pending.payload.timestamp};
-      assert.ok(dataHandler.handleCollision.calledWith(DATASETID, pending.payload.meta_data, sinon.match(expectedCollision)));
+      sinon.assert.calledWith(dataHandler.handleCollision, DATASETID, '2', pending.payload.timestamp, pending.payload.uid, pending.payload.pre, pending.payload.post, pending.payload.meta_data);
       assert.ok(syncStorage.saveUpdate.calledOnce);
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.COLLISION})));
       assert.ok(metricsClient.gauge.calledOnce);
@@ -258,7 +257,8 @@ module.exports = {
         cuid: 'testCuid',
         hash: 'testDeleteSuccess',
         uid: 'deleteuid',
-        pre: {'a': '0'}
+        pre: {'a': '0'},
+        timestamp: Date.now()
       }
     };
     dataHandler.doRead.yieldsAsync(null, {'a': '2'});
@@ -270,8 +270,7 @@ module.exports = {
       assert.ok(dataHandler.doRead.calledOnce);
       assert.ok(dataHandler.doDelete.notCalled);
       assert.ok(dataHandler.handleCollision.calledOnce);
-      var expectedCollision = {uid: pending.payload.uid, hash: '2', pre: pending.payload.pre};
-      assert.ok(dataHandler.handleCollision.calledWith(DATASETID, pending.payload.meta_data, sinon.match(expectedCollision)));
+      sinon.assert.calledWith(dataHandler.handleCollision, DATASETID, '2', pending.payload.timestamp, pending.payload.uid, pending.payload.pre, pending.payload.post, pending.payload.meta_data);
       assert.ok(syncStorage.saveUpdate.calledWith(DATASETID, sinon.match({type: pendingProcessor.SYNC_UPDATE_TYPES.COLLISION})));
       assert.ok(metricsClient.gauge.calledOnce);
       done();

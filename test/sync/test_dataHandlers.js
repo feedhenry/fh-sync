@@ -90,11 +90,10 @@ module.exports = {
 
   'test set custom collisionHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
-    dataHandlers.collisionHandler(id, function (datasetId, metadata, collisionFields, cb) {
+    dataHandlers.collisionHandler(id, function(dataset_id, hash, timestamp, uid, pre, post, meta_data, cb) {
       cb(null);
     });
-
-    dataHandlers.handleCollision(id, metaData, [], function(err) {
+    dataHandlers.handleCollision(id, '', Date.now(), '', {}, {}, metaData, function(err) {
       assert.ok(!err);
       done();
     });
@@ -142,7 +141,7 @@ module.exports = {
 
   'test set default collisionHandler': function(done) {
     var dataHandlers = dataHandlersModule({defaultHandlers: defaultHandlers});
-    dataHandlers.handleCollision(id, metaData, [],  function(err) {
+    dataHandlers.handleCollision(id, '', Date.now(), '', {}, {}, metaData, function(err) {
       assert.ok(defaultHandlers.handleCollision.called);
       done();
     });

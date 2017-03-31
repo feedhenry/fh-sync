@@ -42,7 +42,7 @@ module.exports = {
       }
     };
 
-    syncStorage.updateDatasetClient.yieldsAsync();
+    syncStorage.updateDatasetClient.yieldsAsync(null, { collisionCount: 0 });
     dataHandler.doList.yieldsAsync(null, records);
     syncStorage.updateDatasetClientWithRecords.yieldsAsync();
 
@@ -52,7 +52,7 @@ module.exports = {
       assert.ok(dataHandler.doList.calledWith(job.payload.datasetId, {}, {}));
       assert.ok(syncStorage.updateDatasetClient.calledTwice);
       assert.ok(syncStorage.updateDatasetClientWithRecords.calledOnce);
-      assert.ok(syncStorage.updateDatasetClientWithRecords.calledWith(job.payload.id, {globalHash: "abc"}));
+      assert.ok(syncStorage.updateDatasetClientWithRecords.calledWith(job.payload.id, {globalHash: "abc0"}));
       assert.ok(metricsClient.gauge.calledOnce);
       done();
     });

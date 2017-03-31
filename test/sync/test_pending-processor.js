@@ -3,7 +3,8 @@ var sinon = require('sinon');
 var pendingProcessor = require('../../lib/sync/pending-processor');
 
 var syncStorage = {
-  saveUpdate: sinon.stub()
+  saveUpdate: sinon.stub(),
+  updateDatasetClient: sinon.stub()
 };
 
 var dataHandler = {
@@ -172,12 +173,16 @@ module.exports = {
         uid: 'updateuid',
         pre: {'a': '0'},
         post: {'a': '1'},
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        datasetClient: {
+          collisionCount: 0
+        }
       }
     };
     dataHandler.doRead.yieldsAsync(null, {'a': '2'});
     dataHandler.doUpdate.yieldsAsync();
     syncStorage.saveUpdate.yieldsAsync();
+    syncStorage.updateDatasetClient.yieldsAsync();
     dataHandler.handleCollision.yieldsAsync();
     pendingProcessorImpl(pending, function(err){
       assert.ok(!err);
@@ -258,13 +263,17 @@ module.exports = {
         hash: 'testDeleteSuccess',
         uid: 'deleteuid',
         pre: {'a': '0'},
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        datasetClient: {
+          collisionCount: 0
+        }
       }
     };
     dataHandler.doRead.yieldsAsync(null, {'a': '2'});
     dataHandler.doDelete.yieldsAsync();
     dataHandler.handleCollision.yieldsAsync();
     syncStorage.saveUpdate.yieldsAsync();
+    syncStorage.updateDatasetClient.yieldsAsync();
     pendingProcessorImpl(pending, function(err){
       assert.ok(!err);
       assert.ok(dataHandler.doRead.calledOnce);

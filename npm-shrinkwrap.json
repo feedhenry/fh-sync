@@ -14,6 +14,18 @@
         }
       }
     },
+    "backoff": {
+      "version": "2.5.0",
+      "from": "backoff@>=2.5.0 <3.0.0",
+      "resolved": "https://registry.npmjs.org/backoff/-/backoff-2.5.0.tgz",
+      "dependencies": {
+        "precond": {
+          "version": "0.2.3",
+          "from": "precond@>=0.2.0 <0.3.0",
+          "resolved": "https://registry.npmjs.org/precond/-/precond-0.2.3.tgz"
+        }
+      }
+    },
     "colors": {
       "version": "0.6.2",
       "from": "colors@0.6.2",
@@ -2030,6 +2042,31 @@
                   "version": "0.1.6",
                   "from": "getpass@>=0.1.1 <0.2.0",
                   "resolved": "https://registry.npmjs.org/getpass/-/getpass-0.1.6.tgz"
+                },
+                "jsbn": {
+                  "version": "0.1.1",
+                  "from": "jsbn@>=0.1.0 <0.2.0",
+                  "resolved": "https://registry.npmjs.org/jsbn/-/jsbn-0.1.1.tgz"
+                },
+                "tweetnacl": {
+                  "version": "0.14.5",
+                  "from": "tweetnacl@>=0.14.0 <0.15.0",
+                  "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz"
+                },
+                "jodid25519": {
+                  "version": "1.0.2",
+                  "from": "jodid25519@>=1.0.0 <2.0.0",
+                  "resolved": "https://registry.npmjs.org/jodid25519/-/jodid25519-1.0.2.tgz"
+                },
+                "ecc-jsbn": {
+                  "version": "0.1.1",
+                  "from": "ecc-jsbn@>=0.1.1 <0.2.0",
+                  "resolved": "https://registry.npmjs.org/ecc-jsbn/-/ecc-jsbn-0.1.1.tgz"
+                },
+                "bcrypt-pbkdf": {
+                  "version": "1.0.1",
+                  "from": "bcrypt-pbkdf@>=1.0.0 <2.0.0",
+                  "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz"
                 }
               }
             }

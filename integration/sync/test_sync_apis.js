@@ -19,7 +19,14 @@ var recordCUid;
 module.exports = {
   'test sync & syncRecords apis': {
     'before': function(done) {
-      sync.api.setConfig({syncWorkerInterval: 100, pendingWorkerInterval: 100, ackWorkerInterval: 100, schedulerInterval: 100, schedulerLockName: 'test:syncApi:lock', useCache: true});
+      sync.api.setConfig({
+        syncWorkerInterval: 100, 
+        syncWorkerBackoff: {strategy: 'none'},
+        pendingWorkerInterval: 100, 
+        ackWorkerInterval: 100, 
+        schedulerInterval: 100, 
+        schedulerLockName: 'test:syncApi:lock', 
+        useCache: true});
       async.series([
         async.apply(sync.api.connect, mongoDBUrl, null, redisUrl),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),

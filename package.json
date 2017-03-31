@@ -5,6 +5,7 @@
   "main": "lib/api.js",
   "dependencies": {
     "async": "2.1.5",
+    "backoff": "^2.5.0",
     "colors": "0.6.2",
     "cycle": "1.0.3",
     "debug": "2.6.3",

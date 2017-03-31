@@ -34,7 +34,7 @@ module.exports = {
     q.get.onThirdCall().yields(null, null);
     q.get.onCall(3).yields(null, task2);
     q.ack.yields(new Error('test ack failed'));
-    var worker = new Worker(q, processor, metrics, {interval: 10});
+    var worker = new Worker(q, processor, metrics, {interval: 10, backoff: {strategy: 'none'}});
     worker.work();
     setTimeout(function(){
       assert.ok(worker.statsCollector);
@@ -66,5 +66,33 @@ module.exports = {
         done();
       }, 20);
     }, 40)
+  },
+  'test_queue_worker backoff using exponential strategy': function(done) {
+    var q = {
+      get: sinon.stub(),
+      ack: sinon.stub(),
+      size: sinon.spy()
+    };
+    q.get.yields(null, null);
+    var worker = new Worker(q, processor, metrics, {interval: 10, backoff: {strategy: 'exp'}});
+    worker.work();
+    setTimeout(function(){
+      assert.equal(q.get.callCount, 3);
+      done();
+    }, 50);
+  },
+  'test_queue_worker turn off backoff': function(done) {
+    var q = {
+      get: sinon.stub(),
+      ack: sinon.stub(),
+      size: sinon.spy()
+    };
+    q.get.yields(null, null);
+    var worker = new Worker(q, processor, metrics, {interval: 10, backoff: {strategy: 'none'}});
+    worker.work();
+    setTimeout(function(){
+      assert.ok(q.get.callCount >=4 );
+      done();
+    }, 50);
   }
 };

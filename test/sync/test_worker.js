@@ -37,6 +37,7 @@ module.exports = {
     var worker = new Worker(q, processor, metrics, {interval: 10});
     worker.work();
     setTimeout(function(){
+      assert.ok(worker.statsCollector);
       assert.ok(q.get.callCount >= 4);
       assert.equal(q.ack.callCount, 2);
       assert.ok(task1.processed);

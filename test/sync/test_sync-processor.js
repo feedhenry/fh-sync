@@ -52,7 +52,7 @@ module.exports = {
       assert.ok(dataHandler.doList.calledWith(job.payload.datasetId, {}, {}));
       assert.ok(syncStorage.updateDatasetClient.calledTwice);
       assert.ok(syncStorage.updateDatasetClientWithRecords.calledOnce);
-      assert.ok(syncStorage.updateDatasetClientWithRecords.calledWith(job.payload.id, {globalHash: "abc0"}));
+      assert.ok(syncStorage.updateDatasetClientWithRecords.calledWith(job.payload.id, {globalHash: "abc_0"}));
       assert.ok(metricsClient.gauge.calledOnce);
       done();
     });

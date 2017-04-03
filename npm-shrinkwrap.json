@@ -1,5 +1,5 @@
 {
-  "name": "fh-mbaas-api",
+  "name": "fh-mbaas-api-metrics",
   "version": "7.0.0-0",
   "dependencies": {
     "async": {

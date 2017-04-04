@@ -95,5 +95,7 @@ module.exports = {
     assert.equal(typeof sync.api.handleCollision, 'function');
     assert.equal(typeof sync.api.listCollisions, 'function');
     assert.equal(typeof sync.api.removeCollision, 'function');
+    assert.equal(typeof sync.api.setRecordHashFn, 'function');
+    assert.equal(typeof sync.api.setGlobalHashFn, 'function');
   }
 };

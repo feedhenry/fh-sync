@@ -27,5 +27,3 @@ matrix:
       - npm install
       - npm link fh-mbaas-api
       - npm test
-script:
-  - npm run test

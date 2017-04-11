@@ -1,4 +1,3 @@
-
 // Copyright (c) FeedHenry 2011
 var util = require('util'),
 ditchMock = require('./fixtures/db'),
@@ -20,6 +19,13 @@ module.exports = {
     var databaseConnectionStringStub = sinon.stub().callsArgWithAsync(1, null, {
       url: 'test-url'
     });
+    var syncMock = {
+      api: {
+        connect: sinon.stub().yieldsAsync(),
+        stopAll: sinon.stub().yieldsAsync(),
+        setEventEmitter: sinon.stub()
+      }
+    };
 
     $fh = proxyquire('../lib/api.js', {
       './db': proxyquire('../lib/db.js', {
@@ -31,7 +37,8 @@ module.exports = {
         'fh-db': {
           'local_db': localdbStub
         }
-      })
+      }),
+      './sync': syncMock
     });
     $fh.db({
       "act" : "create",
@@ -47,7 +54,12 @@ module.exports = {
     }, function(err, res){
       assert.ok(!err, err);
       sinon.assert.calledOnce(localdbStub);
-      sinon.assert.calledOnce(databaseConnectionStringStub);
+
+      // this is called 2 times:
+      // - for sync connection
+      // - when calling fh.db
+      // - in fh.bootstrap
+      sinon.assert.calledTwice(databaseConnectionStringStub);
       finish();
     });
   },
@@ -60,6 +72,13 @@ module.exports = {
     var databaseConnectionStringStub = sinon.stub().callsArgWithAsync(1, null, {
       url: 'test-url'
     });
+    var syncMock = {
+      api: {
+        connect: sinon.stub().yieldsAsync(),
+        stopAll: sinon.stub().yieldsAsync(),
+        setEventEmitter: sinon.stub()
+      }
+    };
 
     $fh = proxyquire('../lib/api.js', {
       './db': proxyquire('../lib/db.js', {
@@ -71,7 +90,8 @@ module.exports = {
         'fh-db': {
           'local_db': localdbStub
         }
-      })
+      }),
+      './sync': syncMock
     });
     $fh.db({
       "act" : "connectionString"

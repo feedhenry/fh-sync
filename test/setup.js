@@ -1,5 +1,4 @@
-var proxyquire =  require('proxyquire').noCallThru(),
-exec = require('child_process').exec,
+var exec = require('child_process').exec,
 redis;
 
 exports.before = function(finish){

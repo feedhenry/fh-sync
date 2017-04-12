@@ -121,13 +121,11 @@ module.exports = {
   'test handleCollision': function(done) {
     const that = this;
     var dataHandlers = defaultDataHandlersModule(dbStub);
-    var timestamp = Date.now();
-    dataHandlers.handleCollision(id, null, timestamp, null, {}, {}, metaData, function(err, res) {
+    dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       assert.ok(!err);
       assert.ok(res.uid);
       assert.ok(res.data);
-      assert.equal(res.data.timestamp, timestamp);
       dbStub.collection(id + '_collision').drop();
       done();
     });
@@ -136,15 +134,13 @@ module.exports = {
   'test listCollisions': function(done) {
     const that = this;
     var dataHandlers = defaultDataHandlersModule(dbStub);
-    var timestamp = Date.now();
-    dataHandlers.handleCollision(id, null, timestamp, null, {}, {}, metaData, function(err, res) {
+    dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       assert.ok(!err);
       resetStubUid();
       dataHandlers.listCollisions(id, metaData, function(err, res) {
         assert.ok(res);
         assert.ok(res[uid]);
-        assert.equal(res[uid].timestamp, timestamp);
         dbStub.collection(id + '_collision').drop();
         done();
       });

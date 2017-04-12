@@ -16,6 +16,42 @@ module.exports = {
     'after': function(done){
       sync.api.stopAll(done);
     },
+    'should allow setting interceptor before init': function(done) {
+      sync.api.globalInterceptRequest(function() {});
+      sync.api.interceptRequest(function() {});
+      return done();
+    },
+
+    'should allow setting collision handlers before init': function(done) {
+      sync.api.globalHandleCollision(function() {});
+      sync.api.globalListCollisions(function() {});
+      sync.api.globalRemoveCollision(function() {});
+      sync.api.handleCollision(function() {});
+      sync.api.listCollisions(function() {});
+      sync.api.removeCollision(function() {});
+      return done();
+    },
+
+    'should allow setting data handlers before init': function(done) {
+      sync.api.globalHandleCreate(function() {});
+      sync.api.globalHandleRead(function() {});
+      sync.api.globalHandleUpdate(function() {});
+      sync.api.globalHandleDelete(function() {});
+      sync.api.globalHandleList(function() {});
+      sync.api.handleCreate(function() {});
+      sync.api.handleRead(function() {});
+      sync.api.handleUpdate(function() {});
+      sync.api.handleDelete(function() {});
+      sync.api.handleList(function() {});
+      return done();
+    },
+
+    'should allow setting hash fn before init': function(done) {
+      sync.api.setGlobalHashFn(function() {});
+      sync.api.setRecordHashFn('testdataset', function() {});
+      return done();
+    },
+    
     'should connect ok': function(finish) {
       var readyEmitted = false;
       sync.api.getEventEmitter().on('sync:ready', function onSyncReady() {

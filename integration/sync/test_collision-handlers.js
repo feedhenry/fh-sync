@@ -29,7 +29,8 @@ module.exports = {
       sync.api.connect(MONGODB_URL, {}, null, function(err, mongoClient, redisClient) {
         mongodb = mongoClient;
         mongodb.dropCollection(DATASETID + '_collision');
-        defaultHandlers = defaultDataHandlersModule(mongodb);
+        defaultHandlers = defaultDataHandlersModule();
+        defaultHandlers.setMongoDB(mongodb);
         dataHandlers = dataHandlersModule({
           defaultHandlers: defaultHandlers
         });
@@ -40,9 +41,11 @@ module.exports = {
       sync.api.stopAll(done);
     },
     'afterEach': function(done) {
+      defaultHandlers = defaultDataHandlersModule();
       dataHandlers = dataHandlersModule({
-        defaultHandlers: defaultDataHandlersModule(mongodb)
+        defaultHandlers: defaultHandlers
       });
+      defaultHandlers.setMongoDB(mongodb);
       mongodb.dropCollection(DATASETID + '_collision', function(){
         return done();
       });

@@ -38,18 +38,9 @@ module.exports = {
     resetStubUid();
   },
 
-  'test defaultDataHandlers module constructor': function(done) {
-    assert.throws(function() {
-      defaultDataHandlersModule();
-    }, function(err) {
-      assert.equal(err.message, 'MongoDB instance must be passed to module.');
-      done();
-      return true;
-    });
-  },
-
   'test doCreate': function(done) {
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     var data = {'name': 'Fletch'};
     dataHandlers.doCreate(id, data, metaData, function(err, res) {
       assert.ok(!err);
@@ -62,7 +53,8 @@ module.exports = {
 
   'test doList': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     var data = {'name': 'Fletch'};
     dataHandlers.doCreate(id, data, metaData, function(err, res) {
       var uid = res.uid || stubUid;
@@ -80,7 +72,8 @@ module.exports = {
 
   'test doRead': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       dataHandlers.doRead(id, uid, metaData, function(err, res) {
@@ -94,7 +87,8 @@ module.exports = {
 
   'test doUpdate': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       dataHandlers.doUpdate(id, uid, {name: "Fletch"}, metaData, function(err) {
@@ -107,7 +101,8 @@ module.exports = {
 
   'test doDelete': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.doCreate(id, queryParams, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       dataHandlers.doDelete(id, uid, metaData, function(err, res) {
@@ -120,7 +115,8 @@ module.exports = {
 
   'test handleCollision': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       assert.ok(!err);
@@ -133,7 +129,8 @@ module.exports = {
 
   'test listCollisions': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
       var uid = res.uid || stubUid;
       assert.ok(!err);
@@ -149,7 +146,8 @@ module.exports = {
 
   'test removeCollision': function(done) {
     const that = this;
-    var dataHandlers = defaultDataHandlersModule(dbStub);
+    var dataHandlers = defaultDataHandlersModule();
+    dataHandlers.setMongoDB(dbStub);
     dataHandlers.handleCollision(id, null, Date.now(), null, {}, {}, metaData, function(err, res) {
       assert.ok(!err);
       var uid = res.insertedId;

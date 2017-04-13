@@ -10,45 +10,150 @@ var DATASETID = 'testSyncInitStop';
 
 module.exports = {
   'test sync connect': {
-    'before': function(done){
+    'beforeEach': function(done){
       helper.resetDb(mongoDBUrl, DATASETID, done);
     },
-    'after': function(done){
+    'afterEach': function(done){
       sync.api.stopAll(done);
     },
-    'should allow setting interceptor before init': function(done) {
-      sync.api.globalInterceptRequest(function() {});
-      sync.api.interceptRequest(function() {});
+
+    'should allow setting globalInterceptRequest before init': function(done) {
+      sync.api.globalInterceptRequest(function() {
+        throw new Error('globalInterceptRequest should never be called here');
+      });
       return done();
     },
 
-    'should allow setting collision handlers before init': function(done) {
-      sync.api.globalHandleCollision(function() {});
-      sync.api.globalListCollisions(function() {});
-      sync.api.globalRemoveCollision(function() {});
-      sync.api.handleCollision(function() {});
-      sync.api.listCollisions(function() {});
-      sync.api.removeCollision(function() {});
+    'should allow setting interceptRequest before init': function(done) {
+      sync.api.interceptRequest(function() {
+        throw new Error('interceptRequest should never be called here');
+      });
       return done();
     },
 
-    'should allow setting data handlers before init': function(done) {
-      sync.api.globalHandleCreate(function() {});
-      sync.api.globalHandleRead(function() {});
-      sync.api.globalHandleUpdate(function() {});
-      sync.api.globalHandleDelete(function() {});
-      sync.api.globalHandleList(function() {});
-      sync.api.handleCreate(function() {});
-      sync.api.handleRead(function() {});
-      sync.api.handleUpdate(function() {});
-      sync.api.handleDelete(function() {});
-      sync.api.handleList(function() {});
+    'should allow setting globalHandleCollision before init': function(done) {
+      sync.api.globalHandleCollision(function() {
+        throw new Error('globalHandleCollision should never be called here');
+      });
       return done();
     },
 
-    'should allow setting hash fn before init': function(done) {
-      sync.api.setGlobalHashFn(function() {});
-      sync.api.setRecordHashFn('testdataset', function() {});
+    'should allow setting globalListCollisions before init': function(done) {
+      sync.api.globalListCollisions(function() {
+        throw new Error('globalListCollisions should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalRemoveCollision before init': function(done) {
+      sync.api.globalRemoveCollision(function() {
+        throw new Error('globalRemoveCollision should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleCollision before init': function(done) {
+      sync.api.handleCollision('testdatasetid', function() {
+        throw new Error('handleCollision should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting listCollisions before init': function(done) {
+      sync.api.listCollisions('testdatasetid', function() {
+        throw new Error('listCollisions should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting removeCollision before init': function(done) {
+      sync.api.removeCollision('testdatasetid', function() {
+        throw new Error('removeCollision should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalHandleCreate before init': function(done) {
+      sync.api.globalHandleCreate(function() {
+        throw new Error('globalHandleCreate should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalHandleRead before init': function(done) {
+      sync.api.globalHandleRead(function() {
+        throw new Error('globalHandleRead should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalHandleUpdate before init': function(done) {
+      sync.api.globalHandleUpdate(function() {
+        throw new Error('globalHandleUpdate should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalHandleDelete before init': function(done) {
+      sync.api.globalHandleDelete(function() {
+        throw new Error('globalHandleDelete should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting globalHandleList before init': function(done) {
+      sync.api.globalHandleList(function() {
+        throw new Error('globalHandleList should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleCreate before init': function(done) {
+      sync.api.handleCreate('testdatasetid', function() {
+        throw new Error('handleCreate should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleRead before init': function(done) {
+      sync.api.handleRead('testdatasetid', function() {
+        throw new Error('handleRead should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleUpdate before init': function(done) {
+      sync.api.handleUpdate('testdatasetid', function() {
+        throw new Error('handleUpdate should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleDelete before init': function(done) {
+      sync.api.handleDelete('testdatasetid', function() {
+        throw new Error('handleDelete should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting handleList before init': function(done) {
+      sync.api.handleList('testdatasetid', function() {
+        throw new Error('handleList should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting setGlobalHashFn before init': function(done) {
+      sync.api.setGlobalHashFn(function() {
+        throw new Error('setGlobalHashFn should never be called here');
+      });
+      return done();
+    },
+
+    'should allow setting setRecordHashFn before init': function(done) {
+      sync.api.setRecordHashFn('testdatasetid', function() {
+        throw new Error('setRecordHashFn should never be called here');
+      });
       return done();
     },
     

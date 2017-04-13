@@ -101,7 +101,7 @@ module.exports = {
       async.series([
         function invokeSync(callback) {
           sync.api.invoke(DATASETID, params, function(err, response){
-            assert.ok(!err);
+            assert.ok(!err, util.inspect(err));
             assert.ok(response);
             callback();
           });

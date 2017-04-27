@@ -82,7 +82,7 @@ module.exports = {
       ], function(err){
         assert.ok(!err);
         
-        storage.listDatasetClients(function(err, savedDatasetClients){
+        storage.listDatasetClients({}, function(err, savedDatasetClients){
           assert.ok(!err);
           assert.equal(savedDatasetClients.length, 2);
           done();
@@ -131,7 +131,7 @@ module.exports = {
         async.apply(storage.removeDatasetClients, [datasetClient1])
       ], function(err){
         assert.ok(!err);
-        storage.listDatasetClients(function(err, savedDatasetClients){
+        storage.listDatasetClients({}, function(err, savedDatasetClients){
           assert.ok(!err);
           assert.equal(savedDatasetClients.length, 1);
           done();
@@ -235,7 +235,7 @@ module.exports = {
         async.apply(storage.updateManyDatasetClients, {}, {stopped: true}),
       ], function(err){
         assert.ok(!err);
-        storage.listDatasetClients(function(err, savedDatasetClients){
+        storage.listDatasetClients({}, function(err, savedDatasetClients){
           assert.ok(!err);
           assert.equal(savedDatasetClients[0].stopped, true);
           assert.equal(savedDatasetClients[1].stopped, true);

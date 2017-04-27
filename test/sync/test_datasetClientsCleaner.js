@@ -30,10 +30,12 @@ module.exports = {
       var datasetClients = [{
         'datasetId': DATASETID,
         'queryParams': {user: '1'},
+        'config': {clientSyncTimeout: 1},
         'lastAccessed': Date.now() - 1.5*60*1000
       }, {
         'datasetId': DATASETID,
         'queryParams': {user: '2'},
+        'config': {clientSyncTimeout: 1},
         'lastAccessed': Date.now()
       }];
       syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);

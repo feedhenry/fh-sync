@@ -1,6 +1,7 @@
 var assert = require('assert');
 var sinon = require('sinon');
 var syncSchedulerModule = require('../../lib/sync/sync-scheduler');
+var DatasetClient = require('../../lib/sync/DatasetClient');
 
 var lockProvider = {
   acquire: sinon.stub(),
@@ -120,7 +121,9 @@ module.exports = {
       assert.equal(datasetClientsToSync[0].queryParams.user, "user1");
       assert.equal(datasetClientsToSync[1].queryParams.user, "user4");
 
-      assert.ok(syncStorage.updateManyDatasetClients.calledOnce);
+      assert.ok(syncStorage.updateManyDatasetClients.calledTwice);
+      var deactiveDatasetClients = syncStorage.updateManyDatasetClients.args[1][0];
+      assert.equal(deactiveDatasetClients.id.$in[0], DatasetClient.fromJSON(datasetClients[1]).getId());
 
       done();
     }, 1500);

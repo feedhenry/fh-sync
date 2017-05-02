@@ -222,7 +222,7 @@ module.exports = {
         async.apply(sync.api.init, DATASETID, {}),
         async.apply(sync.api.invoke, DATASETID, params)
       ], function(err){
-        assert.ok(!err);
+        assert.ok(!err, util.inspect(err));
         done();
       });
     }

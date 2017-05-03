@@ -1,6 +1,6 @@
 {
   "name": "fh-mbaas-api",
-  "version": "7.0.3",
+  "version": "7.0.4",
   "dependencies": {
     "async": {
       "version": "2.1.5",

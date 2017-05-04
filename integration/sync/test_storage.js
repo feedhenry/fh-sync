@@ -173,7 +173,6 @@ module.exports = {
             assert.ok(!err);
             assert.equal(datasetClient.props.syncCompleted, true);
             assert.equal(datasetClient.records.length, 2);
-            assert.equal(datasetClient.recordUids.length, 2);
             var record1 = _.findWhere(datasetClient.records, {uid: '1'});
             var record2 = _.findWhere(datasetClient.records, {uid: '2'});
             recordMatch(record1, records[0]);
@@ -188,7 +187,6 @@ module.exports = {
             assert.ok(!err);
             assert.equal(datasetClient.props.syncCompleted, true);
             assert.equal(datasetClient.records.length, 2);
-            assert.equal(datasetClient.recordUids.length, 2);
             var record1 = _.findWhere(datasetClient.records, {uid: '1'});
             var record2 = _.findWhere(datasetClient.records, {uid: '2'});
             recordMatch(record1, records[0]);
@@ -201,7 +199,6 @@ module.exports = {
           storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
             assert.ok(!err);
             assert.equal(datasetClient.records.length, 1);
-            assert.equal(datasetClient.recordUids.length, 1);
             var updateRecord = _.findWhere(datasetClient.records, {uid: '1'});
             recordMatch(updateRecord, updateRecords[0]);
             callback();

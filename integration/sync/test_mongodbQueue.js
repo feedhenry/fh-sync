@@ -22,9 +22,6 @@ module.exports = {
     },
 
     'after': function(done) {
-      if (queue) {
-        queue.stopPruneJob();
-      }
       done();
     },
 
@@ -61,19 +58,6 @@ module.exports = {
           collection.count({}, function(err, size){
             assert.ok(!err);
             assert.equal(2, size);
-            callback();
-          });
-        },
-        function waitForMessagesInvisible(callback) {
-          setTimeout(callback, 2000);
-        },
-        async.apply(queue.prune.bind(queue)),
-        function verifyMessagesDeleted(callback) {
-          var collection = mongodb.collection(queueName);
-          collection.count({}, function(err, size){
-            assert.ok(!err);
-            //only 1 message is acked, so it should be deleted
-            assert.equal(1, size);
             callback();
           });
         }

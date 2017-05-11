@@ -28,6 +28,9 @@ module.exports = {
           },
           createIndex: function(name, opts, cb) {
             return cb();
+          },
+          indexExists: function(name, cb) {
+            return cb();
           }
         }
       }

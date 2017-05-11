@@ -55,8 +55,8 @@
     },
     "fh-component-metrics": {
       "version": "2.7.0",
-      "from": "feedhenry/fh-component-metrics#support-base-tags",
-      "resolved": "git://github.com/feedhenry/fh-component-metrics.git#9b4f4c3ee7d4dde67ba54320834dcaad8ccf4fe0",
+      "from": "fh-component-metrics@2.7.0",
+      "resolved": "https://registry.npmjs.org/fh-component-metrics/-/fh-component-metrics-2.7.0.tgz",
       "dependencies": {
         "lodash": {
           "version": "4.17.4",
@@ -2168,15 +2168,15 @@
           "from": "https://registry.npmjs.org/request/-/request-2.81.0.tgz",
           "resolved": "https://registry.npmjs.org/request/-/request-2.81.0.tgz"
         },
-        "ajv": {
-          "version": "4.11.5",
-          "from": "https://registry.npmjs.org/ajv/-/ajv-4.11.5.tgz",
-          "resolved": "https://registry.npmjs.org/ajv/-/ajv-4.11.5.tgz"
-        },
         "asn1": {
           "version": "0.2.3",
           "from": "https://registry.npmjs.org/asn1/-/asn1-0.2.3.tgz",
           "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.2.3.tgz"
+        },
+        "ajv": {
+          "version": "4.11.5",
+          "from": "https://registry.npmjs.org/ajv/-/ajv-4.11.5.tgz",
+          "resolved": "https://registry.npmjs.org/ajv/-/ajv-4.11.5.tgz"
         },
         "assert-plus": {
           "version": "0.2.0",
@@ -2198,15 +2198,15 @@
           "from": "https://registry.npmjs.org/aws4/-/aws4-1.6.0.tgz",
           "resolved": "https://registry.npmjs.org/aws4/-/aws4-1.6.0.tgz"
         },
-        "bcrypt-pbkdf": {
-          "version": "1.0.1",
-          "from": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz",
-          "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz"
-        },
         "boom": {
           "version": "2.10.1",
           "from": "https://registry.npmjs.org/boom/-/boom-2.10.1.tgz",
           "resolved": "https://registry.npmjs.org/boom/-/boom-2.10.1.tgz"
+        },
+        "bcrypt-pbkdf": {
+          "version": "1.0.1",
+          "from": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz",
+          "resolved": "https://registry.npmjs.org/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz"
         },
         "caseless": {
           "version": "0.12.0",
@@ -2378,15 +2378,15 @@
           "from": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.6.0.tgz",
           "resolved": "https://registry.npmjs.org/tunnel-agent/-/tunnel-agent-0.6.0.tgz"
         },
-        "tweetnacl": {
-          "version": "0.14.5",
-          "from": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz",
-          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz"
-        },
         "uuid": {
           "version": "3.0.1",
           "from": "https://registry.npmjs.org/uuid/-/uuid-3.0.1.tgz",
           "resolved": "https://registry.npmjs.org/uuid/-/uuid-3.0.1.tgz"
+        },
+        "tweetnacl": {
+          "version": "0.14.5",
+          "from": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz",
+          "resolved": "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz"
         },
         "verror": {
           "version": "1.3.6",

@@ -10,7 +10,7 @@
     "cycle": "1.0.3",
     "debug": "2.6.3",
     "eyes": "0.1.8",
-    "fh-component-metrics": "~2.6.1",
+    "fh-component-metrics": "feedhenry/fh-component-metrics#support-base-tags",
     "fh-db": "2.0.0",
     "fh-mbaas-client": "0.15.0",
     "fh-mbaas-express": "5.7.0",

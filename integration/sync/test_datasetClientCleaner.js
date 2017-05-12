@@ -47,7 +47,7 @@ module.exports = {
         mongodb = db;
         storage = storageModule(mongodb, null);
         lock = lockModule(mongodb);
-        cleaner = datasetClientCleanerModule(storage, lock)({retentionPeriod: '50ms'});
+        cleaner = datasetClientCleanerModule(storage, lock)({retentionPeriod: '50ms', cleanerLockName: 'test_datasetCleaner_lock'});
         done();
       });
     },

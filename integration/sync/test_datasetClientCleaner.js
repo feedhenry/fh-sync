@@ -1,4 +1,5 @@
 var storageModule = require('../../lib/sync/storage');
+var lockModule = require('../../lib/sync/lock');
 var async = require('async');
 var assert = require('assert');
 var _ = require('underscore');
@@ -32,6 +33,7 @@ activeDCJson.active = true;
 
 var mongodb;
 var storage;
+var lock;
 
 var cleaner;
 
@@ -44,7 +46,8 @@ module.exports = {
         }
         mongodb = db;
         storage = storageModule(mongodb, null);
-        cleaner = datasetClientCleanerModule(storage)({retentionPeriod: '50ms'});
+        lock = lockModule(mongodb);
+        cleaner = datasetClientCleanerModule(storage, lock)({retentionPeriod: '50ms', cleanerLockName: 'test_datasetCleaner_lock'});
         done();
       });
     },

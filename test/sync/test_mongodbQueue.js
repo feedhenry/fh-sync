@@ -3,12 +3,17 @@ var proxyquire = require('proxyquire');
 var sinon = require('sinon');
 var async = require('async');
 
+var mockLock = {
+  acquire: sinon.stub(),
+  release: sinon.stub()
+};
+
 module.exports = {
   'test mongodb queue methods': function(done) {
     var metrics = {gauge: function(){}};
     var MongodbQueue = require('../../lib/sync/mongodbQueue');
-    var queue = new MongodbQueue('test', metrics, {mongodb: {}});
-    ['create', 'add', 'get', 'ack', 'ping', 'total', 'size', 'inFlight', 'done', 'clean', 'prune', 'startPruneJob'].forEach(function(method){
+    var queue = new MongodbQueue('test', metrics, mockLock, {mongodb: {}});
+    ['create', 'add', 'get', 'ack', 'ping', 'total', 'size', 'inFlight', 'done', 'clean'].forEach(function(method){
       assert.equal(typeof queue[method], 'function');
     });
     done();
@@ -20,6 +25,24 @@ module.exports = {
         return cb();
       }
     };
+    var mockMongodb = {
+      collection: function() {
+        return {
+          dropIndex: function(name, cb) {
+            return cb();
+          },
+          createIndex: function(name, opts, cb) {
+            return cb();
+          },
+          indexExists: function(name, cb) {
+            return cb();
+          },
+          indexInformation: function(opts, cb) {
+            return cb(null, []);
+          }
+        }
+      }
+    }
     var methods = ['add', 'get', 'ack', 'ping', 'total', 'size', 'inFlight', 'done', 'clean'];
     methods.forEach(function(method){
       var fn = sinon.stub();
@@ -36,7 +59,10 @@ module.exports = {
     var metrics = {
       gauge: sinon.spy()
     };
-    var queue = new MongodbQueue('test-metrics-queue', metrics, {mongodb: {}});
+    mockLock.acquire.yieldsAsync(null, 'testlock');
+    mockLock.acquire.yieldsAsync();
+    
+    var queue = new MongodbQueue('test-metrics-queue', metrics, mockLock, {mongodb: mockMongodb});
     queue.create(function(){
       async.parallel([
         async.apply(queue.add.bind(queue)),

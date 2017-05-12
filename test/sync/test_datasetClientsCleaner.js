@@ -10,6 +10,11 @@ var syncStorage = {
   removeDatasetClients: sinon.stub()
 };
 
+var syncLock = {
+  acquire: sinon.stub(),
+  release: sinon.stub()
+};
+
 var DATASETID = 'testDatasetClientsCleaner';
 
 module.exports = {
@@ -17,7 +22,9 @@ module.exports = {
     'before': function(done) {
       syncStorage.listDatasetClients.reset();
       syncStorage.removeDatasetClients.reset();
-      datasetClientCleaner = datasetClientsCleanerModule(syncStorage)({retentionPeriod: '1m', checkFrequency: '100ms'});
+      syncLock.acquire.reset();
+      syncLock.release.reset();
+      datasetClientCleaner = datasetClientsCleanerModule(syncStorage, syncLock)({retentionPeriod: '1m', checkFrequency: '100ms'});
       done();
     },
     'after': function(done) {
@@ -40,10 +47,14 @@ module.exports = {
       }];
       syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
       syncStorage.removeDatasetClients.yieldsAsync(null, {});
+      syncLock.acquire.yieldsAsync(null, 'testlock');
+      syncLock.release.yieldsAsync();
       datasetClientCleaner.start(true);
       setTimeout(function(){
         assert.ok(syncStorage.listDatasetClients.called);
         assert.ok(syncStorage.removeDatasetClients.called);
+        assert.ok(syncLock.acquire.called);
+        assert.ok(syncLock.release.called);
         var datasetClientsToRemove = syncStorage.removeDatasetClients.args[0][0];
         assert.equal(datasetClientsToRemove.length, 1);
         assert.equal(datasetClientsToRemove[0].queryParams.user, '1');
@@ -54,10 +65,14 @@ module.exports = {
       var datasetClients = [];
       syncStorage.listDatasetClients.yieldsAsync(null, datasetClients);
       syncStorage.removeDatasetClients.yieldsAsync(null, {});
+      syncLock.acquire.yieldsAsync(null, 'testlock');
+      syncLock.release.yieldsAsync();
       datasetClientCleaner.start(true);
       setTimeout(function(){
         assert.ok(syncStorage.listDatasetClients.called);
         assert.ok(syncStorage.removeDatasetClients.called);
+        assert.ok(syncLock.acquire.called);
+        assert.ok(syncLock.release.called);
         done();
       }, 120);
     }

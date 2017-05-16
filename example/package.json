@@ -1,0 +1,33 @@
+{
+  "name": "fh-sync-cloud-example",
+  "version": "0.2.0",
+  "dependencies": {
+    "body-parser": "^1.0.2",
+    "cors": "~2.2.0",
+    "express": "~4.0.0",
+    "fh-mbaas-api": "7.0.0-1",
+    "fh-sync": "1.0.0",
+    "mongodb": "^2.1.18",
+    "request": "2.34.0"
+  },
+  "devDependencies": {
+    "grunt-contrib-watch": "latest",
+    "grunt-nodemon": "0.2.0",
+    "grunt-concurrent": "latest",
+    "supertest": "0.8.2",
+    "should": "2.1.1",
+    "turbo-test-runner": "0.3.3",
+    "proxyquire": "0.5.3",
+    "grunt-shell": "0.6.4",
+    "istanbul": "0.2.7",
+    "grunt-env": "~0.4.1",
+    "load-grunt-tasks": "~0.4.0",
+    "time-grunt": "~0.3.1",
+    "grunt-node-inspector": ">=0.2.0"
+  },
+  "license": "mit",
+  "main": "application.js",
+  "scripts": {
+    "start": "node application.js"
+  }
+}

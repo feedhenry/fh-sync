@@ -1,5 +1,5 @@
 {
-  "name": "fh-sync-cloud",
+  "name": "fh-sync",
   "version": "1.0.0",
   "description": "FeedHenry fh-sync-cloud",
   "main": "lib/api.js",

@@ -1,7 +1,7 @@
 {
-  "name": "fh-mbaas-api",
-  "version": "7.0.8",
-  "description": "FeedHenry MBAAS Cloud APIs",
+  "name": "fh-sync-cloud",
+  "version": "1.0.0",
+  "description": "FeedHenry fh-sync-cloud",
   "main": "lib/api.js",
   "dependencies": {
     "async": "2.1.5",
@@ -11,8 +11,6 @@
     "debug": "2.6.3",
     "eyes": "0.1.8",
     "fh-component-metrics": "2.7.0",
-    "fh-db": "2.0.0",
-    "fh-mbaas-client": "0.15.0",
     "fh-mbaas-express": "5.7.0",
     "fh-security": "0.2.0",
     "fh-statsc": "0.3.0",
@@ -52,7 +50,6 @@
     "valid-url": "1.0.9"
   },
   "scripts": {
-    "testwindows": "test_win.cmd",
     "pretest": "./scripts/pretest.sh",
     "test": "grunt fh:unit mochaTest:integration",
     "posttest": "./scripts/posttest.sh"
@@ -60,6 +57,6 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "git@github.com:feedhenry/fh-mbaas-api.git"
+    "url": "git@github.com:feedhenry/fh-sync.git"
   }
 }

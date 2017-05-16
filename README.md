@@ -1,5 +1,7 @@
 # fh-sync cloud
 
+Node.js and express.js based mobile app data synchronization library. 
+
 ## Usage
  fh-sync  is included as standard with your cloud app code.
 

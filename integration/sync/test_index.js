@@ -186,45 +186,6 @@ module.exports = {
           return finish();
         });
       });
-    },
-
-    'should init & stop': function(done) {
-      var TESTCUID = 'testcuid';
-      var params = {
-        fn: 'sync',
-        query_params: {},
-        meta_data: {},
-        __fh: {
-          cuid: TESTCUID
-        },
-        pending: [{
-          action: 'create',
-          hash: 'a1',
-          uid: 'client-a1',
-          post: {
-            'a': '1',
-            'user': '1'
-          }
-        }]
-      };
-      async.series([
-        async.apply(sync.api.connect, mongoDBUrl, {}, null),
-        async.apply(sync.api.init, DATASETID, {}),
-        async.apply(sync.api.invoke, DATASETID, params),
-        async.apply(sync.api.stop, DATASETID),
-        function checkSyncCallFailed(callback){
-          sync.api.invoke(DATASETID, params, function(err){
-            assert.ok(err);
-            assert.ok(err.message.match(/stopped/ig));
-            callback();
-          });
-        },
-        async.apply(sync.api.init, DATASETID, {}),
-        async.apply(sync.api.invoke, DATASETID, params)
-      ], function(err){
-        assert.ok(!err, util.inspect(err));
-        done();
-      });
     }
   }
 };

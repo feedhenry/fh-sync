@@ -28,7 +28,7 @@ module.exports = {
 
   'test invoke with missing fn': function(finish) {
     sync.api.invoke('test_dataset_id', {}, function(err) {
-      assert.equal(err, 'no fn parameter provided in params "{}"');
+      assert.equal(err.message, 'no fn parameter provided in params "{}"');
       return finish();
     });
   },
@@ -39,7 +39,7 @@ module.exports = {
     };
 
     sync.api.invoke('test_dataset_id', params, function(err) {
-      assert.equal(err, 'invalid fn parameter provided in params "some_invalid_fn"');
+      assert.equal(err.message, 'invalid fn parameter provided in params "some_invalid_fn"');
       return finish();
     });
   },

@@ -2,7 +2,7 @@ var exec = require('child_process').exec,
 redis;
 
 exports.before = function(finish){
-  require('./fixtures/env.js');
+  //require('./fixtures/env.js');
 
   // Start redis & mongo , wait 'till finished then run tests!
   redis = exec("redis-server", function(){});

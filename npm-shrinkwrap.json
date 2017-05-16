@@ -1558,37 +1558,6 @@
         }
       }
     },
-    "fh-security": {
-      "version": "0.2.0",
-      "from": "fh-security@0.2.0",
-      "resolved": "https://registry.npmjs.org/fh-security/-/fh-security-0.2.0.tgz",
-      "dependencies": {
-        "node-rsa": {
-          "version": "0.3.2",
-          "from": "https://registry.npmjs.org/node-rsa/-/node-rsa-0.3.2.tgz",
-          "resolved": "https://registry.npmjs.org/node-rsa/-/node-rsa-0.3.2.tgz",
-          "dependencies": {
-            "asn1": {
-              "version": "0.2.3",
-              "from": "https://registry.npmjs.org/asn1/-/asn1-0.2.3.tgz",
-              "resolved": "https://registry.npmjs.org/asn1/-/asn1-0.2.3.tgz"
-            }
-          }
-        }
-      }
-    },
-    "fh-statsc": {
-      "version": "0.3.0",
-      "from": "fh-statsc@0.3.0",
-      "resolved": "https://registry.npmjs.org/fh-statsc/-/fh-statsc-0.3.0.tgz",
-      "dependencies": {
-        "async": {
-          "version": "0.2.9",
-          "from": "https://registry.npmjs.org/async/-/async-0.2.9.tgz",
-          "resolved": "https://registry.npmjs.org/async/-/async-0.2.9.tgz"
-        }
-      }
-    },
     "lodash-contrib": {
       "version": "393.0.1",
       "from": "lodash-contrib@>=393.0.1 <394.0.0",

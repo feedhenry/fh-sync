@@ -1,18 +1,18 @@
 [[fh-sync]]
-= $fh.sync
+= sync
 
 The cloud sync framework requires handler functions to be defined which provide access to the back end data & manage data collisions. These are specified in the handleXXX() functions. Each unique dataset being managed is identified by a dataset_id which must be specified as the first parameter when calling any function of the sync framework.
 
-NOTE: Default implementations of the handler functions are already provided as part of the mBaas service. They use hosted db service to save data (via xref:fh-db[$fh.db]). If this is enough for your app, you don't need to implement the handler functions anymore, you just need to call the init function and provide sync options.
+NOTE: Default implementations of the handler functions are already provided as part of the mBaas service. They use hosted db service to save data (via xref:fh-db[db]). If this is enough for your app, you don't need to implement the handler functions anymore, you just need to call the init function and provide sync options.
 
-However, if the default implementations do not meet your app's requirement (e.g you need to save data to somewhere else), you need to provide your own implementations of the handler functions listed below. You can provide implementations for all the CRUDL operations, or you can change the default behaviour of a particular operation by only providing an override for the corresponding handler function (e.g provide an override `$fh.sync.handleRead` function will allow you to implement your own read data logic, but keep the rest operations to still use the default MBaaS implementations).
+However, if the default implementations do not meet your app's requirement (e.g you need to save data to somewhere else), you need to provide your own implementations of the handler functions listed below. You can provide implementations for all the CRUDL operations, or you can change the default behaviour of a particular operation by only providing an override for the corresponding handler function (e.g provide an override `sync.handleRead` function will allow you to implement your own read data logic, but keep the rest operations to still use the default MBaaS implementations).
 
 [[fh-sync-init]]
-== $fh.sync.init
+== sync.init
 
 [source,javascript]
 ----
-$fh.sync.init(dataset_id, options, callback)
+sync.init(dataset_id, options, callback)
 ----
 
 Initialise cloud data sync service for specified dataset.
@@ -29,13 +29,13 @@ var options = {
   "sync_frequency": 10, // How often to synchronise data with the back end data store in seconds. Default: 10s
   "logLevel":"info" // The level of logging. Can be usful for debugging. Valid options including: 'silly', 'verbose', 'info', 'warn', 'debug', 'error'
 };
-$fh.sync.init(dataset_id, options, function(err) {
+sync.init(dataset_id, options, function(err) {
   // Check for any error thrown during initialisation
   if (err) {
     console.error(err);
   } else {
     //you can now provide data handler function overrides (again, not required at all). For example,
-    $fh.sync.handleList(dataset_id, function(dataset_id, params, cb, meta_data){
+    sync.handleList(dataset_id, function(dataset_id, params, cb, meta_data){
       //implement the data listing logic
     });
   }
@@ -43,11 +43,11 @@ $fh.sync.init(dataset_id, options, function(err) {
 ----
 
 [[fh-sync-invoke]]
-== $fh.sync.invoke
+== sync.invoke
 
 [source,javascript]
 ----
-$fh.sync.invoke(dataset_id, params, callback)
+sync.invoke(dataset_id, params, callback)
 ----
 
 Invoke the Sync Server.
@@ -62,17 +62,17 @@ Invoke the Sync Server.
 var params = {
   "limit": 50
 };
-$fh.sync.invoke(dataset_id, params, function() {
+sync.invoke(dataset_id, params, function() {
   // "act" function callback
 });
 ----
 
 [[fh-sync-stop]]
-== $fh.sync.stop
+== sync.stop
 
 [source,javascript]
 ----
-$fh.sync.stop(dataset_id, callback)
+sync.stop(dataset_id, callback)
 ----
 
 Stop cloud data sync for the specified dataset_id.
@@ -88,7 +88,7 @@ Stop cloud data sync for the specified dataset_id.
 // sync.init() function again.
 // Calling stop on a non-existent dataset has no effect.
 // Calling stop multiple times on the same dataset has no effect.
-$fh.sync.stop(dataset_id, function() {
+sync.stop(dataset_id, function() {
   // Callback to invoke once the dataset has been removed from the management
   // of the service.
   // There are no parameters passed to this callback.
@@ -96,11 +96,11 @@ $fh.sync.stop(dataset_id, function() {
 ----
 
 [[fh-sync-stopall]]
-== $fh.sync.stopAll
+== sync.stopAll
 
 [source,javascript]
 ----
-$fh.sync.stopAll(callback)
+sync.stopAll(callback)
 ----
 
 Stop cloud data sync service for ALL datasets.
@@ -116,7 +116,7 @@ Stop cloud data sync service for ALL datasets.
 // the sync.init() function again and passing the required dataset_id.
 // Calling stop multiple times has no effect -
 // except that the return data to the callback (an array of dataset_ids which are no longer being synced) will be different.
-$fh.sync.stopAll(function(err, res) {
+sync.stopAll(function(err, res) {
   if (err) console.error(err); // Any error thrown during the removal of the datasets
 
   // A JSON Array of Strings - representing the dataset_Ids which have been
@@ -126,11 +126,11 @@ $fh.sync.stopAll(function(err, res) {
 ----
 
 [[fh-sync-handlelist]]
-== $fh.sync.handleList
+== sync.handleList
 
 [source,javascript]
 ----
-$fh.sync.handleList(dataset_id, callback)
+sync.handleList(dataset_id, callback)
 ----
 
 Defines a handler function for listing data from the back end data source for a dataset. Should be called after the dataset is initialised.
@@ -140,7 +140,7 @@ Defines a handler function for listing data from the back end data source for a 
 
 [source,javascript]
 ----
-$fh.sync.handleList(dataset_id, function(dataset_id, params, cb, meta_data) {
+sync.handleList(dataset_id, function(dataset_id, params, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -200,15 +200,15 @@ $fh.sync.handleList(dataset_id, function(dataset_id, params, cb, meta_data) {
 ----
 
 [[fh-sync-globalhandlelist]]
-== $fh.sync.globalHandleList
+== sync.globalHandleList
 
 [source,javascript]
 ----
-$fh.sync.globalHandleList(callback)
+sync.globalHandleList(callback)
 ----
 
-Similar to $fh.sync.handleList, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleList.
+Similar to sync.handleList, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleList.
 
 [[fh-sync-example-5]]
 === Example
@@ -216,17 +216,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleList(function(dataset_id, params, cb, meta_data){
+sync.globalHandleList(function(dataset_id, params, cb, meta_data){
   //list data for the specified dataset_id
 });
 ----
 
 [[fh-sync-handlecreate]]
-== $fh.sync.handleCreate
+== sync.handleCreate
 
 [source,javascript]
 ----
-$fh.sync.handleCreate(dataset_id, callback)
+sync.handleCreate(dataset_id, callback)
 ----
 
 Defines a handler function for creating a single row of data in the back end. Should be called after the dataset is inited.
@@ -237,7 +237,7 @@ Defines a handler function for creating a single row of data in the back end. Sh
 [source,javascript]
 ----
 // data source for a dataset.
-$fh.sync.handleCreate(dataset_id, function(dataset_id, data, cb, meta_data) {
+sync.handleCreate(dataset_id, function(dataset_id, data, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -257,15 +257,15 @@ $fh.sync.handleCreate(dataset_id, function(dataset_id, data, cb, meta_data) {
 ----
 
 [[fh-sync-globalhandlecreate]]
-== $fh.sync.globalHandleCreate
+== sync.globalHandleCreate
 
 [source,javascript]
 ----
-$fh.sync.globalHandleCreate(callback)
+sync.globalHandleCreate(callback)
 ----
 
-Similar to $fh.sync.handleCreate, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleCreate.
+Similar to sync.handleCreate, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleCreate.
 
 [[fh-sync-example-7]]
 === Example
@@ -273,17 +273,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleCreate(function(dataset_id, data, cb, meta_data){
+sync.globalHandleCreate(function(dataset_id, data, cb, meta_data){
   //create data for the specified dataset_id
 });
 ----
 
 [[fh-sync-handleread]]
-== $fh.sync.handleRead
+== sync.handleRead
 
 [source,javascript]
 ----
-$fh.sync.handleRead(dataset_id, callback)
+sync.handleRead(dataset_id, callback)
 ----
 
 Defines a handler function for reading a single row of data from the back end. Should be called after the dataset is initialised.
@@ -294,7 +294,7 @@ Defines a handler function for reading a single row of data from the back end. S
 [source,javascript]
 ----
 // data source for a dataset
-$fh.sync.handleRead(dataset_id, function(dataset_id, uid, cb, meta_data) {
+sync.handleRead(dataset_id, function(dataset_id, uid, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -317,15 +317,15 @@ $fh.sync.handleRead(dataset_id, function(dataset_id, uid, cb, meta_data) {
 ----
 
 [[fh-sync-globalhandleread]]
-== $fh.sync.globalHandleRead
+== sync.globalHandleRead
 
 [source,javascript]
 ----
-$fh.sync.globalHandleRead(callback)
+sync.globalHandleRead(callback)
 ----
 
-Similar to $fh.sync.handleRead, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleRead.
+Similar to sync.handleRead, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleRead.
 
 [[fh-sync-example-9]]
 === Example
@@ -333,17 +333,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleRead(function(dataset_id, uid, cb, meta_data){
+sync.globalHandleRead(function(dataset_id, uid, cb, meta_data){
   //read data for the specified dataset_id and uid
 });
 ----
 
 [[fh-sync-handleupdate]]
-== $fh.sync.handleUpdate
+== sync.handleUpdate
 
 [source,javascript]
 ----
-$fh.sync.handleUpdate(dataset_id, callback)
+sync.handleUpdate(dataset_id, callback)
 ----
 
 Defines a handler function for updating a single row of data from the back end. Should be called after the dataset is initialised.
@@ -356,7 +356,7 @@ Defines a handler function for updating a single row of data from the back end. 
 // data source for a dataset.
 // The sync service will verify that the update can proceed
 // (that is, collision detection) before it invokes the update function.
-$fh.sync.handleUpdate(dataset_id, function(dataset_id, uid, data, cb, meta_data) {
+sync.handleUpdate(dataset_id, function(dataset_id, uid, data, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -382,15 +382,15 @@ $fh.sync.handleUpdate(dataset_id, function(dataset_id, uid, data, cb, meta_data)
 ----
 
 [[fh-sync-globalhandleupdate]]
-== $fh.sync.globalHandleUpdate
+== sync.globalHandleUpdate
 
 [source,javascript]
 ----
-$fh.sync.globalHandleUpdate(callback)
+sync.globalHandleUpdate(callback)
 ----
 
-Similar to $fh.sync.handleUpdate, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleUpdate.
+Similar to sync.handleUpdate, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleUpdate.
 
 [[fh-sync-example-11]]
 === Example
@@ -398,17 +398,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleUpdate(function(dataset_id, uid, data, cb, meta_data){
+sync.globalHandleUpdate(function(dataset_id, uid, data, cb, meta_data){
   //update data for the specified dataset_id and uid
 });
 ----
 
 [[fh-sync-handledelete]]
-== $fh.sync.handleDelete
+== sync.handleDelete
 
 [source,javascript]
 ----
-$fh.sync.handleDelete(dataset_id, callback)
+sync.handleDelete(dataset_id, callback)
 ----
 
 Defines a handler function for deleting a single row of data from the back end. Should be called after the dataset is initialised.
@@ -421,7 +421,7 @@ Defines a handler function for deleting a single row of data from the back end. 
 // data source for a dataset.
 // The sync service will verify that the delete can proceed
 // (that is, collision detection) before it invokes the delete function.
-$fh.sync.handleDelete(dataset_id, function(dataset_id, uid, cb, meta_data) {
+sync.handleDelete(dataset_id, function(dataset_id, uid, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -445,15 +445,15 @@ $fh.sync.handleDelete(dataset_id, function(dataset_id, uid, cb, meta_data) {
 ----
 
 [[fh-sync-globalhandledelete]]
-== $fh.sync.globalHandleDelete
+== sync.globalHandleDelete
 
 [source,javascript]
 ----
-$fh.sync.globalHandleDelete(callback)
+sync.globalHandleDelete(callback)
 ----
 
-Similar to $fh.sync.handleDelete, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleDelete.
+Similar to sync.handleDelete, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleDelete.
 
 [[fh-sync-example-13]]
 === Example
@@ -461,17 +461,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleDelete(function(dataset_id, uid, cb, meta_data){
+sync.globalHandleDelete(function(dataset_id, uid, cb, meta_data){
   //delete data for the specified dataset_id and uid
 });
 ----
 
 [[fh-sync-handlecollision]]
-== $fh.sync.handleCollision
+== sync.handleCollision
 
 [source,javascript]
 ----
-$fh.sync.handleCollision(dataset_id, callback)
+sync.handleCollision(dataset_id, callback)
 ----
 
 Defines a handler function for dealing with data collisions (that is, stale updates). Should be called after the dataset is initialised.
@@ -483,7 +483,7 @@ Defines a handler function for dealing with data collisions (that is, stale upda
 ----
 // Typically a collision handler will write the data record to a collisions table
 // which is reviewed by a user who can manually reconcile the collisions.
-$fh.sync.handleCollision(dataset_id, function(dataset_id, hash, timestamp, uid, pre, post, meta_data) {
+sync.handleCollision(dataset_id, function(dataset_id, hash, timestamp, uid, pre, post, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -508,15 +508,15 @@ $fh.sync.handleCollision(dataset_id, function(dataset_id, hash, timestamp, uid, 
 ----
 
 [[fh-sync-globalhandlecollision]]
-== $fh.sync.globalHandleCollision
+== sync.globalHandleCollision
 
 [source,javascript]
 ----
-$fh.sync.globalHandleCollision(callback)
+sync.globalHandleCollision(callback)
 ----
 
-Similar to $fh.sync.handleCollision, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.handleCollision.
+Similar to sync.handleCollision, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.handleCollision.
 
 [[fh-sync-example-15]]
 === Example
@@ -524,17 +524,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalHandleCollision(function(dataset_id, hash, timestamp, uid, pre, post, meta_data){
+sync.globalHandleCollision(function(dataset_id, hash, timestamp, uid, pre, post, meta_data){
 
 });
 ----
 
 [[fh-sync-listcollisions]]
-== $fh.sync.listCollisions
+== sync.listCollisions
 
 [source,javascript]
 ----
-$fh.sync.listCollisions(dataset_id, callback)
+sync.listCollisions(dataset_id, callback)
 ----
 
 Defines a handler function for returning the current list of collisions. Should be called after the dataset is initialised.
@@ -546,7 +546,7 @@ Defines a handler function for returning the current list of collisions. Should 
 ----
 // This would usually be used by an administration console where a user is
 // manually reviewing & resolving collisions.
-$fh.sync.listCollisions(dataset_id, function(dataset_id, cb, meta_data) {
+sync.listCollisions(dataset_id, function(dataset_id, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -583,15 +583,15 @@ $fh.sync.listCollisions(dataset_id, function(dataset_id, cb, meta_data) {
 NOTE: "collision_hash" is the hash value which uniquely identifies a collision. This value will have been passed as the "hash" parameter when the collision was originally created in the "handleCollision" function.
 
 [[fh-sync-globallistcollisions]]
-== $fh.sync.globalListCollisions
+== sync.globalListCollisions
 
 [source,javascript]
 ----
-$fh.sync.globalListCollisions(callback)
+sync.globalListCollisions(callback)
 ----
 
-Similar to $fh.sync.listCollisions, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.listCollisions.
+Similar to sync.listCollisions, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.listCollisions.
 
 [[fh-sync-example-17]]
 === Example
@@ -599,17 +599,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalListCollisions(function(dataset_id, cb, meta_data){
+sync.globalListCollisions(function(dataset_id, cb, meta_data){
 
 });
 ----
 
 [[fh-sync-removecollision]]
-== $fh.sync.removeCollision
+== sync.removeCollision
 
 [source,javascript]
 ----
-$fh.sync.removeCollision(dataset_id, callback)
+sync.removeCollision(dataset_id, callback)
 ----
 
 Defines a handler function for deleting a collision from the collisions list. Should be called after the dataset is initialised.
@@ -621,7 +621,7 @@ Defines a handler function for deleting a collision from the collisions list. Sh
 ----
 // This would usually be used by an administration console where a user is
 // manually reviewing & resolving collisions.
-$fh.sync.removeCollision(dataset_id, function(dataset_id, collision_hash, cb, meta_data) {
+sync.removeCollision(dataset_id, function(dataset_id, collision_hash, cb, meta_data) {
   // The dataset identifier that this function was defined for
   console.log(dataset_id);
 
@@ -634,15 +634,15 @@ $fh.sync.removeCollision(dataset_id, function(dataset_id, collision_hash, cb, me
 ----
 
 [[fh-sync-globalremovecollision]]
-== $fh.sync.globalRemoveCollision
+== sync.globalRemoveCollision
 
 [source,javascript]
 ----
-$fh.sync.globalRemoveCollision(callback)
+sync.globalRemoveCollision(callback)
 ----
 
-Similar to $fh.sync.removeCollision, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.removeCollision.
+Similar to sync.removeCollision, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.removeCollision.
 
 [[fh-sync-example-19]]
 === Example
@@ -650,17 +650,17 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalRemoveCollision(function(dataset_id, collision_hash, cb, meta_data){
+sync.globalRemoveCollision(function(dataset_id, collision_hash, cb, meta_data){
 
 });
 ----
 
 [[fh-sync-interceptrequest]]
-== $fh.sync.interceptRequest
+== sync.interceptRequest
 
 [source,javascript]
 ----
-$fh.sync.interceptRequest(dataset_id, callback);
+sync.interceptRequest(dataset_id, callback);
 ----
 
 Intercept the sync requests for the specified dataset. Can be useful for checking client identities and validating authentication.
@@ -671,10 +671,10 @@ Intercept the sync requests for the specified dataset. Can be useful for checkin
 [source,javascript]
 ----
 
-$fh.sync.interceptRequest(dataset_id, function(dataset_id, interceptorParams, cb){
+sync.interceptRequest(dataset_id, function(dataset_id, interceptorParams, cb){
 
-  var query_params = interceptorParams.query_params; //the query_params specified in the client $fh.sync.manage
-  var meta_data = interceptorParams.meta_data;  //the meta_data specified in the client $fh.sync.manage
+  var query_params = interceptorParams.query_params; //the query_params specified in the client sync.manage
+  var meta_data = interceptorParams.meta_data;  //the meta_data specified in the client sync.manage
 
   var validUser = function(qp, meta){
     //implement user authentication and return true or false
@@ -690,15 +690,15 @@ $fh.sync.interceptRequest(dataset_id, function(dataset_id, interceptorParams, cb
 ----
 
 [[fh-sync-globalinterceptrequest]]
-== $fh.sync.globalInterceptRequest
+== sync.globalInterceptRequest
 
 [source,javascript]
 ----
-$fh.sync.globalInterceptRequest(callback)
+sync.globalInterceptRequest(callback)
 ----
 
-Similar to $fh.sync.interceptRequest, but set the handler globally which means the same handler function can be used by multiple datasets.
-The global handler will only be used if there is no handler assigned to the dataset via $fh.sync.interceptRequest.
+Similar to sync.interceptRequest, but set the handler globally which means the same handler function can be used by multiple datasets.
+The global handler will only be used if there is no handler assigned to the dataset via sync.interceptRequest.
 
 [[fh-sync-example-21]]
 === Example
@@ -706,7 +706,7 @@ The global handler will only be used if there is no handler assigned to the data
 [source,javascript]
 ----
 
-$fh.sync.globalInterceptRequest(function(dataset_id, interceptorParams, cb){
+sync.globalInterceptRequest(function(dataset_id, interceptorParams, cb){
 
 });
 ----

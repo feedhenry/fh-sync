@@ -50,7 +50,7 @@ The Client and Node.js API calls for Sync are thoroughly documented here:
 
 If you just need to get the sync framework working with your app, here are the steps you need to follow:
 
-. Init $fh.sync on the client side
+. Init sync on the client side
 +
 [source,javascript]
 ----
@@ -59,18 +59,18 @@ If you just need to get the sync framework working with your app, here are the s
   var datasetId = "myShoppingList";
 
   //provide sync init options
-  $fh.sync.init({
+  sync.init({
     "sync_frequency": 10,
     "do_console_log": true,
     "storage_strategy": "dom"
   });
 
   //provide listeners for notifications.
-  $fh.sync.notify(function(notification){
+  sync.notify(function(notification){
     var code = notification.code
     if('sync_complete' === code){
       //a sync loop completed successfully, list the update data
-      $fh.sync.doList(datasetId,
+      sync.doList(datasetId,
         function (res) {
           console.log('Successful result from list:', JSON.stringify(res));
           },
@@ -85,7 +85,7 @@ If you just need to get the sync framework working with your app, here are the s
   //manage the data set, repeat this if the app needs to manage multiple datasets
   var query_params = {}; //or something like this: {"eq": {"field1": "value"}}
   var meta_data = {};
-  $fh.sync.manage(datasetId, {}, query_params, meta_data, function(){
+  sync.manage(datasetId, {}, query_params, meta_data, function(){
 
   });
 ----
@@ -100,9 +100,9 @@ But adding appropriate notification listeners will help improve the user experie
 * Update the UI related to the sync data if delta is received, it means there are changes to the data and it's better to reflect the changes in the UI ASAP. For example, delta_received, record_delta_received.
 * Watch for collisions. Probably let the user know if collisions occured.
 +
-That's pretty much it. Now you just need to make sure to use $fh.sync APIs to perform CRUDL operations on the client.
+That's pretty much it. Now you just need to make sure to use sync APIs to perform CRUDL operations on the client.
 
-. Init $fh.sync on the cloud side
+. Init sync on the cloud side
 +
 Just need to call the init function in your cloud app (probably on app start):
 +
@@ -137,11 +137,11 @@ In order to synchronize with the back end data source, the App developer can imp
 
 For example, when listing data from back end, instead of loading data from database, I want to return hard coded data. Here are the steps:
 
-. Init $fh.sync on the client side
+. Init sync on the client side
 +
 This is the same as Step 1 in basic usage
 
-. Init $fh.sync on the cloud side and provide overrides
+. Init sync on the cloud side and provide overrides
 +
 [source,javascript]
 ----
@@ -172,7 +172,7 @@ fhapi.sync.init(datasetId, options, function(err) {
   if (err) {
     console.error(err);
   } else {
-    $fh.sync.handleList(datasetId, datalistHandler);
+    sync.handleList(datasetId, datalistHandler);
   }
 });
 ----

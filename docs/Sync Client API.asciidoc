@@ -1,7 +1,7 @@
 [[fh-sync]]
-= $fh.sync
+= sync
 
-The Sync API provides a resilient mechanism for data synchronization between a client app and a back-end data store. When using the Sync API, the client app should perform all data operations only through the Sync API and never through `$fh.cloud` calls.
+The Sync API provides a resilient mechanism for data synchronization between a client app and a back-end data store. When using the Sync API, the client app should perform all data operations only through the Sync API and never through `cloud` calls.
 
 Datasets are put under control of the Sync service by calling `manage` and specifying a unique ID for the dataset, along with any query parameters passed to the back-end data store to restrict the dataset.
 
@@ -24,11 +24,11 @@ The Sync client uses events to notify the app when data state has changed, such 
 For detailed version information, see link:https://access.redhat.com/node/2357761[Supported Configurations^].
 
 [[fh-sync-init]]
-== $fh.sync.init
+== sync.init
 
 [source,javascript]
 ----
-$fh.sync.init(options);
+sync.init(options);
 ----
 
 [[sync-details-1]]
@@ -42,7 +42,7 @@ Initialise the client data sync service.
 .JavaScript
 [source,javascript]
 ----
-$fh.sync.init({
+sync.init({
   // How often to synchronize data with the cloud, in seconds.
   // Optional. Default: 10
   "sync_frequency": 10,
@@ -405,11 +405,11 @@ client.Initialise(config);
 ----
 
 [[fh-sync-notify]]
-== $fh.sync.notify
+== sync.notify
 
 [source,javascript]
 ----
-$fh.sync.notify(callback(data));
+sync.notify(callback(data));
 ----
 
 [[sync-details-2]]
@@ -423,7 +423,7 @@ Register a callback function to be invoked when the sync service has notificatio
 .JavaScript
 [source,javascript]
 ----
-$fh.sync.notify(function(event) {
+sync.notify(function(event) {
   // The dataset that the notification is associated with
   var dataset_id = event.dataset_id;
 
@@ -715,11 +715,11 @@ client.SyncFailed += async (sender, args) => { };
 ----
 
 [[fh-sync-manage]]
-== $fh.sync.manage
+== sync.manage
 
 [source,javascript]
 ----
-$fh.sync.manage(dataset_id, options, query_params, meta_data, callback);
+sync.manage(dataset_id, options, query_params, meta_data, callback);
 ----
 
 [[sync-details-3]]
@@ -742,7 +742,7 @@ var options = {
 
 // Parameters object to be passed to the cloud sync service.
 // It will be passed to the dataHandler when listing dataset on the back end.
-// If the default mBaas cloud implementation is used (which uses $fh.db for data handlers), all the valid list options can be used here.
+// If the default mBaas cloud implementation is used (which uses db for data handlers), all the valid list options can be used here.
 // For example, to list the tasks that are assigned to a user called "Tom", the query params should be
 var query_params = {
 "eq": {
@@ -752,7 +752,7 @@ var query_params = {
 
 // Extra params that will be sent to the back-end data handlers.
 var meta_data = {};
-$fh.sync.manage(dataset_id, options, query_params, meta_data, function(){
+sync.manage(dataset_id, options, query_params, meta_data, function(){
 console.log('dataset ' + dataset_id + ' is now managed by sync');
 });
 ----
@@ -761,7 +761,7 @@ console.log('dataset ' + dataset_id + ' is now managed by sync');
 
 [source,java]
 ----
-//queryParams are any query supported by $fh.db
+//queryParams are any query supported by db
 JSONObject queryParams = new JSONObject();
 
 //MetaData such as sessionTokens, userIds, etc
@@ -834,7 +834,7 @@ const string DatasetId = "tasks";
 
 /// Query is a Dictionary of parameters to be sent to the server with each sync
 /// operation. If the default mBaas cloud implementation is used (which uses
-/// $fh.db for data handlers), all the valid list options can be used here.
+/// db for data handlers), all the valid list options can be used here.
 /// For example, to list the tasks that are assigned to a user called "Tom",
 /// the query params should be
 Dictionary<string, string> query = new Dictionary<string, string>
@@ -855,11 +855,11 @@ client.Manage<Task>(DatasetId, config, query);
 
 
 [[fh-sync-dolist]]
-== $fh.sync.doList
+== sync.doList
 
 [source,javascript]
 ----
-$fh.sync.doList(dataset_id, success, failure);
+sync.doList(dataset_id, success, failure);
 ----
 
 [[sync-details-4]]
@@ -876,7 +876,7 @@ Get a list of the records for the dataset.
 // This must correspond to an “act” function which represents the cloud portion of the sync contract.
 var dataset_id = 'tasks';
 
-$fh.sync.doList(dataset_id, function(res) {
+sync.doList(dataset_id, function(res) {
 // The data returned by the sync service.
 // Always a full data set (even in the case of deltas).
 console.log(res);
@@ -988,11 +988,11 @@ foreach (var item in client.List<Task>(DatasetId))
 
 
 [[fh-sync-docreate]]
-== $fh.sync.doCreate
+== sync.doCreate
 
 [source,javascript]
 ----
-$fh.sync.doCreate(dataset_id, data, success, failure);
+sync.doCreate(dataset_id, data, success, failure);
 ----
 
 [[sync-details-5]]
@@ -1015,7 +1015,7 @@ var data = {
 "user": "joe@bloggs.com"
 };
 
-$fh.sync.doCreate(dataset_id, data, function(res) {
+sync.doCreate(dataset_id, data, function(res) {
 // The update record which will be sent to the cloud
 console.log(res);
 }, function(code, msg) {
@@ -1082,11 +1082,11 @@ client.Create(MainPage.DatasetId, task);
 ----
 
 [[fh-sync-doread]]
-== $fh.sync.doRead
+== sync.doRead
 
 [source,javascript]
 ----
-$fh.sync.doRead(dataset_id, uid, success, failure);
+sync.doRead(dataset_id, uid, success, failure);
 ----
 
 [[sync-details-6]]
@@ -1104,7 +1104,7 @@ var dataset_id = 'tasks';
 // Unique Id of the record to read.
 var uid = '42abcdefg';
 
-$fh.sync.doRead(dataset_id, uid, function(data) {
+sync.doRead(dataset_id, uid, function(data) {
 // The record data
 console.log(data.data); //the data fileds
 console.log(data.hash); //the hash value of the data
@@ -1169,11 +1169,11 @@ Task task = client.Read(datasetId, uid);
 ----
 
 [[fh-sync-doupdate]]
-== $fh.sync.doUpdate
+== sync.doUpdate
 
 [source,javascript]
 ----
-$fh.sync.doUpdate(dataset_id, uid, data, success, failure);
+sync.doUpdate(dataset_id, uid, data, success, failure);
 ----
 
 [[sync-details-7]]
@@ -1192,10 +1192,10 @@ var dataset_id = 'tasks';
 var uid = '42abcdefg';
 
 // Record data to update. Note that you need to provide the FULL data to update.
-$fh.sync.doRead(dataset_id, uid, function(data){
+sync.doRead(dataset_id, uid, function(data){
 var fields = data.data;
 fields.name = "Organise layouts";
-$fh.sync.doUpdate(dataset_id, uid, fields, function(data) {
+sync.doUpdate(dataset_id, uid, fields, function(data) {
 // The updated record which will be send to the cloud
 console.log(data);
 }, function(code, msg) {
@@ -1270,11 +1270,11 @@ Task task = client.Update(datasetId, task);
 ----
 
 [[fh-sync-dodelete]]
-== $fh.sync.doDelete
+== sync.doDelete
 
 [source,javascript]
 ----
-$fh.sync.doDelete(dataset_id, uid, success, failure);
+sync.doDelete(dataset_id, uid, success, failure);
 ----
 
 [[sync-details-8]]
@@ -1292,7 +1292,7 @@ var dataset_id = 'tasks';
 // Unique Id of the record to delete.
 var uid = '42abcdefg';
 
-$fh.sync.doDelete(dataset_id, uid, function(data) {
+sync.doDelete(dataset_id, uid, function(data) {
 // The deleted record data sent to the cloud.
 console.log(data);
 }, function(code, msg) {
@@ -1347,11 +1347,11 @@ client.Delete(datasetId, uid);
 ----
 
 [[fh-sync-startsync]]
-== $fh.sync.startSync
+== sync.startSync
 
 [source,javascript]
 ----
-$fh.sync.startSync(dataset_id, success, failure)
+sync.startSync(dataset_id, success, failure)
 ----
 
 [[sync-details-9]]
@@ -1367,7 +1367,7 @@ Start the sync loop if 'sync_active' option is set to false.
 ----
 var dataset_id = 'tasks';
 
-$fh.sync.startSync(dataset_id, function(){
+sync.startSync(dataset_id, function(){
 console.log('sync loop started');
 }, function(error){
 console.log('failed to start sync loop. Error : ' + error);
@@ -1416,11 +1416,11 @@ client.Start(datasetId);
 ----
 
 [[fh-sync-stopsync]]
-== $fh.sync.stopSync
+== sync.stopSync
 
 [source,javascript]
 ----
-$fh.sync.stopSync(dataset_id, success, failure)
+sync.stopSync(dataset_id, success, failure)
 ----
 
 [[sync-details-10]]
@@ -1436,7 +1436,7 @@ Stop the sync loop for a dataset.
 ----
 var dataset_id = 'tasks';
 
-$fh.sync.stopSync(dataset_id, function(){
+sync.stopSync(dataset_id, function(){
 console.log('sync loop stopped');
 }, function(error){
 console.log('failed to stop sync loop. Error : ' + error);
@@ -1482,11 +1482,11 @@ client.Stop(datasetId);
 ----
 
 [[fh-sync-dosync]]
-== $fh.sync.doSync
+== sync.doSync
 
 [source,javascript]
 ----
-$fh.sync.doSync(dataset_id, success, failure)
+sync.doSync(dataset_id, success, failure)
 ----
 
 [[sync-details-11]]
@@ -1502,7 +1502,7 @@ Run the sync loop almost immediately (within next 500 ms) if `sync_active` is tr
 ----
 var dataset_id = 'tasks';
 
-$fh.sync.doSync(dataset_id, function(){
+sync.doSync(dataset_id, function(){
 console.log('sync loop will run');
 }, function(error){
 console.log('failed to run sync loop. Error : ' + error);
@@ -1522,11 +1522,11 @@ There is no `doSync` method in the iOS Synchronization API. Use xref:fh-sync-for
 There is no `doSync` method in the Windows Synchronization API. Use xref:fh-sync-forcesync[ForceSync] instead.
 
 [[fh-sync-forcesync]]
-== $fh.sync.forceSync
+== sync.forceSync
 
 [source,javascript]
 ----
-$fh.sync.forceSync(dataset_id, success, failure)
+sync.forceSync(dataset_id, success, failure)
 ----
 
 [[sync-details-12]]
@@ -1542,7 +1542,7 @@ Run the sync loop almost immediately (within next 500 ms) even if `sync_active` 
 ----
 var dataset_id = 'tasks';
 
-$fh.sync.forceSync(dataset_id, function(){
+sync.forceSync(dataset_id, function(){
   console.log('sync loop will run');
 }, function(error){
   console.log('failed to run sync loop. Error : ' + error);

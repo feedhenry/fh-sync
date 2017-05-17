@@ -1,0 +1,1586 @@
+[[fh-sync]]
+= $fh.sync
+
+The Sync API provides a resilient mechanism for data synchronization between a client app and a back-end data store. When using the Sync API, the client app should perform all data operations only through the Sync API and never through `$fh.cloud` calls.
+
+Datasets are put under control of the Sync service by calling `manage` and specifying a unique ID for the dataset, along with any query parameters passed to the back-end data store to restrict the dataset.
+
+The Sync client uses events to notify the app when data state has changed, such as when new records are received, updates are committed to back end, and other ones. For a deeper explanation of the concepts of the Sync Service, see link:{ServerSideDeveloperGuide}#data-sync-framework[Data Sync Framework].
+
+[[sync-supported-platforms]]
+.Supported Platforms
+
+* JavaScript SDK
+** Cordova
+** Appcelerator
+** Web Apps
+* Android SDK
+* iOS Objective-C SDK
+* iOS Swift SDK
+* .NET SDK
+** Windows
+** Xamarin
+
+For detailed version information, see link:https://access.redhat.com/node/2357761[Supported Configurations^].
+
+[[fh-sync-init]]
+== $fh.sync.init
+
+[source,javascript]
+----
+$fh.sync.init(options);
+----
+
+[[sync-details-1]]
+=== Details
+
+Initialise the client data sync service.
+
+[[sync-example]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+$fh.sync.init({
+  // How often to synchronize data with the cloud, in seconds.
+  // Optional. Default: 10
+  "sync_frequency": 10,
+
+  // Should local changes be synchronized to the cloud immediately, or should they wait for the next synchronization interval.
+  // Optional. Default: true
+  "auto_sync_local_updates": true,
+
+  // Should a notification event be triggered when loading or saving to client storage fails.
+  // Optional. Default: true
+  "notify_client_storage_failed": true,
+
+  // Should a notification event be triggered when a synchronization cycle with the server has been started.
+  // Optional. Default: true
+  "notify_sync_started": true,
+
+  // Should a notification event be triggered when a synchronization cycle with the server has been completed.
+  // Optional. Default: true
+  "notify_sync_complete": true,
+
+  // Should a notification event be triggered when an attempt was made to update a record while offline.
+  // Optional. Default: true
+  "notify_offline_update": true,
+
+  // Should a notification event be triggered when an update failed due to data collision.
+  // Optional. Default: true
+  "notify_collision_detected": true,
+
+  // Should a notification event be triggered when an update was applied to the local data store.
+  // Optional. Default: true
+  "notify_local_update_applied": true,
+
+  // Should a notification event be triggered when an update failed for a reason other than data collision.
+  // Optional. Default: true
+  "notify_remote_update_failed": true,
+
+  // Should a notification event be triggered when an update was applied to the remote data store.
+  // Optional. Default: true
+  "notify_remote_update_applied": true,
+
+  // Should a notification event be triggered when a delta was received from the remote data store.
+  // Optional. Default: true
+  "notify_delta_received": true,
+
+  // Should a notification event be triggered when a delta was received from the remote data store for a record.
+  // Optional. Default: true
+  "notify_record_delta_received": true,
+
+  // Should a notification event be triggered when the synchronization loop failed to complete.
+  // Optional. Default: true
+  "notify_sync_failed": true,
+
+  // Should log statements be written to console.log. Will be useful for debugging.
+  // Optional. Default: false
+  "do_console_log": false,
+
+  // How many synchronization cycles to check for updates on crashed in-flight updates.
+  // Optional. Default: 10
+  "crashed_count_wait" : 10,
+
+  // If crashed_count_wait limit is reached, should the client retry sending the crashed in flight pending records.
+  // Optional. Default: true
+  "resend_crashed_updates" : true,
+
+  // Is the background synchronization with the cloud currently active. If this is set to false, the synchronization loop will not start automatically. You need to call startSync to start the synchronization loop.
+  // Optional. Default: true
+  "sync_active" : true,
+
+  // Storage strategy to use for the underlying client storage framework Lawnchair. Valid values include 'dom', 'html5-filesystem', 'webkit-sqlite', 'indexed-db'.
+  // Multiple values can be specified as an array and the first valid storage option will be used.
+  // If the app is running on Titanium, the only support value is 'titanium'.
+  // Optional. Default: 'html5-filesystem'
+  "storage_strategy" : "html5-filesystem",
+
+  // Amount of space to request from the HTML5 filesystem API when running in browser
+  // Optional. Default: 50 \* 1024 \* 1024
+  "file_system_quota" : 50 \* 1024 \* 1024,
+
+  // If the app has legacy custom cloud sync function (the app implemented the data CRUDL operations in main.js file in FH V2 apps), it should be set to true. If set to false, the default mbaas sync implementation will be used. When set to null or undefined, a check will be performed to determine which implementation to use.
+  // Optional. Default: null
+  "has_custom_sync" : null,
+
+  // ios only. If set to true, the file will be backed by icloud.
+  // Optional.Default: false
+  "icloud_backup" : false
+});
+----
+
+.Android (Java)
+[source,java]
+----
+FHSyncConfig syncConfig = new FHSyncConfig();
+
+// Should local changes be synchronized to the cloud immediately, or should
+// they wait for the next synchronization interval.
+// Optional. Default: false
+syncConfig.setAutoSyncLocalUpdates(false);
+
+// How many synchronization cycles to check for updates on crashed in-flight
+// updates.
+// Optional. Default: 10
+syncConfig.setCrashCountWait(10);
+
+// Should a notification event be triggered when loading or saving to client
+//storage fails.
+// Optional. Default: false
+syncConfig.setNotifyClientStorageFailed(false);
+
+// Should a notification event be triggered when a delta was received from the
+//remote data store.
+// Optional. Default: false
+syncConfig.setNotifyDeltaReceived(false);
+
+// Should a notification event be triggered when an update was applied to the local
+//data store.
+// Optional. Default: false
+syncConfig.setNotifyLocalUpdateApplied(false);
+
+// Should a notification event be triggered when an attempt was made to update a
+//record while offline.
+// Optional. Default: false
+syncConfig.setNotifyOfflineUpdate(false);
+
+// Should a notification event be triggered when an update was applied to the remote
+//data store.
+// Optional. Default: false
+syncConfig.setNotifyRemoteUpdateApplied(false);
+
+// Should a notification event be triggered when a synchronization cycle with the
+//server has been started.
+// Optional. Default: false
+syncConfig.setNotifySyncStarted(false);
+
+// Should a notification event be triggered when the synchronization loop failed to complete.
+// Optional. Default: false
+syncConfig.setNotifySyncFailed(false);
+
+// Should a notification event be triggered when a synchronization cycle with the
+// server has been completed.
+// Optional. Default: false
+syncConfig.setNotifySyncComplete(false);
+
+// Should a notification event be triggered when an update failed due to data collision.
+// Optional. Default: false
+syncConfig.setNotifySyncCollisions(false);
+
+// Should a notification event be triggered when an update failed for a reason other
+//than data collision.
+// Optional. Default: false
+syncConfig.setNotifyUpdateFailed(false);
+
+// If the limit set in setCrashCountWait is reached, should the client
+// retry sending the crashed in-flight pending records.
+// Optional. Default: true
+syncConfig.setResendCrashedUpdates(true);
+
+// How often to synchronize data with the cloud, in seconds.
+// Optional. Default: 10
+syncConfig.setSyncFrequency(10);
+
+// If the app has legacy custom cloud sync function (the app implemented the data
+//CRUDL operations in main.js file in FH V2 apps), it should be set to true. If set
+//to false, the default mbaas sync implementation will be used.
+// Optional. Default: false
+syncConfig.setUseCustomSync(false);
+
+syncClient = FHSyncClient.getInstance();
+syncClient.init(appContext, syncConfig, new FHSyncListener() {
+                                                    /**The implementation for this class
+                                                    * is discussed later in this document
+                                                    **/
+                                                });
+----
+
+.iOS (Swift)
+[source,swift]
+----
+let conf = FHSyncConfig()
+
+// How often to synchronize data with the cloud, in seconds.
+// Optional. Default: 10
+conf.syncFrequency = 10
+
+// Should local changes be synchronized to the cloud immediately, or should they wait for the next synchronization interval.
+// Optional. Default: true
+conf.autoSyncLocalUpdates = true
+
+// Should a notification event be triggered when loading or saving to client storage fails.
+// Optional. Default: false
+conf.notifyClientStorageFailed = true
+
+// Should a notification event be triggered when a synchronization cycle with the server has been started.
+// Optional. Default: false
+conf.notifySyncStarted = true
+
+// Should a notification event be triggered when a synchronization cycle with the server has been completed.
+// Optional. Default: false
+conf.notifySyncCompleted = true
+
+// Should a notification event be triggered when an attempt was made to update a record while offline.
+// Optional. Default: false
+conf.notifyOfflineUpdate = true
+
+// Should a notification event be triggered when an update failed due to data collision.
+// Optional. Default: false
+conf.notifySyncCollision = true
+
+// Should a notification event be triggered when an update was applied to the local data store.
+// Optional. Default: false
+conf.notifyLocalUpdateApplied = true
+
+// Should a notification event be triggered when an update failed for a reason other than data collision.
+// Optional. Default: false
+conf.notifyRemoteUpdateFailed = true
+
+// Should a notification event be triggered when an update was applied to the remote data store.
+// Optional. Default: false
+conf.notifyRemoteUpdateApplied = true
+
+// Should a notification event be triggered when a delta was received from the remote data store.
+// Optional. Default: false
+conf.notifyDeltaReceived = true
+
+// Should a notification event be triggered when the synchronization loop failed to complete.
+// Optional. Default: false
+conf.notifySyncFailed = true
+
+// Should log statements be written to console.log. Will be useful for debugging.
+// Optional. Default: false
+conf.debug = true
+
+// How many synchronization cycles to check for updates on crashed in-flight updates.
+// Optional. Default: 10
+conf.crashCountWait = 10
+
+// If crashCountWait limit is reached, should the client retry sending the crashed in flight pending records.
+// Optional. Default: true
+conf.resendCrashedUpdates = true
+
+// If the app has legacy custom cloud sync function (the app implemented the data CRUDL operations in main.js file in FH V2 apps), it should be set to true. If set to false, the default mbaas sync implementation will be used. When set to null or undefined, a check will be performed to determine which implementation to use.
+// Optional. Default: false
+conf.hasCustomSync = false
+
+// iOS only. If set to YES, the file will be backed by icloud.
+// Optional.Default: false
+conf.icloud_backup = false
+
+syncClient = FHSyncClient(config: conf)
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+FHSyncConfig* conf = [[FHSyncConfig alloc] init];
+
+// How often to synchronize data with the cloud, in seconds.
+// Optional. Default: 10
+conf.syncFrequency = 10;
+
+// Should local changes be synchronized to the cloud immediately, or should they wait for the next synchronization interval.
+// Optional. Default: YES
+conf.autoSyncLocalUpdates = YES;
+
+// Should a notification event be triggered when loading or saving to client storage fails.
+// Optional. Default: NO
+conf.notifyClientStorageFailed = YES;
+
+// Should a notification event be triggered when a synchronization cycle with the server has been started.
+// Optional. Default: NO
+conf.notifySyncStarted = YES;
+
+// Should a notification event be triggered when a synchronization cycle with the server has been completed.
+// Optional. Default: NO
+conf.notifySyncCompleted = YES;
+
+// Should a notification event be triggered when an attempt was made to update a record while offline.
+// Optional. Default: NO
+conf.notifyOfflineUpdate = YES;
+
+// Should a notification event be triggered when an update failed due to data collision.
+// Optional. Default: NO
+conf.notifySyncCollision = YES;
+
+// Should a notification event be triggered when an update was applied to the local data store.
+// Optional. Default: NO
+conf.notifyLocalUpdateApplied = YES;
+
+// Should a notification event be triggered when an update failed for a reason other than data collision.
+// Optional. Default: NO
+conf.notifyRemoteUpdateFailed = YES;
+
+// Should a notification event be triggered when an update was applied to the remote data store.
+// Optional. Default: NO
+conf.notifyRemoteUpdateApplied = YES;
+
+// Should a notification event be triggered when a delta was received from the remote data store.
+// Optional. Default: NO
+conf.notifyDeltaReceived = YES;
+
+// Should a notification event be triggered when the synchronization loop failed to complete.
+// Optional. Default: NO
+conf.notifySyncFailed = YES;
+
+// Should log statements be written to console.log. Will be useful for debugging.
+// Optional. Default: NO
+conf.debug = YES;
+
+// How many synchronization cycles to check for updates on crashed in-flight updates.
+// Optional. Default: 10
+conf.crashCountWait = 10;
+
+// If crashCountWait limit is reached, should the client retry sending the crashed in flight pending records.
+// Optional. Default: YES
+conf.resendCrashedUpdates = YES;
+
+// If the app has legacy custom cloud sync function (the app implemented the data CRUDL operations in main.js file in FH V2 apps), it should be set to true. If set to false, the default mbaas sync implementation will be used. When set to null or undefined, a check will be performed to determine which implementation to use.
+// Optional. Default: NO
+conf.hasCustomSync = NO;
+
+// iOS only. If set to YES, the file will be backed by icloud.
+// Optional.Default: NO
+conf.icloud_backup = NO;
+
+FHSyncClient* syncClient = [[FHSyncClient alloc] initWithConfig:conf];
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+var client = FHSyncClient.GetInstance();
+var config = new FHSyncConfig();
+
+/// How often to synchronize data with the cloud, in seconds.
+/// Default Value : 10
+config.SyncFrequency = 10;
+
+/// Should local changes be synchronized to the cloud immediately, or should they wait for the next synchronization interval.
+/// Default value : true
+config.AutoSyncLocalUpdates = true;
+
+/// How many synchronization cycles to check for updates on crashed in-flight updates.
+/// Default value : 10
+config.CrashedCountWait = 10;
+
+/// If CrashedCountWait limit is reached, should the client retry sending the crashed in flight pending records.
+/// Default value : true
+config.ResendCrashedUpdated = true;
+
+/// Is the background sync with the cloud currently active. If this is set to false, the sync loop will not start automatically. You need to call Start to start the synchronization loop.
+/// Default value : true
+config.SyncActive = true;
+
+/// Set whether to use a legacy FH V2 sync cloud app, the MBaaS sync service,
+/// or automatically select.
+/// Values are SyncCloudType.Auto, SyncCloudType.Legacy, SyncCloudType.Mbbas
+/// Default value : Auto
+config.SyncCloud = SyncCloudType.Auto;
+
+client.Initialise(config);
+----
+
+[[fh-sync-notify]]
+== $fh.sync.notify
+
+[source,javascript]
+----
+$fh.sync.notify(callback(data));
+----
+
+[[sync-details-2]]
+=== Details
+
+Register a callback function to be invoked when the sync service has notifications to communicate to the client.
+
+[[sync-example-1]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+$fh.sync.notify(function(event) {
+  // The dataset that the notification is associated with
+  var dataset_id = event.dataset_id;
+
+    // The unique identifier that the notification is associated with.
+  // This will be the unique identifier for a record if the notification is related to an individual record,
+  // or the current hash of the dataset if the notification is associated with a full dataset
+  //  (for example, sync_complete)
+  var uid = event.uid;
+
+  // Optional free text message with additional information
+  var message = event.message;
+
+  // The notification message code
+  var code = event.code;
+   /* Codes:
+    * client_storage_failed: Loading or saving to client storage failed. This is a critical error and the Sync Client will not work properly without client storage.
+    * sync_started: A synchronization cycle with the server has been started.
+    * sync_complete: A synchronization cycle with the server has been completed.
+    * offline_update: An attempt was made to update or delete a record while offline.
+    * collision_detected: Update failed due to data collision.
+    * remote_update_failed: Update failed for a reason other than data collision.
+    * remote_update_applied: An update was applied to the remote data store.
+    * local_update_applied: An update was applied to the local data store.
+    * delta_received: A change was received from the remote data store for the dataset. It is best to listen to this notification and update the UI accordingly.
+    * record_delta_received: A delta was received from the remote data store for the record. It is best to listen to this notification and update UI accordingly.
+    * sync_failed: Synchronization loop failed to complete.
+    */
+});
+----
+
+.Android (Java)
+Synchronization events are sent to the `FHSyncListener` instance you registered using `syncClient.init`. Each method of the listener is provided a non-null `NotificationMessage` parameter.
+
+[source,java]
+----
+public class SampleSyncListener implements FHSyncListener {
+
+
+  public void onSyncStarted(NotificationMessage notificationMessage) {
+      /*Data sync is available. Update your UI, enable editing fields,
+          display messages to the user, etc.*/
+  }
+
+  public void onSyncCompleted(NotificationMessage notificationMessage) {
+
+      /*Sync has completed. Data has been successfully sent to the server or
+         successfully received from the server. In either case you should refresh
+         the data presented to the user.
+
+      You may retrieve your latest data for this message with
+      FHSyncClient.getInstance().list(notificationMessage.getDataId())*/
+  }
+
+  public void onUpdateOffline(NotificationMessage notificationMessage) {
+      /*A create, delete, or update operation was called, but the device is
+      not connected to the network. The UI should be updated, fields disabled,
+      user notified, etc.*/
+  }
+
+  public void onCollisionDetected(NotificationMessage notificationMessage) {
+      /* The update could not be applied to the server. There are many reasons
+      why this could happen and it is up to the application developer to
+      resolve the collision.
+
+      After the data has been updated to synchronize cleanly, the methods
+      FHSyncClient.listCollisions and FHSyncClient.removeCollision can be used
+      to view and resolve the collision entries.
+
+      Use FHSyncClient.getInstance().read(notificationMessage.getDataId(),
+                                          notificationMessage.getUID())
+      to view the data record.
+
+      */
+  }
+
+  public void onRemoteUpdateFailed(NotificationMessage notificationMessage) {
+      /* The remote updated failed. You may use notificationMessage.getExtraMessage()
+      to get additional details.
+
+      Use FHSyncClient.getInstance().read(notificationMessage.getDataId(),
+                                          notificationMessage.getUID())
+      to view the data record.*/
+  }
+
+  public void onRemoteUpdateApplied(NotificationMessage notificationMessage) {
+      /* An update was successfully processed by the remote server.
+
+      Use FHSyncClient.getInstance().read(notificationMessage.getDataId(),
+                                          notificationMessage.getUID())
+      to view the data record.
+      */
+  }
+
+  public void onLocalUpdateApplied(NotificationMessage notificationMessage) {
+      /* An update is applied locally and waiting to be sent to the remote
+      server.
+
+      Use FHSyncClient.getInstance().read(notificationMessage.getDataId(),
+                                          notificationMessage.getUID())
+      to view the data record.
+      */
+  }
+
+  public void onDeltaReceived(NotificationMessage notificationMessage) {
+      /*An incoming update has been applied. The UI should be updated if appropriate.
+
+      Use FHSyncClient.getInstance().read(notificationMessage.getDataId(),
+                                          notificationMessage.getUID())
+      to view the data record.
+
+      Use FHSyncClient.getInstance().list(notificationMessage.getDataId())
+      to load all data records.
+
+      notificationMessage.getExtraMessage() will return the type of operation
+      (update, delete, create) which was performed.
+
+      */
+  }
+
+  public void onSyncFailed(NotificationMessage notificationMessage) {
+      /*
+      For some reason the sync loop was unable to complete.  This could be for
+      many different reasons such as network connectivity, authentication
+      issues, programming errors, etc.
+
+      Use notificationMessage.getExtraMessage() to get extra information.
+
+      */
+  }
+
+  public void onClientStorageFailed(NotificationMessage notificationMessage) {
+      /*
+      Sync was not able to store data locally.  This indicates a device error
+      such as out of space, invalid permissions, etc
+
+      Use notificationMessage.getExtraMessage() to get extra information.
+      */
+  }
+}
+----
+
+.iOS (Objective-C)
+Synchronization notifications are dispatched via the standard `NSNotificationCenter` facility. To start receiving `kFHSyncStateChangedNotification` notifications, register using the `addObserver:selector:name:object:` or `addObserverForName:object:queue:usingBlock:` methods of `NSNotificationCenter`.
+[source,objectivec]
+----
+[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSyncMessage:) name:kFHSyncStateChangedNotification object:nil];
+
+* (void) onSyncMessage:(NSNotification*) note
+{
+FHSyncNotificationMessage* msg = (FHSyncNotificationMessage*) [note object];
+NSString* code = msg.code;
+if([code isEqualToString:REMOTE_UPDATE_APPLIED_MESSAGE]) {
+}
+  /* Codes:
+  *
+  * NSString *const SYNC_STARTED_MESSAGE = @"SYNC_STARTED";
+  * A synchronization cycle with the server has been started.
+  *
+  * NSString *const SYNC_COMPLETE_MESSAGE = @"SYNC_COMPLETE";
+  * A synchronization cycle with the server has been completed.
+  *
+  * NSString *const SYNC_FAILED_MESSAGE = @"SYNC_FAILED";
+  * Synchronization loop failed to complete.
+  *
+  * NSString *const OFFLINE_UPDATE_MESSAGE = @"OFFLINE_UPDATE";
+  * An attempt was made to update or delete a record while offline.
+  *
+  * NSString *const COLLISION_DETECTED_MESSAGE = @"COLLISION_DETECTED";
+  * Update failed due to data collision.
+  *
+  * NSString *const REMOTE_UPDATE_FAILED_MESSAGE = @"REMOTE_UPDATE_FAILED";
+  * Update failed for a reason other than data collision.
+  *
+  * NSString *const REMOTE_UPDATE_APPLIED_MESSAGE = @"REMOTE_UPDATE_APPLIED";
+  * An update was applied to the remote data store.
+  *
+  * NSString *const LOCAL_UPDATE_APPLIED_MESSAGE = @"LOCAL_UPDATE_APPLIED";
+  * An update was applied to the local data store.
+  *
+  * NSString *const DELTA_RECEIVED_MESSAGE = @"DELTA_RECEIVED";
+  * An change was received from the remote data store for the dataset.
+  * It's best to listen to this notification and update UI accordingly.
+  *
+  * NSString *const CLIENT_STORAGE_FAILED_MESSAGE = @"CLIENT_STORAGE_FAILED";
+  * Loading or saving to client storage failed. This is a critical error and the Sync Client will not work properly without client storage.
+  */
+}
+----
+
+.iOS (Swift)
+Synchronization notifications are dispatched via the standard `NSNotificationCenter` facility. To start receiving `kFHSyncStateChangedNotification` notifications, register using the `+addObserver(\_:selector:name:object:)+` or `+addObserverForName(\_:object:queue:usingBlock:)+` methods of `NSNotificationCenter`.
+[source,swift]
+----
+NSNotificationCenter.defaultCenter().addObserver(self, selector:Selector("onSyncMessage:"), name:"kFHSyncStateChangedNotification", object:nil)
+
+public func onSyncMessage(note: NSNotification) {
+  if let msg = note.object as? FHSyncNotificationMessage, let code = msg.code {
+    if code == REMOTE_UPDATE_APPLIED_MESSAGE {
+    }
+    /* Codes:
+    *
+    * let SYNC_STARTED_MESSAGE = "SYNC_STARTED"
+    * A synchronization cycle with the server has been started.
+    *
+    * let SYNC_COMPLETE_MESSAGE = "SYNC_COMPLETE"
+    * A synchronization cycle with the server has been completed.
+    *
+    * let SYNC_FAILED_MESSAGE = "SYNC_FAILED"
+    * Synchronization loop failed to complete.
+    *
+    * let OFFLINE_UPDATE_MESSAGE = "OFFLINE_UPDATE"
+    * An attempt was made to update or delete a record while offline.
+    *
+    * let COLLISION_DETECTED_MESSAGE = "COLLISION_DETECTED"
+    * Update failed due to data collision.
+    *
+    * let REMOTE_UPDATE_FAILED_MESSAGE = "REMOTE_UPDATE_FAILED"
+    * Update failed for a reason other than data collision.
+    *
+    * let REMOTE_UPDATE_APPLIED_MESSAGE = "REMOTE_UPDATE_APPLIED"
+    * An update was applied to the remote data store.
+    *
+    * let LOCAL_UPDATE_APPLIED_MESSAGE = "LOCAL_UPDATE_APPLIED"
+    * An update was applied to the local data store.
+    *
+    * let DELTA_RECEIVED_MESSAGE = "DELTA_RECEIVED"
+    * An change was received from the remote data store for the dataset.
+    * It's best to listen to this notification and update UI accordingly.
+    *
+    * let CLIENT_STORAGE_FAILED_MESSAGE = "CLIENT_STORAGE_FAILED"
+    * Loading or saving to client storage failed. This is a critical error and the Sync Client will not work properly without client storage.
+    */
+}
+----
+
+.{nbsp}.NET (C#)
+In the following section, `client` is a configured and initialised `FHSyncClient` instance. You can set event handlers of the type `EventHandler<FHSyncNotificationEventArgs>` to the different event types supported by the client.
+[source,csharp]
+----
+/// The event arguments that will be sent to the sync event listeners
+public class FHSyncNotificationEventArgs : EventArgs
+{
+    /// The id of the dataset
+    public string DatasetId { set; get; }
+
+    ///     The unique universal id of the record
+    public string Uid { private get; set; }
+
+    ///     Type fo the notification.
+    public SyncNotification Code { get; set; }
+
+    ///     An message associated with the event argument. Could be empty.
+    public string Message { get; set; }
+
+}
+
+/// Loading or saving to client storage failed. This is a critical error and the Sync Client will not work properly without client storage.
+client.ClientStorageFailed += async (sender, args) => { };
+
+/// A synchronization cycle with the server has been started.
+client.SyncStarted += async (sender, args) => { };
+
+/// A synchronization cycle with the server has been completed.
+client.SyncCompleted += async (sender, args) => { };
+
+/// An attempt was made to update or delete a record while offline.
+client.OfflineUpdate += async (sender, args) => { };
+
+/// Update failed due to data collision.
+client.CollisionDetected += async (sender, args) => { };
+
+/// Update failed for a reason other than data collision.
+client.RemoteUpdateFailed += async (sender, args) => { };
+
+/// An update was applied to the local data store.
+client.LocalUpdateApplied += async (sender, args) => { };
+
+/// An update was applied to the remote data store.
+client.RemoteUpdateApplied += async (sender, args) => { };
+
+/// A change was received from the remote data store for the dataset. It's best to listen to this notification and update UI accordingly.
+client.DeltaReceived += async (sender, args) => { };
+
+/// A delta was received from the remote data store for the record. It's best to listen to this notification and update UI accordingly.
+client.RecordDeltaReceived += async (sender, args) => { };
+
+/// Synchronization loop failed to complete.
+client.SyncFailed += async (sender, args) => { };
+----
+
+[[fh-sync-manage]]
+== $fh.sync.manage
+
+[source,javascript]
+----
+$fh.sync.manage(dataset_id, options, query_params, meta_data, callback);
+----
+
+[[sync-details-3]]
+=== Details
+
+Put a dataset under the management of the sync service. Calling manage multiple times for the same dataset will update the options and query_params but will not result in the dataset syncing multiple times.
+
+[[sync-example-2]]
+=== Example
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+// Configuration options object.
+// These override the options passed to init.
+var options = {
+"sync_frequency": 30 // Sync every 30 seconds for the 'tasks' dataset
+};
+
+// Parameters object to be passed to the cloud sync service.
+// It will be passed to the dataHandler when listing dataset on the back end.
+// If the default mBaas cloud implementation is used (which uses $fh.db for data handlers), all the valid list options can be used here.
+// For example, to list the tasks that are assigned to a user called "Tom", the query params should be
+var query_params = {
+"eq": {
+"assigned": "Tom"
+}
+};
+
+// Extra params that will be sent to the back-end data handlers.
+var meta_data = {};
+$fh.sync.manage(dataset_id, options, query_params, meta_data, function(){
+console.log('dataset ' + dataset_id + ' is now managed by sync');
+});
+----
+
+.Android (Java)
+
+[source,java]
+----
+//queryParams are any query supported by $fh.db
+JSONObject queryParams = new JSONObject();
+
+//MetaData such as sessionTokens, userIds, etc
+JSONObject metaData = new JSONObject();
+
+//Any String identifier
+String dataSet = "myDataSetId";
+
+// If configOverride is null then the config provided in FHSyncClient.init
+// will be used instead.
+FHSyncConfig configOverride = null;
+
+FHSyncClient.getInstance().manage(dataSet, configOverride, queryParams, metaData);
+----
+
+.iOS (Objective-C)
+
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+#define DATA_ID @"tasks"
+
+// Configuration options object.
+// These override the options passed to init.
+FHSyncConfig* conf = [[FHSyncConfig alloc] init];
+conf.syncFrequency = 10;
+
+// Parameters object to be passed to the cloud sync service.
+// For example, to list the tasks that are assigned to a user called "Tom":
+NSDictionary* query = @%7B@"assigned": @"Tom"};
+
+// Extra params that will be sent to the back-end data handlers.
+NSMutableDictionary* metaData = nil;
+
+// Initialise Sync Client
+FHSyncClient* syncClient = [[FHSyncClient alloc] initWithConfig:conf];
+
+// Put a dataset under the management of the sync service.
+[syncClient manageWithDataId:DATA_ID AndConfig:conf AndQuery:query AndMetaData:metaData];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+public let DATA_ID = "tasks"
+
+// Configuration options object.
+// These override the options passed to init.
+let conf = FHSyncConfig()
+conf.syncFrequency = 10
+
+// Parameters object to be passed to the cloud sync service.
+// For example, to list the tasks that are assigned to a user called "Tom":
+let query = ["assigned": "Tom"]
+
+// Initialise Sync Client
+let syncClient = FHSyncClient(config: conf)
+
+// Put a dataset under the management of the sync service.
+syncClient.manageWithDataId(DATA_ID, andConfig:conf, andQuery:query)
+----
+
+.{nbsp}.NET (C#)
+In the following section, `client` is a configured and initialised FHSyncClient instance. DataSets managed by FHSyncClient on the Windows platforms must implement the interface `IFHSyncModel`.
+[source,csharp]
+----
+/// The datasetId needs to be unique for your app and will be used to name the
+/// collection in the cloud.
+const string DatasetId = "tasks";
+
+/// Query is a Dictionary of parameters to be sent to the server with each sync
+/// operation. If the default mBaas cloud implementation is used (which uses
+/// $fh.db for data handlers), all the valid list options can be used here.
+/// For example, to list the tasks that are assigned to a user called "Tom",
+/// the query params should be
+Dictionary<string, string> query = new Dictionary<string, string>
+{
+{"eq", "{"assigned", "Tom"}"}
+};
+
+/// When you manage a DataSet you may set new configuration parameters to
+/// override the parameters for the sync client. If you do not wish to do this,
+/// you may pass null into the FHSyncClient.manage method.
+var config = new FHSyncConfig();
+config.SyncFrequency = 100;
+
+/// Put a dataset under the management of the sync service. Note that Task
+/// is an implementation of the IFHSyncModel.
+client.Manage<Task>(DatasetId, config, query);
+----
+
+
+[[fh-sync-dolist]]
+== $fh.sync.doList
+
+[source,javascript]
+----
+$fh.sync.doList(dataset_id, success, failure);
+----
+
+[[sync-details-4]]
+=== Details
+
+Get a list of the records for the dataset.
+
+[[sync-example-3]]
+=== Example
+.JavaScript
+[source,javascript]
+----
+// Unique Id for the dataset to manage.
+// This must correspond to an “act” function which represents the cloud portion of the sync contract.
+var dataset_id = 'tasks';
+
+$fh.sync.doList(dataset_id, function(res) {
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+console.log(res);
+
+//res is a JSON object
+for(var key in res){
+  if(res.hasOwnProperty(key)){
+    // Unique Id of the record, used for read, update & delete operations (string).
+    var uid = key;
+    // Record data, opaque to sync service.
+    var data = res[key].data;
+    // Unique hash value for this record
+    var hash = res[key].hash;
+  }
+}
+
+}, function(code, msg) {
+// Error code. Currently only 'unknown_dataset' is possible
+console.error(code);
+
+// Optional free text message with additional information
+console.error(msg);
+
+});
+----
+
+.Android (Java)
+[source,java]
+----
+FHClient fhClient = FHSyncClient.getInstance();
+
+// Unique Id for the dataset being manage.
+String dataSetId = "photos";
+
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+JSONObject allData = fhClient.getSyncClient().list("photos");
+
+Iterator<String> keysIterator = allData.keys();
+List<Project> itemsToSync = new ArrayList<>();
+
+while (keysIterator.hasNext()) {
+// Unique Id of the record, used for read,
+//update & delete operations (string).
+String uid = keysIterator.next();
+
+  // Record data
+  JSONObject record = allData.getJSONObject(uid);
+
+  // The synced data object.  In Android this can be a JSON serialized POJO
+  JSONObject dataObj = data.getJSONObject("data");
+
+  // Unique hash value for this record
+  String hash = records.getString("hash");
+
+}
+
+projects.addAll(itemsToSync);
+bus.post(new ProjectsAvailable(new ArrayList<Project>(projects)));
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+#define DATA_ID @"tasks"
+
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+NSDictionary* items = [syncClient listWithDataId:DATA_ID];
+[items enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+// Unique Id of the record, used for read,
+// update & delete operations (string).
+NSString* uid = key; +
+// Record data
+NSDictionary* object = obj;
+NSDictionary* dataObj = object[@"data"];
+uid = object[@"uid"];
+}];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+let items = syncClient.listWithDataId(DATA_ID)
+for (key, value) in items {
+if let data = value["data"], let uid = value["uid"] {
+// do something with item
+}
+}
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+/// The datasetId needs to be unique for your app and will be used to name the
+/// collection in the cloud.
+const string DatasetId = "tasks";
+
+foreach (var item in client.List<Task>(DatasetId))
+{
+/// Do Something with item
+}
+----
+
+
+[[fh-sync-docreate]]
+== $fh.sync.doCreate
+
+[source,javascript]
+----
+$fh.sync.doCreate(dataset_id, data, success, failure);
+----
+
+[[sync-details-5]]
+=== Details
+
+Update the data associated with the unique id.
+
+[[sync-example-4]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+// Record data to create, opaque to sync service.
+var data = {
+"name": "Organise widgets",
+"time": Date.now() + 100000,
+"user": "joe@bloggs.com"
+};
+
+$fh.sync.doCreate(dataset_id, data, function(res) {
+// The update record which will be sent to the cloud
+console.log(res);
+}, function(code, msg) {
+// Error code. One of 'unknown_dataset' or 'unknown_id'
+console.error(code);
+
+// Optional free text message with additional information
+console.error(msg);
+
+});
+----
+
+.Android (Java)
+[source,java]
+----
+String dataSetId = "tasks";
+
+// Record data to create
+JSONObject data = new JSONObject();
+data.put("name", "Organise widgets");
+data.put("time", new Date().getTime() + 100000);
+data.put("user", "joe@bloggs.com");
+
+syncClient.create(dataSetId, data);
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+
+#define DATA_ID @"tasks"
+
+NSDate* now = [NSDate date];
+NSMutableDictionary* data = [NSMutableDictionary dictionary];
+[data setObject:shoppingItem.name forKey:@"name"];
+[data setObject:[NSNumber numberWithLongLong:[now timeIntervalSince1970]*1000] forKey:@"created"];
+[syncClient createWithDataId:DATA_ID AndData:data];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+let myItem: [String: AnyObject] = ["name": name, "created": created*1000]
+
+syncClient.createWithDataId(DATA_ID, andData: myItem)
+----
+
+.{nbsp}.NET (C#)
+In the following section, `client` is a configured and initialised FHSyncClient instance. Task is a class which implements `IFHSyncModel` and has a `string Name` property .
+[source,csharp]
+----
+/// The datasetId needs to be unique for your app and will be used to name the
+/// collection in the cloud.
+const string DatasetId = "tasks";
+
+Task task = new Task();
+task.Name = "task name";
+
+client.Create(MainPage.DatasetId, task);
+----
+
+[[fh-sync-doread]]
+== $fh.sync.doRead
+
+[source,javascript]
+----
+$fh.sync.doRead(dataset_id, uid, success, failure);
+----
+
+[[sync-details-6]]
+=== Details
+
+Read a single data record.
+
+[[sync-example-5]]
+=== Example
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+// Unique Id of the record to read.
+var uid = '42abcdefg';
+
+$fh.sync.doRead(dataset_id, uid, function(data) {
+// The record data
+console.log(data.data); //the data fileds
+console.log(data.hash); //the hash value of the data
+}, function(code, msg) {
+// Error code. One of 'unknown_dataset' or 'unknown_id'
+console.error(code);
+
+// Optional free text message with additional information
+console.error(msg);
+});
+----
+
+.Android (Java)
+[source,java]
+----
+//name of dataset to manage
+String dataSetId = "tasks";
+
+// Unique Id of the record to read.
+String uid = "42abcdefg";
+
+JSONObject record = FHSyncClient.getInstance().read(dataSetId, uid);
+
+if (data != null) {
+JSONObject document = record.getJSONObject("data");
+String uid = record.getString("uid");
+}
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+
+#define DATA_ID @"tasks"
+
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+NSDictionary* item = [syncClient readWithDataId:DATA_ID AndUID:@"42abcdefg"];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+// The data returned by the sync service.
+// Always a full data set (even in the case of deltas).
+let item = syncClient.readWithDataId(DATA_ID, andUID: "42abcdefg")
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+/// Unique Id of the record to read.
+string uid = "42abcdefg";
+
+Task task = client.Read(datasetId, uid);
+----
+
+[[fh-sync-doupdate]]
+== $fh.sync.doUpdate
+
+[source,javascript]
+----
+$fh.sync.doUpdate(dataset_id, uid, data, success, failure);
+----
+
+[[sync-details-7]]
+=== Details
+
+Update the data associated with the unique id.
+
+[[sync-example-6]]
+=== Example
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+// Unique Id of the record to update.
+var uid = '42abcdefg';
+
+// Record data to update. Note that you need to provide the FULL data to update.
+$fh.sync.doRead(dataset_id, uid, function(data){
+var fields = data.data;
+fields.name = "Organise layouts";
+$fh.sync.doUpdate(dataset_id, uid, fields, function(data) {
+// The updated record which will be send to the cloud
+console.log(data);
+}, function(code, msg) {
+// Error code. One of 'unknown_dataset' or 'unknown_id'
+console.error(code);
+
+  // Optional free text message with additional information
+  console.error(msg);
+});
+});
+----
+
+.Android (Java)
+[source,java]
+----
+// name of dataset to manage
+String dataSetId = "tasks";
+
+// Unique Id of the record to read and update.
+String uid = "42abcdefg";
+
+// Fetch a record
+JSONObject record = FHSyncClient.getInstance().read(dataSetId, uid);
+
+// Fetch the data of the record and change a field
+JSONObject data = record.getJSONObject("data");
+data.set("newField","newValue");
+
+// Update the data in the sync system
+FHSyncClient.getInstance().update(dataSetId, uid, data);
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+#define DATA_ID @"tasks"
+
+// The Updated data
+NSDate* now = [NSDate date];
+NSMutableDictionary* data = [NSMutableDictionary dictionary];
+[data setObject:shoppingItem.name forKey:@"name"];
+[data setObject:[NSNumber numberWithLongLong:[now timeIntervalSince1970]*1000] forKey:@"created"];
+
+NSDictionary* item = [syncClient updateWithDataId:DATA_ID AndUID:@"42abcdefg" AndData:data];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+// The Updated data
+let myItem: [String: AnyObject] = ["name": name, "created": created*1000]
+syncClient.updateWithDataId(DATA_ID, andUID: uid, andData: myItem)
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+/// Unique Id of the record to read.
+string uid = "42abcdefg";
+
+Task task = client.Read(datasetId, uid);
+
+task.Name = "new name";
+
+Task task = client.Update(datasetId, task);
+----
+
+[[fh-sync-dodelete]]
+== $fh.sync.doDelete
+
+[source,javascript]
+----
+$fh.sync.doDelete(dataset_id, uid, success, failure);
+----
+
+[[sync-details-8]]
+=== Details
+
+Delete the data associated with the unique id.
+
+[[sync-example-7]]
+=== Example
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+// Unique Id of the record to delete.
+var uid = '42abcdefg';
+
+$fh.sync.doDelete(dataset_id, uid, function(data) {
+// The deleted record data sent to the cloud.
+console.log(data);
+}, function(code, msg) {
+// Error code. One of 'unknown_dataset' or 'unknown_id'
+console.error(code);
+
+// Optional free text message with additional information
+console.error(msg);
+}
+----
+
+.Android (Java)
+[source,java]
+----
+// name of dataset to manage
+String dataSetId = "tasks";
+
+// Unique Id of the record to remove.
+String uid = "42abcdefg";
+
+FHSyncClient.getInstance().delete(dataSetId, uid);
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+
+#define DATA_ID @"tasks"
+
+NSDictionary* item = [syncClient deleteWithDataId:DATA_ID AndUID:@"42abcdefg"];
+----
+
+<div class="tab-pane" id="example-doDelete-swift">
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+syncClient.deleteWithDataId(DATA_ID, andUID: uid)
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+/// Unique Id of the record to delete.
+string uid = "42abcdefg";
+
+client.Delete(datasetId, uid);
+----
+
+[[fh-sync-startsync]]
+== $fh.sync.startSync
+
+[source,javascript]
+----
+$fh.sync.startSync(dataset_id, success, failure)
+----
+
+[[sync-details-9]]
+=== Details
+
+Start the sync loop if 'sync_active' option is set to false.
+
+[[sync-example-8]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+$fh.sync.startSync(dataset_id, function(){
+console.log('sync loop started');
+}, function(error){
+console.log('failed to start sync loop. Error : ' + error);
+});
+----
+
+.Android (Java)
+The link:http://developer.android.com/training/basics/activity-lifecycle/index.html[Activity lifecycle^] must be considered if your `FHSyncListener` references an Activity or Fragment. The `pauseSync` and `resumeSync` methods are created for this situation. There is also a `destroy` method which shuts down synchronization entirely.
+
+[source,java]
+----
+// Synchronization is automatically started by the FHSyncClient.init method.
+// However, synchronization may be paused and resumed in the Activity
+// lifecycle onPause and onResume methods.
+
+@Override
+public void onPause() {
+super.onPause();
+FHSyncClient.getInstance().pauseSync();
+}
+
+@Override
+public void onResume() {
+super.onResume();
+FHSyncClient.getInstance().resumeSync(new FHSyncListener() { });
+}
+
+public void onDestroy() {
+super.onDestroy();
+FHSyncClient.getInstance().destroy();
+}
+----
+
+.iOS (Objective-C)
+There is no `startSync` method in the iOS Synchronization API. Synchronization is started with the xref:fh-sync-init[init] method.
+
+.iOS (Swift)
+There is no `startSync` method in the iOS Synchronization API. Synchronization is started with the xref:fh-sync-init[init] method.
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+client.Start(datasetId);
+----
+
+[[fh-sync-stopsync]]
+== $fh.sync.stopSync
+
+[source,javascript]
+----
+$fh.sync.stopSync(dataset_id, success, failure)
+----
+
+[[sync-details-10]]
+=== Details
+
+Stop the sync loop for a dataset.
+
+[[sync-example-9]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+$fh.sync.stopSync(dataset_id, function(){
+console.log('sync loop stopped');
+}, function(error){
+console.log('failed to stop sync loop. Error : ' + error);
+});
+----
+
+.Android (Java)
+
+The `stop` function will stop synchronizing a dataset but it will not remove the `FHSyncListener` attached to the `FHSyncClient` instance.
+
+[source,java]
+----
+String dataSetId = "tasks";
+
+FHSyncClient.getInstance().stop(dataSetId);
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+
+#define DATA_ID @"tasks"
+
+[syncClient stopWithDataId:DATA_ID];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+syncClient.stopWithDataId(DATA_ID)
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+client.Stop(datasetId);
+----
+
+[[fh-sync-dosync]]
+== $fh.sync.doSync
+
+[source,javascript]
+----
+$fh.sync.doSync(dataset_id, success, failure)
+----
+
+[[sync-details-11]]
+=== Details
+
+Run the sync loop almost immediately (within next 500 ms) if `sync_active` is true.
+
+[[sync-example-10]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+$fh.sync.doSync(dataset_id, function(){
+console.log('sync loop will run');
+}, function(error){
+console.log('failed to run sync loop. Error : ' + error);
+});
+----
+
+.Android (Java)
+There is no `doSync` method in the Android SDK. Use xref:fh-sync-forcesync[forceSync] instead.
+
+.iOS (Objective-C)
+There is no `doSync` method in the iOS Synchronization API. Use xref:fh-sync-forcesync[forceSync] instead.
+
+.iOS (Swift)
+There is no `doSync` method in the iOS Synchronization API. Use xref:fh-sync-forcesync[forceSync] instead.
+
+.NET (C#)
+There is no `doSync` method in the Windows Synchronization API. Use xref:fh-sync-forcesync[ForceSync] instead.
+
+[[fh-sync-forcesync]]
+== $fh.sync.forceSync
+
+[source,javascript]
+----
+$fh.sync.forceSync(dataset_id, success, failure)
+----
+
+[[sync-details-12]]
+=== Details
+
+Run the sync loop almost immediately (within next 500 ms) even if `sync_active` is false.
+
+[[sync-example-11]]
+=== Example
+
+.JavaScript
+[source,javascript]
+----
+var dataset_id = 'tasks';
+
+$fh.sync.forceSync(dataset_id, function(){
+  console.log('sync loop will run');
+}, function(error){
+  console.log('failed to run sync loop. Error : ' + error);
+});
+----
+
+.Android (Java)
+If a `FHSyncClient` has been "destroyed" with `FHSyncClient.destroy()`, you must call `init` again before calling `forceSync`. When synchronization is paused, a synchronization loop is still performed, but no listeners are attached and no events are fired.
+[source,java]
+----
+String dataSetId = "tasks";
+
+FHSyncClient.getInstance().forceSync(dataSetId);
+----
+
+.iOS (Objective-C)
+[source,objectivec]
+----
+// Unique Id for the dataset to manage.
+
+#define DATA_ID @"tasks"
+
+[syncClient forceSync:DATA_ID];
+----
+
+.iOS (Swift)
+[source,swift]
+----
+// Unique Id for the dataset to manage.
+public let DATA_ID = "tasks"
+
+syncClient.forceSync(DATA_ID)
+----
+
+.{nbsp}.NET (C#)
+[source,csharp]
+----
+string datasetId = "tasks";
+
+client.ForceSync(datasetId);
+----

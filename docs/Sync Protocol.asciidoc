@@ -1,0 +1,514 @@
+[[sync-protocol]]
+= Sync Protocol
+
+[[overview]]
+== Overview
+
+This document is aiming to provide a detailed explanation about the FH sync framework for developers. 
+
+This document will use the FH Sync JS SDK implementation as a reference.
+
+
+
+
+
+CRUDL operations on the dataset are invoked via the client APIs. 
+
+A dataset is a map. The key is the universal unique id (UID) of the data record and the value is an instance of data record.
+A data record is a map too. It contains 2 keys: data and hash. The data is the actual user data. The hash is the hash value generated from the data. The same user data will result in the same hash value.
+At the moment, all the SDKs persist client side dataset as files.
+
+Any write operations will result in a pending change. Normally there will be a set of pending changes (ChangeSet) on the client.
+
+The ChangeSet is a map. The keys are the hash values of the instances of Pending Change.
+Each Pending Change will be like this:
+
++
+[source,json]
+----
+{
+  "uid": <the unique id of the data record. For creation, it’s the hash of the pending record>,
+ "hash": <the hash value of the pending record>,
+ "action": <operation type, should be one of create, update or delete>,
+ "post": <the updated user data>,
+ "postHash": <the hash value of the updated user data>
+ "pre": <the user data before the change>,
+ "preHash": <the hash value of the user data before the change>
+ "timestamp": <when this pending change is generated>
+}
+----
++
+The sync loop will run at an interval set by the app (the value of sync frequency in the config) or anytime if there are updates (if the auto_sync_local_updates config flag is set to true). During each sync loop, the client SDK will first try to submit all the pending changes that haven’t been submitted before to the cloud via HTTP. 
+
+Sample Request Body:
++
+[source,json]
+----
+{
+  "fn": "sync",  //the name of the function to invoke in the cloud
+  "dataset_id": "myShoppingList",  //the id of the dataset it tries to sync
+  "query_params": {},  //the query params set by the client app. Query params can be used to filter the data set returned - e.g. for a specific user, or data within a geo-fenced area. The server side sync handlers need to understand how to use query params to filter data sets returned from the back end.
+  "config": {  //the client sync configurations
+    "sync_frequency": 15,
+    "auto_sync_local_updates": true,
+    "notify_client_storage_failed": true,
+    "notify_sync_started": true,
+    "notify_sync_complete": true,
+    "notify_offline_update": true,
+    "notify_collision_detected": true,
+    "notify_remote_update_failed": true,
+    "notify_local_update_applied": true,
+    "notify_remote_update_applied": true,
+    "notify_delta_received": true,
+    "notify_record_delta_received": true,
+    "notify_sync_failed": true,
+    "do_console_log": true,
+    "crashed_count_wait": 1,
+    "resend_crashed_updates": true,
+    "sync_active": true,
+    "storage_strategy": "dom",
+    "file_system_quota": 61644800,
+    "has_custom_sync": false,
+    "icloud_backup": false
+  },
+  "meta_data": {},  //the custom meta data set by the client app. This meta data will be sent to the cloud data handler to allow developers to limit the scope of the data set
+  "dataset_hash": "a6f7dccd2c70c2743c348f46d905e119f10f2298",  //the hash value of the client dataset
+  "acknowledgements": [],  //to confirm acknowledged cloud replies from previous calls
+  "pending": [{   //the pending changes that haven’t been submitted before
+    "inFlight": true,
+    "action": "update",
+    "post": {
+      "name": "g6",
+      "created": 1444763286767
+    },
+    "postHash": "d05be16096158efd93e77584569576a52a0ff022",
+    "timestamp": 1444772422701,
+    "uid": "561d56bb176f7e000000000f",
+    "pre": {
+      "name": "g5",
+      "created": 1444763286767
+    },
+    "preHash": "c7a80aebb917865b655bb3eee1289735e9809379",
+    "hash": "5a53abb526abd460a552135571f62b732ed34728",
+    "inFlightDate": 1444772424027
+  }],
+  "__fh": {  //extra device/app info added by the FH JS SDK
+    "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+    "cuidMap": null,
+    "destination": "web",
+    "sdk_version": "FH_JS_SDK/2.10.0",
+    "appid": "kceR5H95sLXXqr7ejwYh9zXP",
+    "appkey": "8c1b3fba33a7d741e7726dea52efc14e994f7c0c",
+    "projectid": "kceR5HZqoDgFRZ7vMJXgPoJ2",
+    "connectiontag": "0.0.1"
+  }
+}
+----
++
+Once the cloud receives the request, it will invoke the function specified in the request body. For the ‘sync’ function, it will process all the pending changes in the request body.
+For each of the pending change, the cloud will decide if each change can be applied:
+For update and delete, there will be a collision detection: the preHash value in the pending change should match the current hash value of the data with the same uid. If not, the update/delete will not be applied, and a collision will be reported. It is up to the developer to decide how best to handle collisions. This is done by implementing the server side colissionHandler function 
+the result of processing each pending change will be recorded in the MongoDB of the app.
+
+If the pending change should be applied, the cloud sync API will then call the corresponding data handlers to update the data to the database.
+
+After all the pending changes are processed, the cloud app will return the results of the process that are recorded in the MongoDB. 
+
+It’s possible that it will take too long for the cloud to process all the pending changes - usually due to a slow back end system or a large number of pending records. In this case, the client request will be timed out and mark those pending changes as "crashed".
+However, since the results of those changes are saved in the db, in future sync loops, the results will be returned eventually. The client will be able to deal with the results of those updates later on.
+Once the client receives the results of those pending changes, it will iterate through each of the update and:
+acknowledge receiving the results of the pending change
+remove the processed pending change from local change set
+process previously pending changes that are failed ("crashed")
+Check to see if any of the delayed pending changes can be submitted
+Make sure the client dataset internal meta contains the correct information
+
+The response will be like this:
++
+[source,json]
+----
+	{
+  	  "hash": "61468b040690d5a8ef14568095b887190c80436a",  //the hash value of the same dataset in the cloud. The client will compare it against the client dataset hash to determine if the syncRecords request is required
+              "updates": {  //the results of all the pending changes that have been processed by the cloud app
+                "hashes": {  //a map of hashes of all the processed pending changes and the results
+                  "5a53abb526abd460a552135571f62b732ed34728": {
+                    "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+                    "type": "applied",
+                    "action": "update",
+                    "hash": "5a53abb526abd460a552135571f62b732ed34728",
+                    "uid": "561d56bb176f7e000000000f",
+                    "msg": "''"
+                  }
+               },
+              "applied": { //the pending changes that have been applied. Similarly, there will be other keys called "failed" and "collisions" for those are not applied               
+   "5a53abb526abd460a552135571f62b732ed34728": {
+                "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+                "type": "applied",
+                "action": "update",
+                "hash": "5a53abb526abd460a552135571f62b732ed34728",
+                "uid": "561d56bb176f7e000000000f",
+                "msg": "''"
+            }
+          }
+        }
+      }
+----
++
+The client will also compare the current dataset’s hash value and the hash value of the cloud dataset returned in the last step. If the hash values don’t match, the client will invoke another "syncRecords" request. The client will send all the data UIDs in the dataset and their corresponding data hashes. For example:
++
+[source,json]
+----
+{
+  "fn": "syncRecords",  //the cloud function name
+  "dataset_id": "myShoppingList", 
+  "query_params": {}, 
+  "clientRecs": {  //the client data records’ UIDs and hashes
+    "561d002893ef7d0000000017": "8899c109e001e5dc55544f1390c89510db01c9b2",
+    "561d00b6ea74200000000001": "983b6438d40229920b8f527510c3c46e581391dc",
+    "561d019fea74200000000007": "e63fb354a6f132b4ba791219ea9f83af0cd6b9e4",
+    "561d3036176f7e0000000004": "3a4bb885163f73515d36789ad8025a55f50f6f8f",
+    "561d3074176f7e0000000006": "7e32fbbe0a4d144e124362d46c9e7d02e595c22d",
+    "561d56bb176f7e000000000f": "d05be16096158efd93e77584569576a52a0ff022"
+  },
+  "__fh": {
+    "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+    "cuidMap": null,
+    "destination": "web",
+    "sdk_version": "FH_JS_SDK/2.10.0",
+    "appid": "kceR5H95sLXXqr7ejwYh9zXP",
+    "appkey": "8c1b3fba33a7d741e7726dea52efc14e994f7c0c",
+    "projectid": "kceR5HZqoDgFRZ7vMJXgPoJ2",
+    "connectiontag": "0.0.1"
+  }
+}
+----
++
+When the cloud receives the request, it will compare the client records with the current records in the cloud, and return the deltas.
+
+The cloud app keeps a copy of the dataset for the client in memory, and periodically sync with the backend database. The dataset is automatically removed if there is no activity from the client for a period of time.
+
+
+Sample response:
++
+[source,json]
+----
+{
+  "create": {  //the data that is in cloud but not in the client
+    "561d8e63fd12f11b1e000005": {
+      "data": {
+        "name": "h",
+        "created": 1444777543903
+      },
+      "hash": "deed09ce48982efed9bd21c94c7f056f2959cf81"
+    }
+  },
+  "update": { //the data that does not match
+    "561d56bb176f7e000000000f": {
+      "data": {
+        "name": "g7",
+        "created": 1444763286767
+      },
+      "hash": "63248b16951fbaa50b1513e9d722f0d12a113403"
+    }
+  },
+  "delete": {  //the data that is in the client but not in the cloud
+  },
+  "hash": "72489ccd1b64ad08a08cb5ed6706228668e6a345" //the global dataset hash
+}
+----
++
+when the client receives the response, it will merge the pending changes (user can change data between the time the first request is finished and the second request is finished. Those changes are not submitted to the cloud yet) with the delta, and update the local dataset.
+
+if any there any pending changes, remove the corresponding delta from the response as they are not up to date
+apply the rest of the delta to the dataset
+For those failed or collided pending changes, as described in step 6c, once the client acknowledges that those changes have been processed by the cloud, it will remove those pending changes from the client side change set. Then at this point, it will be either:  
+There are no subsequent pending changes based on these failed/collided changes. In this case, the cloud response will be applied to the current dataset for those records immediately and users will see those records are updated to be the value in the cloud.
+There are subsequent pending changes based on these failed/collided changes (delayed pending changes).  In this case, since those pending changes are still in the client change set, the local value will be kept and those changes will be submitted during next sync loop. However, it highly likely those changes will be failed or cause collisions too. Then it will end up in the above situation and the client data will be reverted too. 
+
+At this point, one sync loop is completed. The same steps will repeat during next loop.
+
+Effectively, the first request is responsible for sending patch from the client to the cloud, and the second request will download patch from the cloud to the client. For example, given the dataset A, and its initial state A1 on both client side and cloud side:
+
+Initial state: 
+client = A1, cloud = A1
+User making changes on the client: 
+client = B1 = A1 + diff(A1, B1)
+The first request will submit diff(A1, B1) to the cloud: 
+cloud = A1 + diff(A1, B1) = B1
+In the meantime, cloud has other changes from other clients: 
+	cloud = B1 + diff(B1, C1) = C1
+In the meantime, the user has made more changes on the client:
+	client = D1 = B1 + diff(B1, D1)
+Now the second request will send out current client status D1 to the cloud, and cloud currently have C1, so the client will get back diff(D1, C1).  If we apply the response to the client, it will become:
+client = D1 + diff(D1, C1) + diff(B1, D1) = C1 + diff(B1, D1)
+cloud = C1
+
+At this stage, the client has got the cloud data, and its own new data. The new changeset will be submitted during next sync loop. Once at a stage where diff(B1,D1) == null, we will have C1 = C1 (client and cloud are synced)
+Squash Pending Changes
+
+In order to save space, a small technique is used called "squashing". Basically, the idea is if more than one changes are made to a record before a sync loop occurs, only the value before all those changes and the very last change is saved. All the Intermediate changes are discarded.
+
+For example, given the record current value is A. The user is making a few changes to the record to change it from A to B, then B to C, then C to D. At the end, in the sync request, the pending change will only contain
+
+…
+pre: A
+post: D
+…
+
+The way to achieve this is to use another internal map (called meta, this is different from the meta data that can be set via the API) to track if there are existing pending changes for a given uid. For example, given a record with UID uid1, its value is changed from A to B, there will be a new pending change in the changeset (call it P1), and the hash value of this pending change is hash(AB). This is saved in the meta like this:
++
+[source,json]
+----
+{
+  "uid1": {
+    "fromPending": true,
+    "pendingUid": hash(AB)
+  }
+}
+----
++
+Then the value is changed from B to C, which results in another pending change (P2) with hash value hash(BC). The sync client will look up the meta and it will see there is already a pending change for this data record and it hasn’t been submitted. Then it will use the "pendingUid" value (the hash of the previous pending change) to locate the pending change, and update the post value of P1 to the post value of P2:
+
+P1.post = P2.post = C;
+P1.postHash = P2.postHash = hash(BC) ;
+
+After this, P2 will be discarded.
+
+Different strategy is used for other operations:
+
+If the current pending change operation is "create" and there is a previous pending change
+This should be a rare case (e.g. double submission from the client).  The previous pending change is deleted
+If the current pending change operation is "delete"
+If the previous change is "create", they will cancel each other. Both of them will be removed from the change set
+If the previous change is "update", the current pending change’s pre value will change to the previous change’s pre value. For example, A is change to B (P1) and then deleted (P2). In this case, the change of A to B should be removed:
+P2.pre = P1.pre = A
+P2.preHash = P1.preHash = hash(A)
+delete P1
+
+One thing to notice is that squashing will not happen if the previous pending change has been submitted (the inflight flag of the previous pending change is set to true). 
+
+Crashed Pending Changes
+
+As mentioned earlier on, the first sync request could fail due to network errors, time outs etc. In this case, the pending changes submitted in those requests will be marked as "crashed".
+
+The re-submission of the crashed pending changes can be controlled via 2 configuration options:
+
+crash_count_wait: how many sync loops it should wait before re-submitting the crashed changes
+resend_crashed_updates: should the crashed updates be submitted again
+
+The reason why we need to wait before re-submitting the crashed pending changes is unclear at this stage. It might have it’s purpose at the very beginning. But not sure if we still need those now. For example:
+
+If the failure was caused by network error, then those changes should be re-submitted
+If the failure was caused by cloud app taking too long to process, if those changes are re-submitted again, the cloud app will see the same pending changes more than once. However, the cloud app will save each processed pending change in the cloud db, and it will look up the table to see if a pending change is already processed (using the hash value of the pending change). This means even if there are multiple submissions for the same pending change, the cloud app will only process it once.
+
+Given the above reasons, I think it’s safe to deprecate the crash_count_wait and resend_crashed_updates options and always re-submit crashed pending changes.
+
+Delayed Pending Changes
+
+This example will explain how the delayed flag will be used:
+
+Given a record with UID uid1, and it’s current value A. The user first change the value from A to B, which results in a pending change called P1 (hash value: hash(AB)).
+
+Then P1 is submitted. At the same time, user changed the value from B to C, results in pending change P2 (hash value: hash(BC)). Because P1 is being submitted, P2 will not be squashed into P1.
+
+For whatever reason, the P1 submission fails and is marked as crashed. The app is configured to re-submit the crashed pending changes immediately in next sync loop.
+
+Now, at this moment, there are 2 pending changes in the change set:
++
+[source,json]
+----
+{
+ hash(AB): {
+   uid: uid1,
+   pre: A,
+   post: B
+  },
+  hash(BC): {
+   uid: uid1,
+   pre: B,
+   post: C
+  }
+}
+----
++
+Then the next sync loop is started. The change set are converted into an array of pending changes during the request. However, since the change set is a map, we can not guarantee the order of the pending changes in the array, it could end up with [P1, P2] in the pending array, or [P2, P1] in the pending array.
+
+If it is the former, the changes will be applied. If it is the latter, it will result a conflict, none of the changes will be applied.
+
+To fix this issue, the "delayed" flag is introduced to the pending changes. It means the pending change should not be submitted as there are previous changes that are being submitted and haven’t got response from the cloud yet. 
+
+In this case, because P1 is being submitted, then P2 will be marked as delayed and it will not be submitted until P1 is resolved. The P1 can be resolved using the response of the first sync request. An extra step is required to check if any of the delayed pending changes can be sent in the next sync loop.
+
+Hash Algorithm
+
+In order to generate the same hash across different client SDKs and the cloud SDK, a simple algorithm is used to make sure the data will be always serialized into the same format. It can be demoed using the following pseudocode:
++
+[source,json]
+----
+var out = [];
+function sortObj(data){
+    var keys = data.keys();
+    keys = sort(keys);  //should use the unicode code points, see javascript’s sort for reference
+    for key in keys:
+        var value = data[key];
+        if typeof value == "string":
+            out.push({"key": key, "value": data[key]})
+         else:
+           sortObj(data[key]);
+}
+----
++
+
+For example, data {a:1, b:2, c:3} will be converted to:
+[{"key":"a", "value": 1}, {"key":"b", "value": 2}, {"key":c", "value": 3}]
+
+Then SHA1 hash will be used to generate the hash value.
+UID changes for data created on the client
+
+As described in the sync protocol, when a new data record is created on the client, a temporary UID will be generated on the client and assigned to it. Once the data is synced to the cloud, the the real uid will be returned in the response of the first sync request.
+
+Sample request body (only the pending part is listed here):
++
+[source,json]
+----
+{
+  ...
+  "pending": [{
+    "inFlight": true,
+    "action": "create",
+    "post": {
+      "name": "i",
+      "created": 1444826652192
+    },
+    "postHash": "8619f71cf44f2fbf90d40ca9f8769d603fb42aae",
+    "timestamp": 1444826652193,
+    "hash": "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b",
+    "uid": "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b",  //temporary UID, it is the hash value of this pending record
+    "inFlightDate": 1444826663091
+  }],
+  ...
+}
+----
+Sample Response:
++
+[source,json]
+----
+{
+  "hash": "fdbaab8279ba8d6035ccc6eb32783513e02a1c93",
+  "updates": {
+    "hashes": {
+      "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b": {
+        "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+        "type": "applied",
+        "action": "create",
+        "hash": "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b",
+        "uid": "561e4e45fd12f11b1e000008",
+        "msg": "''"
+      }
+    },
+    "applied": {
+      "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b": {
+        "cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+        "type": "applied",
+        "action": "create",
+        "hash": "6b4419dd66d0ff72f3bdb5796617af64c8e0d89b",  //the temporary UID from the client
+        "uid": "561e4e45fd12f11b1e000008", //the real UID in the cloud
+        "msg": "''"
+      }
+    }
+  }
+}
+----
++
+However, this change of UID will cause a problem for the app developers - after the data is created in the sync framework, the app could save the data record into its own db. But later on if the app tries to read the same data again using the UID from local saved data, it will not be able to find the data record as the UID has changed.
+
+To solve this problem, the sync framework should handle both the new UID and old UID correctly. In order to do this, a new map can be introduced to track the UID changes.
+
+For example, every time when the response of the first sync request is received, the client SDK should iterate through the applied pending changes and look for any "create" replies. If there are any, add the hash value (old UID) and the new uid to the new UID tracking map.
+
+Then when read/update/delete API is called, always check if the UID passed in is in the UID tracking map. If it is, get the real UID and use that instead.
+
+Events
+
+Various events are emitted at different stages of the sync loop, as shown in this diagram:
+
+
+
+
+
+At the moment, some of the client SDKs will emit those events by default (e.g. JS SDK), some SDKs will not emit those events by default (e.g. iOS and Android SDK, can be overwritten in the SyncConfig object). The .NET SDK will only emit those events if there are corresponding listeners are set. This should be changed in the future releases to keep them consistent.
+
+When those events are enabled, each of the listeners will be invoked with a notification parameter. This notification parameter contains different fields for different events:
+
+LOCAL_UPDATE_APPLIED
+An event of this type will be emitted once the change of a record is saved locally
+datasetId: the id of the dataset
+uid: the uid of the saved data record
+code: the type of the event (LOCAL_UPDATE_APPLIED)
+message: the name of the operation (e.g. create, update)
+SYNC_STARTED
+An event of this type will be emitted once the sync loop starts
+datasetId: the id of the dataset
+uid: null
+code: the type of the event (SYNC_STARTED)
+message: null
+REMOTE_UPDATE_APPLIED/REMOTE_UPDATE_FAILED/COLLISION_DETECTED
+there will be one event emitted for each of the processed pending changes returned from the cloud app
+applied -> REMOTE_UPDATE_APPLIED
+failed -> REMOTE_UPDATE_FAILED
+collision -> COLLISION_DETECTED
+datasetId: the id of the dataset
+uid: the uid of the record
+code: the type of the event
+message: the json object return in the "updates" response. e.g.
+"cuid": "6C1F4BAFC6EE4D768202B65A7FDEF7DB",
+"type": "applied",
+"action": "update",
+"hash": "5a53abb526abd460a552135571f62b732ed34728",
+"uid": "561d56bb176f7e000000000f",
+"msg": "''"
+DELTA_RECEIVED/DELTA_RECORD_RECEIVED
+there will be one event emitted for each of the delta records returned from the cloud
+datasetId: the id of the dataset
+uid: the uid of the record
+code: the type of the event
+message: the operation to apply (e.g. create/update/delete)
+SYNC_COMPLETE
+should be emitted when the sync loop is finished succesfully
+datasetId: the id of the dataset
+uid: the hash value of the dataset
+code: the type of the event
+message: the status (e.g. online, offline etc)
+SYNC_FAILED
+should be emitted when there are errors during the sync loop
+datasetId: the id of the dataset
+uid: the hash value of the dataset
+code: the type of the event
+message: possible error messages (if available)
+
+
+Deprecated events:
+
+There are a few events are deprecated and should not be used anymore (they will be removed in future releases).
+
+DELTA_RECEIVED with message "full dataset"
+This has been removed in some sdks (Android, and JS), but still available in others (iOS). 
+There is no individual record uid is available in the notification message
+The client app need to call the list API to get the current available data.
+
+How to use those events:
+To get the data in the sync framework and save it using other ways(e.g. CoreData)
+The best way to do this is to listen on the LOCAL_UPDATE_APPLIED and DELTA_RECEIVED/DELTA_RECORD_RECEIVED events.
+Those events will make sure the app is notified when there are changes made by either local user or remote users
+The uid of the affected data record and the corresponding operation is available in the notifications. The app need to read the data record using the given UID from the sync framework first, and modify the local data accordingly. An example can be found here
+Notify users about failures/collisions
+It’s best to notify users about failures and collisions using the REMOTE_UPDATE_FAILED and COLLISION_DETECTED events. 
+The data could roll back to the value that is valid in the cloud. So it may look like the local user change is discarded without some sort of notifications.
+
+
+
+
+References
+
+A web sequence diagram for the sync framework
+Useful test cases to verify the sync framework

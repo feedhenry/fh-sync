@@ -1,0 +1,227 @@
+:ProductName: FeedHenry Mobile Application Platform
+:ProductShortName: FeedHenry
+
+[[data-sync-framework]]
+= Data Sync Framework
+
+The {ProductShortName} mobile data synchronization framework provides the following key functionality:
+
+* Allows mobile apps to use & update data offline (local cache)
+* Provides a mechanism to manage bi-directional data synchronization from multiple client apps via app cloud & into back end data stores
+* Allows data updates (that is, deltas) to be distributed from the App Cloud to connected clients
+* Provides facilities for managing data collisions from multiple updates in the cloud
+
+This service effectively allows {ProductShortName} Apps to seamlessly continue working when the network connection is lost, and allow them to recover when the network connection is restored.
+
+[[high-level-architecture]]
+== High Level Architecture
+
+image:sync_architecture.png[sync_architecture]
+
+* App Cloud provides default data access implementations using hosted data storage. But developer can also define data handler implementation functions to provide sync server access to back-end data store
+** create, read, update, delete, list (CRUDL) & collisionHandler
+* Cloud sync server uses these functions to manage back end data
+* Sync Framework exists as a set of App Client and App Node.js APIs
+* App client uses Sync Client APIs to manage data on device
+** App Client does not access back end data directly - only through sync client APIs
+** Developer uses sync client to manage datasets on device:
+** Developer receives notifications from sync client when dataset changes
+** Developer reads & lists data via sync client
+** Developer sends creates, updates and deletes to sync client (which synchronizes them with App Cloud)
+* Sync Client maintains local data store of dataset in memory and on device
+** In memory data store periodically flushed to local storage
+* Client Sync Service sends updates from App Client to App Cloud and receives deltas from App Cloud of changes to dataset
+** Local updates are flushed to local storage when client is offline so updates can be pushed at a later date - even if app is closed before network is available
+* App Cloud uses sync server to maintains data state with back end data store
+** App Cloud business logic does not access back end data directly - only through sync server
+
+[[api]]
+== API
+
+The Client and Node.js API calls for Sync are thoroughly documented here:
+
+* link:{ClientAPI}#fh-sync[JavaScript SDK API] Sync section.
+* link:{CloudAPI}#fh-sync[Node.js API] Sync section.
+* http://feedhenry.github.io/fh-ios-sdk/FH/docset/Contents/Resources/Documents/index.html[iOS SDK Docs^]
+* http://www.javadoc.io/doc/com.feedhenry/fh-android-sdk/3.2.0[Android SDK Docs^]
+
+[[basic-usage]]
+== Basic Usage
+
+If you just need to get the sync framework working with your app, here are the steps you need to follow:
+
+. Init $fh.sync on the client side
++
+[source,javascript]
+----
+  //See [JavaScript SDK API](../api/app_api.html#app_api-_fh_sync) for the details of the APIs used here
+
+  var datasetId = "myShoppingList";
+
+  //provide sync init options
+  $fh.sync.init({
+    "sync_frequency": 10,
+    "do_console_log": true,
+    "storage_strategy": "dom"
+  });
+
+  //provide listeners for notifications.
+  $fh.sync.notify(function(notification){
+    var code = notification.code
+    if('sync_complete' === code){
+      //a sync loop completed successfully, list the update data
+      $fh.sync.doList(datasetId,
+        function (res) {
+          console.log('Successful result from list:', JSON.stringify(res));
+          },
+        function (err) {
+          console.log('Error result from list:', JSON.stringify(err));
+        });
+    } else {
+      //choose other notifications the app is interested in and provide callbacks
+    }
+  });
+
+  //manage the data set, repeat this if the app needs to manage multiple datasets
+  var query_params = {}; //or something like this: {"eq": {"field1": "value"}}
+  var meta_data = {};
+  $fh.sync.manage(datasetId, {}, query_params, meta_data, function(){
+
+  });
+----
++
+.About the notifications
+The sync framework will emit different types of notifications during the sync life cycle. Depending on your app's requirements, you can choose which type of notifications your app should be listening to and add callbacks. However, it's not mandatory. The sync framework will running perfectly fine without any notification listeners.
++
+But adding appropriate notification listeners will help improve the user experience of your app when using the sync framework. Here are a few suggestions:
+
+* Show critical error messages to the user because the sync framework will not work properly when this type of errors occured. For example, client_storage_failed.
+* Log other type of errors/failures to the console to help debugging. For example, remote_update_failed, sync_failed.
+* Update the UI related to the sync data if delta is received, it means there are changes to the data and it's better to reflect the changes in the UI ASAP. For example, delta_received, record_delta_received.
+* Watch for collisions. Probably let the user know if collisions occured.
++
+That's pretty much it. Now you just need to make sure to use $fh.sync APIs to perform CRUDL operations on the client.
+
+. Init $fh.sync on the cloud side
++
+Just need to call the init function in your cloud app (probably on app start):
++
+[source,javascript]
+----
+var fhapi = require("fh-mbaas-api");
+var datasetId = "myShoppingList";
+
+var options = {
+  "sync_frequency": 10
+};
+
+fhapi.sync.init(datasetId, options, function(err) {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('sync inited');
+  }
+});
+----
++
+That's it. You can now use the sync framework in your app. You can find the sample app to demostrate the basic usage : https://github.com/feedhenry-templates/sync-app[Client App^] and https://github.com/feedhenry-templates/sync-cloud[Cloud App^].
++
+However, if the default data access implementations don't meet your app's requirements, you can provide override functions.
+
+[[advanced-usage]]
+== Advanced Usage
+
+The Sync Framework provides hooks to allow the App Developer to define how and where the source data for a dataset comes from. Often times the source data will be from an external database (MySql, Oracle, MongoDB etc), but this is not a requirement. The source data for a dataset could be anything - csv files, FTP meta data, or even data pulled from multiple database tables. The only requirement that the Sync Framework imposes is that each record in the source data have a unique Id & that the data is provided to the Sync Framework as a JSON Object.
+
+In order to synchronize with the back end data source, the App developer can implement code for this synchronization.
+
+For example, when listing data from back end, instead of loading data from database, I want to return hard coded data. Here are the steps:
+
+. Init $fh.sync on the client side
++
+This is the same as Step 1 in basic usage
+
+. Init $fh.sync on the cloud side and provide overrides
++
+[source,javascript]
+----
+var fhapi = require("fh-mbaas-api");
+var datasetId = "myShoppingList";
+
+var options = {
+  "sync_frequency": 10
+};
+
+//provide hard coded data list
+var datalistHandler = function(dataset_id, query_params, cb, meta_data){
+  var data = {
+    '00001': {
+      'item': 'item1'
+    },
+    '00002': {
+      'item': 'item2'
+    },
+    '00003': {
+      'item': 'item3'
+    }
+  }
+  return cb(null, data);
+}
+
+fhapi.sync.init(datasetId, options, function(err) {
+  if (err) {
+    console.error(err);
+  } else {
+    $fh.sync.handleList(datasetId, datalistHandler);
+  }
+});
+----
++
+Check the link:{CloudAPI}#fh-sync[Node.js API] Sync section for details on how to provide more overrides.
+
+[[further-reading]]
+== Further Reading
+
+If you are interested, here is more information to help you understand the sync framework.
+
+[[datasets]]
+=== Datasets
+
+At it's most basic, a dataset is a JSON Object which represents data to be synchronized between the App Client and App Cloud. The structure of a Dataset is as follows:
+
+[source,javascript]
+----
+{
+  record_uid_1 : {<JSON Object of data>},
+  record_uid_2 : {<JSON Object of data>},
+  record_uid_3 : {<JSON Object of data>},
+  ...
+}
+----
+
+Each record in a dataset MUST have a unique identifier (UID). This UID is used as the key for the record in the dataset.
+
+The Sync Framework can manage multiple datasets - each of which can be configured independently.
+
+Each Dataset has a unique name which must be used when communicating with the Sync APIs (both in the App Client and App Cloud).
+
+[[collisions]]
+=== Collisions
+
+A collision occurs when an App Client attempts to send an update to a record, but the App Client's version of the record is out of date. The most likely scenario where this will happen is when an App Client is off line and performs an update to a local version of a record.
+
+The following handlers can be used to deal with collisions:
+
+* `handleCollision()` - Called by the Sync Framework when a collision occurs. The default implementation will save the data records to a collection named "<dataset_id>_collision".
+* `listCollision()` - Should return a list of data collisions which have occurred. The default implementation will list all the collision records from the collection name "<dataset_id>_collision".
+* `removeCollision()` - Should remove a collision record from the list of collisions. The default implementation will delete the collision records based on hash values from the collection named "<dataset_id>_collision".
+
+The App developer can provide the handler function overrides for dealing with data collisions. Some possible options include:
+
+* Store the collision record for manual resolution by a data administrator at a later date.
+* Discard the update which caused the collision. To achieve this, the `handleCollision()` function would simply not do anything with the collision record passed to it. WARNING - this may result in data loss as the update which caused the collision would be discarded by the App Cloud.
+* Apply the update which caused the collision. To achieve this, the `handleCollision()` function would need to call the `handleCreate()` function defined for the dataset.
++
+WARNING: This may result in data loss as the update which caused the collision would be based on a stale version of the data and so may cause some fields to revert to old values.
+
+The native sync clients are using similar interfaces. You can check the API and example codes in our https://github.com/feedhenry/fh-ios-sdk[iOS Github repo^] and https://github.com/feedhenry/fh-android-sdk[Android Github repo^].

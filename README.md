@@ -2,6 +2,9 @@
 
 Node.js and express.js based mobile app data synchronization library. 
 
+*Note* WIP. This repo targets to decouple fh-sync from other API's in fh-mbaas-api package.
+For official and supported version of fh-sync please refer to fh-mbaas-api npm package.
+
 ## Usage
  fh-sync  is included as standard with your cloud app code.
 

@@ -16,6 +16,7 @@
     "underscore": "1.7.0"
   },
   "devDependencies": {
+    "jsdoc": "^3.4.3",
     "grunt": "^0.4.5",
     "grunt-cli": "^1.2.0",
     "grunt-fh-build": "^0.5.0",
@@ -27,7 +28,9 @@
     "sinon": "^1.17.5",
     "valid-url": "1.0.9"
   },
+  "types:":"./types/fh-sync.d.ts",
   "scripts": {
+    "docs": "./node_modules/.bin/jsdoc -d apidoc ./lib",
     "pretest": "./scripts/pretest.sh",
     "test": "grunt fh:unit mochaTest:integration",
     "posttest": "./scripts/posttest.sh"

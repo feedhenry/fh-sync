@@ -1,0 +1,71 @@
+[[sync-load-test-result]]
+= Sync Load Test Result
+
+This section outlines the performance differences between using the sync functionality of fh-mbaas-api 7.0.0 and earlier versions.
+
+== Test Scenario
+
+The scenario we used to perform the load test is:
+
+* Each test will run as a new client. The client will create a new data record and then update it. The size of the data payload is about 50K. 
+  The test will wait for the confirmation that the record is created and updated on the server.
+* If a test didn't finish within 6 minutes, the test will fail.
+* We run the test 1000 times, with concurrency value of 500, and ramp up value of 60s.
+
+== Test environment
+
+The environment to run the sync server is:
+
+* 2 vCPU
+* 3G of RAM
+* 5G of Disk
+* Direct access to the same MongoDB
+
+== Test Setup
+
+We run the tests against 3 different setup:
+
+* Old sync server (pre fh-mbaas-api v7.x)
+* New sync server with 1 worker
+* New sync server with 2 workers
+
+We then measure these 2 key values:
+
+* Success Rate (higher the better)
+* Completion Time (lower the better)
+
+== Results
+
+We run the test scenario against each setup 5 times, and take the average value.
+Between each run, we will clear the database and restart the app.
+
+Here are the results:
+
+=== Success Rate
+
+image:sync_success_rate.png[sync_success_rate]
+
+=== Completion Time
+
+image:sync_completion_time.png[sync_completion_time]
+
+=== Raw Data
+
+[width="100%"]
+|==============================================================
+| Type  | Old Sync | New Sync (1 Worker) | New Sync (2 Workers)
+| Success Rate | 0.50% | 100% | 100%
+| Min Completion Time (ms) | 198583 | 21063.2 | 8314.8
+| Average Completion Time (ms) | 287247.9 | 123341.32 | 55692.2
+| Max Completion Time (ms) | 338582.2 | 222623.2 | 130517.8
+|==============================================================
+
+
+== Conclusion
+
+From the results of the tests, we can clearly see that the new sync server has improved performance significantly.
+
+The performance will be improved even further when the sync server is scaled.
+
+However, it's important to note that there are many factors can affect the performance of the sync server.
+You should not use this data as performance reference for your own application.

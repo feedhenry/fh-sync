@@ -3,56 +3,58 @@ var sync = require('fh-sync');
 var express = require('express')
 var app = express()
 
+// Sync framework requires mongodb and redis to be running
+var mongodbConnectionString = process.env.MONGO_CONNECTION_URL || 'mongodb://127.0.0.1:27017/sync';
+var redisUrl = process.env.REDIS_CONNECTION_URL || 'redis://127.0.0.1:6379';
+
+// Following example will sync for single domain object
+// called messages
+var datasetId = "messages";
+
 app.get('/', function (req, res) {
-  res.send('Sample application!')
+  res.send('Sample application is running!')
 })
 
-/** Mount sync api */
+/** 
+ * Sync express api required for sync clients
+ * All sync clients will call that endpoint to sync data
+ */
 app.post('/sync/:datasetId', function (req, res) {
   var dataset_id = req.params.datasetId;
   var params = req.body;
 
-  sync.invoke(dataset_id, params, function (err, ok) {
-    return endResponseCallback(req, res, err, ok);
+  sync.api.invoke(dataset_id, params, function (err, result) {
+    if (err) {
+      res.status(500).json(err);
+      return;
+    }
+    return res.json(result)
   });
 });
 
-var datalistHandler = function (dataset_id, query_params, cb, meta_data) {
-  var data = {
-    '00001': {
-      'item': 'item1'
-    },
-    '00002': {
-      'item': 'item2'
-    },
-    '00003': {
-      'item': 'item3'
-    }
-  }
-  return cb(null, data);
-}
-
-
-// Sync framework initialization
-var mongodbConnectionString = 'mongodb://127.0.0.1:27017/sync';
-var redisUrl = 'redis://127.0.0.1:6379';
-
-sync.api.connect(mongodbConnectionString, {}, redisUrl, function () { });
+var mongoOptions = {};
+// Initialize sync to connect to mongodb and redis
+sync.api.connect(mongodbConnectionString, mongoOptions, redisUrl, function () { });
 sync.api.getEventEmitter().on('sync:ready', function () {
-  console.log('sync ready');
+  console.log('Sync initialized');
+  activateForDataset(datasetId);
+
+});
+
+function activateForDataset(datasetId){
   var options = {
     syncFrequency: 10 // seconds
   };
-  var datasetId = "dataset-name";
   console.log("Init sync data handlers for dataset");
   sync.api.init(datasetId, options, function (err) {
     if (err) {
       console.error(err);
     } else {
-      sync.api.handleList(datasetId, datalistHandler);
+      var dataHandler = require("./lib/dataAccessLayer");
+      sync.api.handleList(datasetId, dataHandler.list);
     }
   });
-});
+}
 
 app.listen(3000, function () {
   console.log('Example app listening on port 3000!')

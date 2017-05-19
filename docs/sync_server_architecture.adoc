@@ -15,7 +15,6 @@ The inner-workings of the Sync Server architecture are:
 Each of these components persist any data they need in MongoDB.
 
 .Inner-workings of the Sync Server architecture
-image::figures/sync_architecture.png[]
 
 === HTTP Handlers
 These handlers are responsible for handling the Sync requests from Sync Clients.

@@ -9,8 +9,6 @@ This document will use the FH Sync JS SDK implementation as a reference.
 
 == Sync Protocol
 
-image:sync_flow_chart.png[sync_flow_chart]
-
 1. CRUDL operations on the dataset are invoked via the client APIs. 
 .. A dataset is a map. The key is the universal unique id (UID) of the data record and the value is an instance of data record.
 .. A data record is a map too. It contains 2 keys: data and hash. The data is the actual user data. The hash is the hash value generated from the data. The same user data will result in the same hash value.
@@ -432,8 +430,6 @@ Then when read/update/delete API is called, always check if the UID passed in is
 == Events
 
 Various events are emitted at different stages of the sync loop, as shown in this diagram:
-
-image:sync_events.png[sync_events]
 
 At the moment, some of the client SDKs will emit those events by default (e.g. JS SDK), some SDKs will *not* emit those events by default (e.g. iOS and Android SDK, can be overwritten in the SyncConfig object). The .NET SDK will only emit those events if there are corresponding listeners are set. This may be changed in the future releases to keep them consistent.
 

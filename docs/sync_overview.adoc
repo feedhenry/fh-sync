@@ -1,5 +1,3 @@
-include::shared/attributes.adoc[]
-
 [[data-sync-framework]]
 = Data Sync Framework
 
@@ -49,7 +47,7 @@ The Client and Node.js API calls for Sync are documented in the following guides
 
 To start using the sync framework in your app:
 
-. Init $fh.sync on the client side
+. Init $sync on the client side
 +
 [source,javascript]
 ----
@@ -57,18 +55,18 @@ To start using the sync framework in your app:
   var datasetId = "myShoppingList";
 
   //provide sync init options
-  $fh.sync.init({
+  $sync.init({
     "sync_frequency": 10,
     "do_console_log": true,
     "storage_strategy": "dom"
   });
 
   //provide listeners for notifications.
-  $fh.sync.notify(function(notification){
+  $sync.notify(function(notification){
     var code = notification.code
     if('sync_complete' === code){
       //a sync loop completed successfully, list the update data
-      $fh.sync.doList(datasetId,
+      $sync.doList(datasetId,
         function (res) {
           console.log('Successful result from list:', JSON.stringify(res));
           },
@@ -83,7 +81,7 @@ To start using the sync framework in your app:
   //manage the data set, repeat this if the app needs to manage multiple datasets
   var query_params = {}; //or something like this: {"eq": {"field1": "value"}}
   var meta_data = {};
-  $fh.sync.manage(datasetId, {}, query_params, meta_data, function(){
+  $sync.manage(datasetId, {}, query_params, meta_data, function(){
 
   });
 ----
@@ -98,21 +96,21 @@ Adding appropriate notification listeners can help improve the user experience o
 * Update the UI related to the sync data if deltas are received. If there are changes to the data, it's better to reflect the changes in the UI immediately. For example, delta_received, record_delta_received.
 * Watch for collisions. Let the user know if collisions occurred.
 
-. Init $fh.sync on the cloud side
+. Init sync on the cloud side
 +
 This step is optional, and only required if you are overriding dataset options on the server, for example, modifying the sync loop frequency with the Dataset back end.
 See the link:#sync-loop-considerations[Considerations] section below if changing the default sync frequency.
 +
 [source,javascript]
 ----
-var fhapi = require("fh-mbaas-api");
+var sync = require("fh-sync");
 var datasetId = "myShoppingList";
 
 var options = {
   "sync_frequency": 10
 };
 
-fhapi.sync.init(datasetId, options, function(err) {
+sync.api.init(datasetId, options, function(err) {
   if (err) {
     console.error(err);
   } else {
@@ -147,15 +145,15 @@ In order to synchronize with the back end data source, the App developer can imp
 
 For example, when listing data from back end, instead of loading data from database, you might want to return hard coded data:
 
-. Init $fh.sync on the client side
+. Init $sync on the client side
 +
 This is the same as Step 1 in xref:basic-usage[Getting Started].
 
-. Init $fh.sync on the cloud side and provide overrides.
+. Init $sync on the cloud side and provide overrides.
 +
 [source,javascript]
 ----
-var fhapi = require("fh-mbaas-api");
+var sync = require("fh-sync");
 var datasetId = "myShoppingList";
 
 var options = {
@@ -178,11 +176,11 @@ var datalistHandler = function(dataset_id, query_params, cb, meta_data){
   return cb(null, data);
 }
 
-fhapi.sync.init(datasetId, options, function(err) {
+sync.api.init(datasetId, options, function(err) {
   if (err) {
     console.error(err);
   } else {
-    $fh.sync.handleList(datasetId, datalistHandler);
+    $sync.handleList(datasetId, datalistHandler);
   }
 });
 ----

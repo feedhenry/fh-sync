@@ -34,11 +34,9 @@ app.post('/sync/:datasetId', function (req, res) {
 
 var mongoOptions = {};
 // Initialize sync to connect to mongodb and redis
-sync.api.connect(mongodbConnectionString, mongoOptions, redisUrl, function () { });
-sync.api.getEventEmitter().on('sync:ready', function () {
+sync.api.connect(mongodbConnectionString, mongoOptions, redisUrl, function () { 
   console.log('Sync initialized');
   activateForDataset(datasetId);
-
 });
 
 function activateForDataset(datasetId){

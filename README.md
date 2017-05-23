@@ -3,9 +3,6 @@
 Node.js implementation of the FeedHenry Data Syncronisation Server.
 To be used in conjunction with the FeedHenry Data Syncronisation Client.
 
-*Note* WIP. The goal of this repo is to decouple fh-sync from other API's in fh-mbaas-api package.
-For the currently maintained fh-sync implementation, please refer to https://github.com/feedhenry/fh-mbaas-api.
-
 ## Usage
 
 ```

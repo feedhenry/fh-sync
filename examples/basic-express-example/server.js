@@ -22,7 +22,8 @@ app.get('/', function (req, res) {
 app.post('/sync/:datasetId', function (req, res) {
   var dataset_id = req.params.datasetId;
   var params = req.body;
-
+  
+  // Invoke action in sync for specific dataset
   sync.api.invoke(dataset_id, params, function (err, result) {
     if (err) {
       res.status(500).json(err);
@@ -34,12 +35,20 @@ app.post('/sync/:datasetId', function (req, res) {
 
 var mongoOptions = {};
 // Initialize sync to connect to mongodb and redis
-sync.api.connect(mongodbConnectionString, mongoOptions, redisUrl, function () { 
-  console.log('Sync initialized');
-  activateForDataset(datasetId);
+sync.api.connect(mongodbConnectionString, mongoOptions, redisUrl, function (err) {
+  if (err) {
+    console.log('Problem with initializing sync', err);
+  } else {
+    console.log('Sync initialized');
+    activateForDataset(datasetId);
+  }
 });
 
-function activateForDataset(datasetId){
+/**
+ * This function with create new sync dataset and seed initial data
+ */
+function activateForDataset(datasetId) {
+  // See documentation for more options
   var options = {
     syncFrequency: 10 // seconds
   };
@@ -49,6 +58,9 @@ function activateForDataset(datasetId){
       console.error(err);
     } else {
       var dataHandler = require("./lib/dataAccessLayer");
+      // List is just one of the CRUD operations that sync supports.
+      // See documentation for more options.
+      // If not defined data will be handled by mongodb driver.
       sync.api.handleList(datasetId, dataHandler.list);
     }
   });

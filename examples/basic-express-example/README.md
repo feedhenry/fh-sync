@@ -5,6 +5,8 @@
 - mongodb 
 
 MONGO_CONNECTION_URL environment variable needs to point to mongodb instance
+By default using: mongodb://127.0.0.1:27017/sync
+
 
 - redis
 

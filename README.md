@@ -34,11 +34,6 @@ sync.api.getEventEmitter().on('sync:ready', function() {
 });
 ```
 
-*TODO*
-
-* mounting routes in an express application that `invoke` sync on demand
-* hooking up a FeedHenry Data Syncronisation Client to the server
-
 ## Tests
 In order to run the tests, please make sure you have [Docker](https://www.docker.com/) installed.
 

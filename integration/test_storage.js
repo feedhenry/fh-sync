@@ -194,7 +194,7 @@ module.exports = {
             callback();
           });
         },
-        async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {}, updateRecords),
+        async.apply(storage.updateDatasetClientWithRecords, datasetClient1.id, {records: null}, updateRecords),
         function checkRecordIsRemovedFromTheDatasetClient(callback) {
           storage.readDatasetClientWithRecords(datasetClient1.id, function(err, datasetClient){
             assert.ok(!err);

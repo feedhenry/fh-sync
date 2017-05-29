@@ -12,6 +12,9 @@ before_install:
   - npm install -g grunt-cli
   - npm config set strict-ssl false
 install: npm install
+env:
+  - MONGODB_VERSION=2.4
+  - MONGODB_VERSION=3.2
 script:
   - npm test
 matrix:
@@ -27,3 +30,4 @@ matrix:
       - npm install
       - npm link fh-mbaas-api
       - npm test
+      

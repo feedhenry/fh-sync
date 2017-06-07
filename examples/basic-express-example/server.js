@@ -1,7 +1,9 @@
 var sync = require('fh-sync');
-
+var bodyParser = require('body-parser');
 var express = require('express')
+
 var app = express()
+app.use(bodyParser.json());
 
 // Sync framework requires mongodb and redis to be running
 var mongodbConnectionString = process.env.MONGO_CONNECTION_URL || 'mongodb://127.0.0.1:27017/sync';

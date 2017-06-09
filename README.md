@@ -3,6 +3,18 @@
 Node.js implementation of the FeedHenry Data Syncronisation Server.
 To be used in conjunction with the FeedHenry Data Syncronisation Client.
 
+# Dependencies 
+
+You will need a local Mongodb server and Redis server. For information on setting up these 
+
+Mongodb see
+
+https://docs.mongodb.com/manual/installation/
+
+Redis see 
+
+https://redis.io/topics/quickstart
+
 ## Usage
 
 ```

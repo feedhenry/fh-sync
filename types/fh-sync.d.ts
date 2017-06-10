@@ -44,8 +44,26 @@ declare module 'fh-sync' {
   type NoRespCb = (err: Error | string | null) => void;
 
   interface SyncInitOptions {
-    sync_frequency?: number;
-    logLevel?: 'silly' | 'verbose' | 'info' | 'warn' | 'debug' | 'error';
+        /**
+         * Value indicating how often the dataset client should be sync with the backend. Matches the clients default 
+         * frequency. Value in seconds
+         */
+        syncFrequency?: number,
+
+        /**
+         * Value that will be used to decide if the dataset client is not active anymore.
+         */
+        clientSyncTimeout?: number,
+
+        /**
+         * Value that determines how long it should wait for the backend list operation to complete
+         */
+        backendListTimeout?: number,
+
+         /**
+         * Specify the max wait time the dataset can be scheduled to sync again after its previous schedule, in seconds.
+         */
+        maxScheduleWaitTime?: number
   }
 
   interface SyncInterceptParams {

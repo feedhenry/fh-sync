@@ -112,7 +112,8 @@ declare module 'fh-sync' {
     function globalInterceptResponse(): void;
     
     function setGlobalHashFn((object: any)=> any): void;
-
+    function setRecordHashFn((object: any)=> any): void;
+    
     // Legacy function please do not use.
     function toJSON(dataset_id: string, returnData: any, cb: (err: Error, data: any) => void): void;
   }

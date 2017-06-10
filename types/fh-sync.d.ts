@@ -40,8 +40,6 @@ declare module 'fh-sync' {
     datasetClientCleanerCheckFrequency: string;
   }
 
-  // Any type TODO means I need to actually figure out the actual type for it
-  type TODO = any;
   type StandardCb<T> = (err: Error | string | null, res: T | null) => void;
   type NoRespCb = (err: Error | string | null) => void;
 
@@ -56,7 +54,7 @@ declare module 'fh-sync' {
   }
 
   namespace Sync {
-    function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: TODO, redisUrl: string, cb: TODO)
+    function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, cb: StandardCb<void>)
 
     function init(dataset_id: string, options: SyncInitOptions, callback: StandardCb<void>): void;
     function invoke(dataset_id: string, options: any, callback: () => void): void;
@@ -79,14 +77,13 @@ declare module 'fh-sync' {
     function handleDelete(dataset_id: string, onCreate: (dataset_id: string, uid: string, meta_data: any, callback: StandardCb<any>) => void): void;
     function globalHandleDelete(onCreate: (dataset_id: string, uid: string, meta_data: any, callback: StandardCb<any>) => void): void;
 
-    function handleCollision(dataset_id: string, onCollision: (dataset_id: string, hash: string, timestamp: TODO, uid: string, pre: any, post: any, meta_data: any, callback: StandardCb<any>) => void): void;
+    function handleCollision(dataset_id: string, onCollision: (dataset_id: string, hash: string, timestamp: any, uid: string, pre: any, post: any, meta_data: any, callback: StandardCb<any>) => void): void;
     function globalHandleCollision(onCollision: (dataset_id: string, hash: string, timestamp: Date, uid: string, pre: any, post: any, meta_data: any, callback: StandardCb<any>) => void): void;
 
     function listCollisions(dataset_id: string, onList: (dataset_id: string, callback: StandardCb<{ [hash: string]: any }>, meta_data: any, callback: StandardCb<any>) => void): void;
     function globalListCollisions(onList: (dataset_id: string, callback: StandardCb<{ [hash: string]: any }>, meta_data: any, callback: StandardCb<any>) => void): void;
 
-    function removeCollision(dataset_id: string, onRemove: (dataset_id: string, collision_hash: string, callback: StandardCb<TODO>, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalListCollisions(onRemove: (dataset_id: string, collision_hash: string, callback: StandardCb<TODO>, meta_data: any, callback: StandardCb<any>) => void): void;
+    function removeCollision(dataset_id: string, onRemove: (dataset_id: string, collision_hash: string, meta_data: any, callback: StandardCb<any>) => void): void;
 
     function interceptRequest(dataset_id: string, onIntercept: (dataset_id: string, interceptor_params: SyncInterceptParams, callback: NoRespCb) => void): void;
     function interceptResponse(): void;

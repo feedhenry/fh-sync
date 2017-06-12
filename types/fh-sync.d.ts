@@ -1,48 +1,97 @@
 declare module 'fh-sync' {
 
+  /**
+   * Options used to initialize Sync Server
+   */
+  interface SyncGlobalOptions {
+    /** @type {Number} how often pending workers should check for the next job, in ms. Default: 1 */
+    pendingWorkerInterval?: number;
+    /** @type {Number} the concurrency value of the pending workers. Default is 1. Can set to 0 to disable the pendingWorkers completely */
+    pendingWorkerConcurrency?: number;
+    /** @type {Object} the backoff strategy for the pending worker to use. 
+     * Default strategy is `exp` (exponential) with a max delay of 60s. The min value will always be the same as `pendingWorkerInterval`
+     * The other valid strategy is `fib` (fibonacci). Set it to anything else will disable the backoff behavior */
+    pendingWorkerBackoff?: PendingWorkerBackoff;
+    /** @type {Number} how often ack workers should check for the next job, in ms. Default: 1 */
+    ackWorkerInterval?: number;
+    /** @type {Number} the concurrency value of the ack workers. Default is 1. Can set to 0 to disable the ackWorker completely */
+    ackWorkerConcurrency?: number;
+    /** 
+    * @type {Object} the backoff strategy for the ack worker to use. 
+    * Default strategy is `exp` (exponential) with a max delay of 60s. The min value will always be the same as `ackWorkerInterval`
+    * The other valid strategy is `fib` (fibonacci). Set it to anything else will disable the backoff behavior  */
+    ackWorkerBackoff?: AckWorkerBackoff;
+    /** @type {Number} how often sync workers should check for the next job, in ms. Default: 100 */
+    syncWorkerInterval?: number;
+    /** @type {Number} the concurrency value of the sync workers. Default is 1. Can set to 0 to disable the syncWorker completely. */
+    syncWorkgerConcurrency?: number;
+    /** @type {Object} the backoff strategy for the sync worker to use. 
+    * Default strategy is `exp` (exponential) with a max delay of 1s. The min value will always be the same as `syncWorkerInterval`
+    * Other valid strategies are `none` and `fib` (fibonacci).*/
+    syncWorkerBackoff?: SyncWorkerBackoff;
+    /** @type {Number} how often the scheduler should check the datasetClients, in ms. Default: 500 */
+    schedulerInterval?: number;
+    /** @type {Number} the max time a scheduler can hold the lock for, in ms. Default: 20000 */
+    schedulerLockMaxTime?: number;
+    /** @type {String} the default lock name for the sync scheduler */
+    schedulerLockName?: string;
+    /**@type {Number} the default concurrency value when update dataset clients in the sync API. Default is 10. In most case this value should not need to be changed */
+    datasetClientUpdateConcurrency?: number;
+    /**@type {Boolean} enable/disable collect sync stats to allow query via an endpoint */
+    collectStats?: boolean;
+    /**@type {Number} the number of records to keep in order to compute the stats data. Default is 1000. */
+    statsRecordsToKeep?: number;
+    /**@type {Number} how often the stats should be collected. In milliseconds. */
+    collectStatsInterval?: number;
+    /**@type {String} the host of the influxdb server. If set, the metrics data will be sent to the influxdb server. */
+    metricsInfluxdbHost?: string;
+    /**@type {Number} the port of the influxdb server. It should be a UDP port. */
+    metricsInfluxdbPort?: number;
+    /**@type {Number} the concurrency value for the component metrics. Default is 10. This value should be increased if there are many concurrent workers. Otherwise the memory useage of the app could go up.*/
+    metricsReportConcurrency?: number;
+    /**@type {Boolean} if cache the dataset client records using redis. This can help improve performance for the syncRecords API.
+    * Can be turned on if there are no records are shared between many different dataset clients. Default is false.*/
+    useCache?: boolean;
+    /**@type {Number} the TTL (Time To Live) value for the messages on the queue. In seconds. Default to 24 hours. */
+    queueMessagesTTL?: string;
+    /**@type {String} specify the maximum retention time of an inactive datasetClient. Any inactive datasetClient that is older than this period of time will be removed.*/
+    datasetClientCleanerRetentionPeriod?: string;
+    /** @type {String} specify the frequency the datasetClient cleaner should run. Default every hour ('1h').*/
+    datasetClientCleanerCheckFrequency: string;
+  }
+
+  /**
+   * Backoff Strategy
+   * Example: {strategy: 'exp', max: 60*1000},
+   */
   interface PendingWorkerBackoff {
     strategy: string;
     max: string;
   }
-
+  /**
+   * Backoff Strategy
+   * Example: {strategy: 'exp', max: 60*1000},
+   */
   interface AckWorkerBackoff {
     strategy: string;
     max: string;
   }
 
+  /**
+   * Backoff Strategy
+   * Example: {strategy: 'exp', max: 60*1000},
+   */
   interface SyncWorkerBackoff {
     strategy: string;
     max: number;
   }
 
-  interface SyncGlobalOptions {
-    pendingWorkerInterval?: number;
-    pendingWorkerConcurrency?: number;
-    pendingWorkerBackoff?: PendingWorkerBackoff;
-    ackWorkerInterval?: number;
-    ackWorkerConcurrency?: number;
-    ackWorkerBackoff?: AckWorkerBackoff;
-    syncWorkerInterval?: number;
-    syncWorkgerConcurrency?: number;
-    syncWorkerBackoff?: SyncWorkerBackoff;
-    schedulerInterval?: number;
-    schedulerLockMaxTime?: number;
-    schedulerLockName?: string;
-    datasetClientUpdateConcurrency?: number;
-    collectStats?: boolean;
-    statsRecordsToKeep?: number;
-    collectStatsInterval?: number;
-    metricsInfluxdbHost?: string;
-    metricsInfluxdbPort?: number;
-    metricsReportConcurrency?: number;
-    useCache?: boolean;
-    queueMessagesTTL?: string;
-    datasetClientCleanerCheckFrequency?: string;
-  }
-
   type StandardCb<T> = (err: Error | string | undefined, res: T | undefined) => void;
   type NoRespCb = (err: Error | string | undefined) => void;
 
+  /**
+   * Options used to initialize sync for specific dataset
+   */
   interface SyncInitOptions {
     /**
      * Value indicating how often the dataset client should be sync with the backend. Matches the clients default 
@@ -66,56 +115,190 @@ declare module 'fh-sync' {
     maxScheduleWaitTime?: number
   }
 
+  /**
+   * Parameters object for request and response interceptors
+   */
   interface SyncInterceptParams {
     query_params: any;
-    meta_data: any;
+    metaData: any;
   }
 
   namespace Sync {
+    /**
+     * Connect sync server to mongo and redis 
+     * 
+     * @param mongoDBConnectionUrl 
+     * @param mongoDBConnectionOption 
+     * @param redisUrl 
+     * @param cb 
+     */
     function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, cb: StandardCb<void>)
 
-    function init(dataset_id: string, options: SyncInitOptions, callback: StandardCb<void>): void;
-    function invoke(dataset_id: string, options: any, callback: () => void): void;
+    /**
+     * Initialize sync for specific dataset
+     * 
+     * @param datasetId 
+     * @param options 
+     * @param callback 
+     */
+    function init(datasetId: string, options: SyncInitOptions, callback: StandardCb<void>): void;
 
-    function stop(dataset_id: string, onStop: () => void): void;
-    function stopAll(onstop: StandardCb<string[]>): void;
+    /**
+     * Internal method used to invoke sync methods. Used to handle json request from client. 
+     * Supported operations 'sync', 'syncRecords', 'listCollisions', 'removeCollision'
+     * 
+     * @param datasetId 
+     * @param options 
+     * @param callback 
+     */
+    function invoke(datasetId: string, options: any, callback: () => void): void;
 
-    function handleList(dataset_id: string, onList: (dataset_id: string, params: any, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleList(onList: (dataset_id: string, params: any, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Stop sync loop for dataset 
+     * 
+     * @param datasetId 
+     * @param onStop callback called when operation is finished
+     */
+    function stop(datasetId: string, onStop: () => void): void;
 
-    function handleCreate(dataset_id: string, onCreate: (dataset_id: string, data: any, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleCreate(onCreate: (dataset_id: string, params: any, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+      * Stop sync loop for all datasets 
+      * 
+      * @param datasetId 
+      * @param onStop callback called when operation is finished
+      */
+    function stopAll(onStop: StandardCb<string[]>): void;
 
-    function handleRead(dataset_id: string, onRead: (dataset_id: string, uid: any, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleRead(onRead: (dataset_id: string, uid: string, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Handle list operation for specific dataset.
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function handleList(datasetId: string, onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function handleUpdate(dataset_id: string, onUpdate: (dataset_id: string, uid: string, data: any, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleUpdate(onCreate: (dataset_id: string, uid: string, data: any, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Handle list operation for all datasets
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function globalHandleList(onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function handleDelete(dataset_id: string, onCreate: (dataset_id: string, uid: string, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleDelete(onCreate: (dataset_id: string, uid: string, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Handle create operation for specific dataset
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function handleCreate(datasetId: string, onCreate: (datasetId: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function handleCollision(dataset_id: string, onCollision: (dataset_id: string, hash: string, timestamp: any, uid: string, pre: any, post: any, meta_data: any, callback: StandardCb<any>) => void): void;
-    function globalHandleCollision(onCollision: (dataset_id: string, hash: string, timestamp: Date, uid: string, pre: any, post: any, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Handle create operation for all datasets
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function globalHandleCreate(onCreate: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function listCollisions(dataset_id: string, onList: (dataset_id: string, meta_data: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
-    function globalListCollisions(onList: (dataset_id: string, meta_data: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
+    /**
+    * Handle read operation for specific dataset
+    * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+    */
+    function handleRead(datasetId: string, onRead: (datasetId: string, uid: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function removeCollision(dataset_id: string, onRemove: (dataset_id: string, collision_hash: string, meta_data: any, callback: StandardCb<any>) => void): void;
+    /**
+     * Handle read operation for all datasets
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function globalHandleRead(onRead: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function interceptRequest(dataset_id: string, onIntercept: (dataset_id: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
-    function interceptResponse(dataset_id: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+    /**
+     * Handle update operation for specific dataset
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function handleUpdate(datasetId: string, onUpdate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function setConfig(config: any): void;
+    /**
+     * Handle update operation for all datasets
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function globalHandleUpdate(onCreate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    function globalInterceptRequest(onIntercept: (dataset_id: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+    /**
+     * Handle delete operation for specific dataset
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function handleDelete(datasetId: string, onCreate: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+
+    /**
+     * Handle delete operation for all datasets
+     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+     */
+    function globalHandleDelete(onCreate: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+
+    /**
+     * Handle data collision for specific dataset (when both entries were changed)
+     * 
+     * @param datasetId 
+     * @param onCollision method called on collision 
+     */
+    function handleCollision(datasetId: string, onCollision: (datasetId: string, hash: string, timestamp: any, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
+
+    /**
+     * Handle data collision for all managed datasets (when both entries were changed)
+     * 
+     * @param datasetId 
+     * @param onCollision method called on collision 
+     */
+    function globalHandleCollision(onCollision: (datasetId: string, hash: string, timestamp: Date, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
+
+    /**
+     * List collisions for specific dataset
+     * 
+     * @param datasetId 
+     * @param onList 
+     */
+    function listCollisions(datasetId: string, onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
+    function globalListCollisions(onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
+
+    /**
+     * Remove collision from dataset?
+     */
+    function removeCollision(datasetId: string, onRemove: (datasetId: string, collision_hash: string, metaData: any, callback: StandardCb<any>) => void): void;
+
+    /**
+     * Request interceptor for dataset - allows to perform custom operations before executing sync method.
+     */
+    function interceptRequest(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+    /**
+     * Response interceptor for dataset - allows to perform custom operations after executing sync method.
+     */
+    function interceptResponse(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+    /**
+     * Set configuration for sync
+     */
+    function setConfig(config: SyncGlobalOptions): void;
+
+    /**
+     * Request interceptor for all sync calls - allows to perform custom operations after executing sync method.
+     */
+    function globalInterceptRequest(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+    /**
+     * Response interceptor for all sync calls - allows to perform custom operations after executing sync method.
+     */
     function globalInterceptResponse(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
 
-    function setGlobalHashFn(datasetId: string, hashFunction: (target: any) => string): void;
-    function setRecordHashFn(datasetId: string, hashFunction: (target: string[]) => string): void;
+    /**
+     * Sets custom global hashing method for determining if objects were changed.
+     * 
+     * @param datasetId 
+     * @param hashFunction allows to perform hashing for array of hashes returned for specific datasets
+     */
+    function setGlobalHashFn(datasetId: string, hashFunction: (target: string[]) => string): void;
 
-    // Legacy function please do not use.
-    function toJSON(dataset_id: string, returnData: any, cb: (err: Error, data: any) => void): void;
+    /**
+     * Sets custom dataset hashing method for determining if objects were changed.
+     * 
+     * @param datasetId 
+     * @param hashFunction  allows to perform hashing for dataset
+     */
+    function setRecordHashFn(datasetId: string, hashFunction: (target: any) => string): void;
   }
   export = Sync;
 }

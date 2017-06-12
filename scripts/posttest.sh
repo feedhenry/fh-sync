@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-docker rm -f $(docker ps -a -q  --filter name=mongodb2.4)
+docker rm -f $(docker ps -a -q  --filter name=mongodb-fh-mbaas-api)
 echo "Mongodb Stopped"
-docker rm -f $(docker ps -a -q  --filter name=redis2.6)
+docker rm -f $(docker ps -a -q  --filter name=redis-fh-mbaas-api)
 echo "Redis Stopped"

@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
-echo "Starting Redis-2.6"
-docker pull redis:2.6
-docker rm -f $(docker ps -a -q  --filter name=redis2.6)
-docker run -d -p 127.0.0.1:6379:6379 --name redis2.6 redis:2.6
-echo "Starting Mongodb-2.4"
-docker pull mongo:2.4
-docker rm -f $(docker ps -a -q  --filter name=mongodb2.4)
-docker run -d -p 127.0.0.1:27017:27017 --name mongodb2.4 mongo:2.4 mongod --smallfiles
+
+REDIS_VERSION=${REDIS_VERSION:-2.6}
+MONGODB_VERSION=${MONGODB_VERSION:-2.4}
+
+echo "Starting Redis-$REDIS_VERSION"
+docker pull redis:$REDIS_VERSION
+docker rm -f $(docker ps -a -q  --filter name=redis-fh-mbaas-api)
+docker run -d -p 127.0.0.1:6379:6379 --name redis-fh-mbaas-api redis:$REDIS_VERSION
+
+echo "Starting Mongodb-$MONGODB_VERSION"
+docker pull mongo:$MONGODB_VERSION
+docker rm -f $(docker ps -a -q  --filter name=mongodb-fh-mbaas-api)
+docker run -d -p 127.0.0.1:27017:27017 --name mongodb-fh-mbaas-api mongo:$MONGODB_VERSION mongod --smallfiles
 #give it some time to complete starting
 sleep 30s

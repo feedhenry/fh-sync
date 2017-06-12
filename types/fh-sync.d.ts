@@ -23,7 +23,7 @@ declare module 'fh-sync' {
     ackWorkerConcurrency?: number;
     ackWorkerBackoff?: AckWorkerBackoff;
     syncWorkerInterval?: number;
-    syncWorkerConcurrency?: number;
+    syncWorkgerConcurrency?: number;
     syncWorkerBackoff?: SyncWorkerBackoff;
     schedulerInterval?: number;
     schedulerLockMaxTime?: number;
@@ -103,16 +103,16 @@ declare module 'fh-sync' {
 
     function removeCollision(dataset_id: string, onRemove: (dataset_id: string, collision_hash: string, meta_data: any, callback: StandardCb<any>) => void): void;
 
-    function interceptRequest(dataset_id: string, onIntercept: (dataset_id: string, interceptor_params: SyncInterceptParams, callback: NoRespCb) => void): void;
-    function interceptResponse(): void;
+    function interceptRequest(dataset_id: string, onIntercept: (dataset_id: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+    function interceptResponse(dataset_id: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
 
     function setConfig(config: any): void;
 
-    function globalInterceptRequest(onIntercept: (dataset_id: string, interceptor_params: SyncInterceptParams, callback: NoRespCb) => void): void;
-    function globalInterceptResponse(): void;
+    function globalInterceptRequest(onIntercept: (dataset_id: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+    function globalInterceptResponse(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
 
-    function setGlobalHashFn(hashFunction: (target: any) => string): void;
-    function setRecordHashFn(hashFunction: (object: any) => any): void;
+    function setGlobalHashFn(datasetId: string, hashFunction: (target: any) => string): void;
+    function setRecordHashFn(datasetId: string, hashFunction: (target: string[]) => string): void;
 
     // Legacy function please do not use.
     function toJSON(dataset_id: string, returnData: any, cb: (err: Error, data: any) => void): void;

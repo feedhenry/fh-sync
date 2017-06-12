@@ -153,7 +153,7 @@ declare module SyncCloud {
    * @param options 
    * @param callback 
    */
-  function invoke(datasetId: string, options: any, callback: () => void): void;
+  function invoke(datasetId: string, options: any, callback: (err: any, result: any) => void): void;
 
   /**
    * Stop sync loop for dataset 

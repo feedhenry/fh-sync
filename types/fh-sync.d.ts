@@ -223,13 +223,13 @@ declare module SyncCloud {
    * Handle delete operation for specific dataset
    * Method may be used to override default data handler to have control over how sync is retrieving and storing data
    */
-  function handleDelete(datasetId: string, onCreate: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+  function handleDelete(datasetId: string, onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
   /**
    * Handle delete operation for all datasets
    * Method may be used to override default data handler to have control over how sync is retrieving and storing data
    */
-  function globalHandleDelete(onCreate: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+  function globalHandleDelete(onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
   /**
    * Handle data collision for specific dataset (when both entries were changed)

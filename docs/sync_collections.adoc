@@ -1,0 +1,100 @@
+[[fh-sync-collections]]
+= MongoDB Collections Created by the Sync Server
+
+[[overview]]
+== Overview
+
+The sync server will maintain various collections in MongoDB while it's running.
+
+This document will explain what collections the sync server will create and their purpose.
+
+NOTE: You should not modify these collections, as it may cause data loss.
+
+[[sync-server-collections]]
+== Sync Server Collections
+
+All the collections created by the sync server will have the prefix *fhsync*.
+
+=== *fhsync_pending_queue*
+
+This collection is used to save the changes submitted from all the clients for all the Datasets.
+
+Some of the useful fields for debugging are:
+
+* *tries*: If the value is greater than 0, it means the change has been processed already by the sync server.
+* *payload.hash*: The unique identifier of the pending change.
+* *payload.cuid*: The unique id of the client.
+* *payload.action*: The type of the change, like `create` or `update`.
+* *payload.pre*: The data before the change was made.
+* *payload.post*: The data after the change was made.
+* *payload.timestamp*: When the change was made on the client.
+
+=== *fhsync_<datasetId>_updates*
+
+When a pending change from the `fhsync_pending_queue` collection is processed, the result is saved in this collection.
+The client will get the result when they next sync, any trigger any relevant client notifications.
+
+Some of the useful fields for debugging are:
+
+* *hash*: The unique identifier of the pending change from the above collection.
+* *type*: If the change is applied successfully. Possible values are `applied`, `failed` or `collision`.
+
+=== *fhsync_ack_queue*
+
+After a client gets the results of its submitted changes (as saved in the `fhsync_<datasetId>_updates` collection), it will confirm the acknowledgements with the server so that server can remove them.
+This collection is used to save the acknowledgements submitted by the clients.
+
+Some of the useful fields for debugging are:
+
+* *payload.hash*: The unique identifier of a pending change from the *fhsync_pending_queue* collection.
+
+=== *fhsync_datasetClients*
+
+This collection is used to persist all the Dataset clients that are managed by the sync server.
+
+Some of the useful fields for debugging are:
+
+* *globalHash*: The current hash value of the Dataset Client.
+* *queryParam*: The query parameters associated with the Dataset Client.
+* *metaData*: The meta data associated with the Dataset Client.
+* *recordUids*: The unique ids of all the records that belong to the Dataset Client.
+* *syncLoopEnd*: When the last sync loop finished for the Dataset Client.
+
+=== *fhsync_<datasetId>_records*
+
+This data in this collection is a local copy of the data from the Dataset Backend.
+It will help to speed up the sync requests from the clients, and also reduce the number of requests to the Dataset Backend.
+
+Some of the useful fields for debugging are:
+
+* *data*: The actual data of the record returned from the Dataset Backend.
+* *uid*: The unique id of the record.
+* *refs*: The ids of all the Dataset Clients that contain this record.
+
+=== *fhsync_queue*
+
+This collection is used to save the requests to sync *fhsync_<datasetId>_records* with the Dataset Backend.
+
+Some of the useful fields for debugging are:
+
+* *tries*: If it's greater than 0, it means the request is already processed by the sync server.
+
+=== *fhsync_locks*
+
+Only 1 worker is allowed to sync with the Dataset Backend at any given time.
+To ensure that, a lock is used.
+This collection is used to persist the lock.
+It is unlikely you'll ever need to look at this collection, unless debugging an issue with the locking mechanism.
+
+== Pruning the Queue Collections
+
+For each of the queue collections, a document is not removed immediately after being processed.
+Instead, it is marked as `deleted`.
+This will allow developers to use them as an audit log, and also help with debugging.
+
+To prevent these queues from using too much space, you can set a TTL (time to live) value for those messages. Once the TTL value is reached, these messages will be deleted from the database.
+
+Please check the "queueMessagesTTL" option in link:./sync_cloud_api/setConfig.adoc[setConfig] API doc for more details.
+
+
+

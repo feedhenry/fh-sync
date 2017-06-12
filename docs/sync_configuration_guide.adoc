@@ -1,0 +1,93 @@
+[[sync_configuration_guide]]
+
+= Data Sync Configuration Guide
+
+== Configuring Frequency of the Sync Server
+
+You can configure a different sync frequency on the client and on the server.
+
+The sync frequency value of a server determines how often the sync processor runs.
+The sync frequency is the time period the system waits between 2 sync processes.
+Every time the sync processor executes, it performs a list operation on the Dataset Backend to synchronize the data with a local copy.
+To determine the best value of the sync frequency for your application, review the following sections.
+
+*  How quickly do you want your clients to see changes from others?
++
+When a client submits changes, those changes are applied to the Dataset Backend directly. To ensure high performance, other clients get data from the local copy. This means other clients can only get the new changes after the next sync processor run. If it is required that other clients get the changes as soon as possible, then consider setting a low value for the sync frequency.
+
+* How long it takes the sync processor to run?
++
+The sync frequency value determines how long the system waits between sync processor executions, that is, the sync frequency is the time from the completion of the one execution to the start time of next execution. This means there is never a situation where 2 sync processors are running at the same time. Therefore:
++
+  actual sync period = sync processor execution time + the sync frequency
++
+This helps you calculate the number of requests the system makes to the Dataset Backend.
++
+To know how long each sync processor execution takes, you can query the sync stats endpoint to see the average `Job Process Time` it takes for the `sync_worker` to complete.
+
+* How much load can the Dataset Backend service handle?
++
+Every time the sync processor runs, it performs a list operation on the Dataset Backend.
+When you configure the sync frequency, you need to estimate how many requests it will generate on the backend, and make sure the backend can handle the load.
++
+For example, if you set the sync frequency of a dataset to 100ms, and each sync processor execution is taking 100ms to run, that means the server generates about 5 req/sec to the backend. However, if you have another dataset with a sync frequency of 100ms that uses the same backend,  there will be about 10 req/sec to the backend. You can perform load tests against the backend to determine if the backend can handle that load.
++
+However, this value doe not grow when you scale the app. For example, if you have multiple workers in your server, the sync processor executions are distributed among the workers rather than duplicated among them. This design protects the backend when the app is under heavy load.
+
+* How much extra load will it cause to the server?
++
+When the data is returned from the backend, the server will have to save the data to the local storage (MongoDB). The system  only performs updates if there are changes. But it needs to perform a read operation first to get the current data in the local storage. When there are a lot of sync processor executions, it could cause extra load on the server itself. Sometimes you may need to take this into consideration especially if the dataset's size is large.
++
+To understand the performance of the server, you can use the sync stats endpoint to check CPU usage, and the MongoDB operation time.
+
+You can use the sync frequency value to control the number of requests the server generate to the backend.
+It is acceptable to set it to 0ms, as long as the backend can handle the load, and the server itself is not over-loaded.
+
+== Configuring the Workers
+
+As described in the xref:sync-server-architecture[Sync Architecture], there are a few queues used to store the sync data.
+To process the data, a corresponding worker is created for each queue.
+Its sole task is to take a job off the queue one at a time and process it. 
+However, there is an interval value for how long between finishing one job and getting the next available job.
+To maximise the worker performance, you can configure this value.
+
+=== Why the intervals?
+
+The request to get a job off the queue is a non-blocking operation.
+When there are no jobs left on the queue, the request will just return and the worker will attempt to get a job again.
+
+In this case, or if jobs are very fast to complete, a worker could overload the main event loop and slow down any other code execution.
+To prevent that from happening, an interval value is introduced for each worker.
+
+The default interval value is very low (1ms), but configurable. 
+The reason for this default value is because the job is most likely going to take some time to execute and have some non-blocking I/O operations (remote HTTP calls, DB calls etc) which will allow other operations to be completed on the main event loop.
+This low default interval will allow the jobs to be processed as quickly as possible, making more efficient use of the CPU.
+When there are no jobs, a backoff mechanism will be invoked to ensure the workers will not consume too much resources when they don't need to.
+
+If the default value is causing too many requests to the Dataset Backend, or you need to change the default interval value, you can override the following configuration options:
+
+* pendingWorkerInterval
+* ackWorkerInterval
+* syncWorkerInterval
+
+=== Worker Backoff
+
+When there are no jobs left on a queue, each worker has a backoff strategy.
+This will prevent workers from consuming unnecessary CPU cycles and unnecessary calls to the queue.
+When new jobs are put on the queue, the worker will reset the interval when it next checks the queue.
+
+You can override the behaviour of each worker with the following configuration options:
+
+* pendingWorkerBackoff
+* ackWorkerBackoff
+* syncWorkerBackoff
+
+By default, all workers will use the exponential strategy, with a max delay value.
+For example, if the min interval is set to 1ms, the worker will wait 1ms after processing a job before taking another job off the queue.
+This pattern will continue as long as there are items on the queue.
+If the queue empties, the interval will gradually increase exponentially (2ms, 4ms, 8ms, 16ms, ... ~16s, ~32s) until it hits the max interval (e.g. 60 seconds).
+The worker will then only check the queue every 60 seconds for a job.
+If it does find a job on the queue in the future, it will go back to checking the queue every 1ms.
+
+For more information, please check the link:./sync_cloud_api[Sync API Doc].
+

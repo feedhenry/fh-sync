@@ -1,0 +1,160 @@
+[[sync-terminology]]
+= Sync Terminology
+
+[[sync-protocol]]
+== Sync Protocol
+
+The protocol used between the link:#sync-client[Sync Client] and link:#sync-server[Sync Server]. +
+See link:sync_protocol.asciidoc[Sync Protocol] for more details.
+
+[[sync-server]]
+== Sync Server
+
+The Sync Server is a Node.js implemention of the server part of the
+link:#sync-protocol[Sync Protocol]. +
+It is included in the fh-mbaas-api module. It:
+
+* exposes the link:sync_server_api.asciidoc[Sync Server API] for integrating
+with a link:#dataset-backend[DataSet Backend]
+* runs the link:#sync-server-loop[Sync Server Loop], updating
+link:#dataset[DataSets] when updates from a
+link:#dataset-backend[DataSet Backend] are detected
+
+[[sync-client]]
+== Sync Client
+
+The Sync Client is an implementation of the client part of the
+link:#sync-protocol[Sync Protocol] +
+There are 3 Sync Client implementations available:
+
+* Javascript, in the
+https://github.com/feedhenry/fh-js-sdk/blob/master/src/modules/sync-cli.js[FeedHenry
+Javascript SDK]
+* Objective C, in the
+https://github.com/feedhenry/fh-ios-sdk/tree/master/fh-ios-sdk/Sync[FeedHenry
+iOS SDK]
+* Java, in the
+https://github.com/feedhenry/fh-android-sdk/tree/master/fh-android-sdk/src/main/java/com/feedhenry/sdk/sync[FeedHenry
+Android SDK]
+
+The Sync Client:
+
+* exposes the link:sync_client_api.asciidoc[Sync Client API] to the frontend for CRUDL actions against a link:#dataset[DataSet]
+* runs the link:#sync-client-loop[Sync Client Loop], making a call to the link:#sync-server[Sync Server] at the specified link:#sync-frequency[Sync Frequency] for a particular link:#dataset[DataSet].
+
+[[sync-server-loop]]
+== Sync Server Loop
+
+The Sync Server Loop is a function that runs continuously in the
+link:#sync-server[Sync Server] with a 500ms wait between each run. +
+Each run it iterates over all link:#dataset-client[DataSet Clients] to
+see if a link:#dataset[DataSet] should be synced from the
+link:#dataset-backend[DataSet Backend].
+
+[[sync-client-loop]]
+== Sync Client Loop
+
+The Sync Client Loop is a function that runs continuously in the
+link:#sync-client[Sync Client] with a 500ms wait between each run. +
+Each run it iterates over all link:#dataset-client[DataSet Clients] to
+see if a link:#dataset[DataSet] should be synced with the
+link:#sync-server[Sync Server].
+
+[[sync-frequency]]
+== Sync Frequency
+
+In the link:#sync-client[Sync Client], this is the frequency to check
+for updates from the link:#sync-server[Sync Server] for a particular
+link:#dataset[DataSet]. +
+In the link:#sync-server[Sync Server], this is the frequency to check
+for updates from the link:#dataset-backend[DataSet Backend] for a
+particular link:#dataset[DataSet].
+
+*IMPORTANT*: It is possible to configure the frequency differently on
+the client and server. However, the frequency should be the same to
+avoid issues where:
+
+* the client is calling more frequently than the server is checking for
+updates from the link:#dataset-backend[DataSet Backend], causing
+unnecessary traffic from the client
+* the client is calling less frequently than the server is checking for
+updates from the link:#dataset-backend[DataSet Backend], causing the
+server to think that client is no longer active and dropping its
+link:#dataset[DataSet] from the cache
+
+[[dataset]]
+== DataSet
+
+A DataSet is a collection of records being synchronized between 1 or
+more link:#sync-client[Sync Clients], the link:#sync-server[Sync Server]
+and the link:#dataset-backend[DataSet Backend].
+
+[[dataset-backend]]
+== DataSet Backend
+
+The system of record for data being syncrhronized between the
+link:#sync-client[Sync Client] and the link:#sync-server[Sync Server]. +
+It could be anything that provides an API that can be integrated with
+from the link:#sync-server[Sync Server] e.g. a mysql database, a SOAP
+service. +
+The Sync Server exposes the link:sync_server_api.asciidoc[Sync Server API]
+for integrating with a DataSet Backend via link:#dataset_handler[DataSet
+Handlers]
+
+[[dataset-handler]]
+== DataSet Handler
+
+A DataSet Handler is a function for intergrating the
+link:#sync-server[Sync Server] into a link:#dataset-backend[DataSet
+Backend]. +
+There are many handlers for doing CRUDL actions on a
+link:#dataset[DataSet] and managing collisions between
+link:#dataset-record[DataSet Records]. +
+The default implementation of these handlers uses fh-mbaas-api db interface (MongoDB backed
+in an RHMAP MBaaS). +
+All of these handlers can be overriden. See the
+link:sync_server_api.asciidoc[Sync Server API] for details.
+
+*IMPORTANT*: If you are overriding handlers, it is advised to override
+_all_ handlers. This is to avoid unusual behaviour with some handlers
+using the default implementation and others using an overridden
+implementation.
+
+[[dataset-client]]
+== DataSet Client
+
+A DataSet Client is a configuration stored in the link:#sync-client[Sync
+Client] & link:#sync-server[Sync Server] for each link:#dataset[DataSet]
+that is actively syncing between the client & server. +
+It contains data such as:
+
+* the link:#sync-frequency[Sync Frequency] of the link:#dataset[DataSet]
+* any query parameters to include when making calls to the
+link:#dataset-backend[DataSet Backend]
+* the latest link:#hash[Hash] of the link:#dataset-record[DataSet
+Records]
+* if a sync with the link:#dataset-backend[DataSet Backend] is currently
+in progress
+
+[[dataset-record]]
+== DataSet Record
+
+A DataSet Record is an individual record in a link:#dataset[DataSet]. +
+It contains:
+
+* the raw data that this record represents e.g. the Row values from a
+MySQL table
+* a link:#hash[Hash] of the raw data
+
+[[hash]]
+== Hash
+
+There are 2 types of Hash used in the Sync Protocol:
+
+* hash of an individual link:#dataset-record[DataSet Record]
+** this is used to compare individual records to see if they are
+different
+* hash of all link:#dataset-record[DataSet Records] for a particular
+link:#dataset-client[DataSet Client]
+** this is used to compare a clients set of records with the servers
+without having to iterate over all records

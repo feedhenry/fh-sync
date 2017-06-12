@@ -45,6 +45,9 @@ sync.api.getEventEmitter().on('sync:ready', function() {
   }, function() {});
 });
 ```
+## Documentation
+
+See [Documentation folder](./docs)
 
 ## Tests
 In order to run the tests, please make sure you have [Docker](https://www.docker.com/) installed.

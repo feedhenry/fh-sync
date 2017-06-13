@@ -125,189 +125,187 @@ declare module SyncCloud {
     query_params: any;
     metaData: any;
   }
-  namespace api {
-    /**
-     * Connect sync server to mongo and redis 
-     * 
-     * @param mongoDBConnectionUrl 
-     * @param mongoDBConnectionOption 
-     * @param redisUrl 
-     * @param cb 
-     */
-    function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, cb: StandardCb<void>): void;
+  /**
+   * Connect sync server to mongo and redis 
+   * 
+   * @param mongoDBConnectionUrl 
+   * @param mongoDBConnectionOption 
+   * @param redisUrl 
+   * @param cb 
+   */
+  function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, cb: StandardCb<void>): void;
 
-    /**
-     * Initialize sync for specific dataset
-     * 
-     * @param datasetId 
-     * @param options 
-     * @param callback 
-     */
-    function init(datasetId: string, options: SyncInitOptions, callback: StandardCb<void>): void;
+  /**
+   * Initialize sync for specific dataset
+   * 
+   * @param datasetId 
+   * @param options 
+   * @param callback 
+   */
+  function init(datasetId: string, options: SyncInitOptions, callback: StandardCb<void>): void;
 
-    /**
-     * Internal method used to invoke sync methods. Used to handle json request from client. 
-     * Supported operations 'sync', 'syncRecords', 'listCollisions', 'removeCollision'
-     * 
-     * @param datasetId 
-     * @param options 
-     * @param callback 
-     */
-    function invoke(datasetId: string, options: any, callback: (err: any, result: any) => void): void;
+  /**
+   * Internal method used to invoke sync methods. Used to handle json request from client. 
+   * Supported operations 'sync', 'syncRecords', 'listCollisions', 'removeCollision'
+   * 
+   * @param datasetId 
+   * @param options 
+   * @param callback 
+   */
+  function invoke(datasetId: string, options: any, callback: (err: any, result: any) => void): void;
 
-    /**
-     * Stop sync loop for dataset 
-     * 
-     * @param datasetId 
-     * @param onStop callback called when operation is finished
-     */
-    function stop(datasetId: string, onStop: NoRespCb): void;
+  /**
+   * Stop sync loop for dataset 
+   * 
+   * @param datasetId 
+   * @param onStop callback called when operation is finished
+   */
+  function stop(datasetId: string, onStop: NoRespCb): void;
 
-    /**
-      * Stop sync loop for all datasets 
-      * 
-      * @param datasetId 
-      * @param onStop callback called when operation is finished
-      */
-    function stopAll(onStop: StandardCb<string[]>): void;
-
-    /**
-     * Handle list operation for specific dataset.
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function handleList(datasetId: string, onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
-
-    /**
-     * Handle list operation for all datasets
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function globalHandleList(onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
-
-    /**
-     * Handle create operation for specific dataset
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function handleCreate(datasetId: string, onCreate: (datasetId: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
-
-    /**
-     * Handle create operation for all datasets
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function globalHandleCreate(onCreate: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
-
-    /**
-    * Handle read operation for specific dataset
-    * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+  /**
+    * Stop sync loop for all datasets 
+    * 
+    * @param datasetId 
+    * @param onStop callback called when operation is finished
     */
-    function handleRead(datasetId: string, onRead: (datasetId: string, uid: any, metaData: any, callback: StandardCb<any>) => void): void;
+  function stopAll(onStop: StandardCb<string[]>): void;
 
-    /**
-     * Handle read operation for all datasets
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function globalHandleRead(onRead: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle list operation for specific dataset.
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function handleList(datasetId: string, onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle update operation for specific dataset
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function handleUpdate(datasetId: string, onUpdate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle list operation for all datasets
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function globalHandleList(onList: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle update operation for all datasets
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function globalHandleUpdate(onCreate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle create operation for specific dataset
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function handleCreate(datasetId: string, onCreate: (datasetId: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle delete operation for specific dataset
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function handleDelete(datasetId: string, onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle create operation for all datasets
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function globalHandleCreate(onCreate: (datasetId: string, params: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle delete operation for all datasets
-     * Method may be used to override default data handler to have control over how sync is retrieving and storing data
-     */
-    function globalHandleDelete(onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+  * Handle read operation for specific dataset
+  * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+  */
+  function handleRead(datasetId: string, onRead: (datasetId: string, uid: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle data collision for specific dataset (when both entries were changed)
-     * 
-     * @param datasetId 
-     * @param onCollision method called on collision 
-     */
-    function handleCollision(datasetId: string, onCollision: (datasetId: string, hash: string, timestamp: any, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle read operation for all datasets
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function globalHandleRead(onRead: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Handle data collision for all managed datasets (when both entries were changed)
-     * 
-     * @param datasetId 
-     * @param onCollision method called on collision 
-     */
-    function globalHandleCollision(onCollision: (datasetId: string, hash: string, timestamp: Date, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle update operation for specific dataset
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function handleUpdate(datasetId: string, onUpdate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * List collisions for specific dataset
-     * 
-     * @param datasetId 
-     * @param onList 
-     */
-    function listCollisions(datasetId: string, onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
+  /**
+   * Handle update operation for all datasets
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function globalHandleUpdate(onCreate: (datasetId: string, uid: string, data: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * List collisions for all datasets
-     * 
-     * @param datasetId 
-     * @param onList 
-     */
-    function globalListCollisions(onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
+  /**
+   * Handle delete operation for specific dataset
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function handleDelete(datasetId: string, onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Remove collision from dataset?
-     */
-    function removeCollision(datasetId: string, onRemove: (datasetId: string, collision_hash: string, metaData: any, callback: StandardCb<any>) => void): void;
+  /**
+   * Handle delete operation for all datasets
+   * Method may be used to override default data handler to have control over how sync is retrieving and storing data
+   */
+  function globalHandleDelete(onDelete: (datasetId: string, uid: string, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Request interceptor for dataset - allows to perform custom operations before executing sync method.
-     */
-    function interceptRequest(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+  /**
+   * Handle data collision for specific dataset (when both entries were changed)
+   * 
+   * @param datasetId 
+   * @param onCollision method called on collision 
+   */
+  function handleCollision(datasetId: string, onCollision: (datasetId: string, hash: string, timestamp: any, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Response interceptor for dataset - allows to perform custom operations after executing sync method.
-     */
-    function interceptResponse(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+  /**
+   * Handle data collision for all managed datasets (when both entries were changed)
+   * 
+   * @param datasetId 
+   * @param onCollision method called on collision 
+   */
+  function globalHandleCollision(onCollision: (datasetId: string, hash: string, timestamp: Date, uid: string, pre: any, post: any, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Set configuration for sync
-     */
-    function setConfig(config: SyncGlobalOptions): void;
+  /**
+   * List collisions for specific dataset
+   * 
+   * @param datasetId 
+   * @param onList 
+   */
+  function listCollisions(datasetId: string, onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
 
-    /**
-     * Request interceptor for all sync calls - allows to perform custom operations after executing sync method.
-     */
-    function globalInterceptRequest(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+  /**
+   * List collisions for all datasets
+   * 
+   * @param datasetId 
+   * @param onList 
+   */
+  function globalListCollisions(onList: (datasetId: string, metaData: any, callback: StandardCb<{ [hash: string]: any }>) => void): void;
 
-    /**
-     * Response interceptor for all sync calls - allows to perform custom operations after executing sync method.
-     */
-    function globalInterceptResponse(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+  /**
+   * Remove collision from dataset?
+   */
+  function removeCollision(datasetId: string, onRemove: (datasetId: string, collision_hash: string, metaData: any, callback: StandardCb<any>) => void): void;
 
-    /**
-     * Sets custom global hashing method for determining if objects were changed.
-     * 
-     * @param datasetId 
-     * @param hashFunction allows to perform hashing for array of hashes returned for specific datasets
-     */
-    function setGlobalHashFn(datasetId: string, hashFunction: (target: string[]) => string): void;
+  /**
+   * Request interceptor for dataset - allows to perform custom operations before executing sync method.
+   */
+  function interceptRequest(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
 
-    /**
-     * Sets custom dataset hashing method for determining if objects were changed.
-     * 
-     * @param datasetId 
-     * @param hashFunction  allows to perform hashing for dataset
-     */
-    function setRecordHashFn(datasetId: string, hashFunction: (target: any) => string): void;
-  }
+  /**
+   * Response interceptor for dataset - allows to perform custom operations after executing sync method.
+   */
+  function interceptResponse(datasetId: string, onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+  /**
+   * Set configuration for sync
+   */
+  function setConfig(config: SyncGlobalOptions): void;
+
+  /**
+   * Request interceptor for all sync calls - allows to perform custom operations after executing sync method.
+   */
+  function globalInterceptRequest(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+  /**
+   * Response interceptor for all sync calls - allows to perform custom operations after executing sync method.
+   */
+  function globalInterceptResponse(onIntercept: (datasetId: string, interceptorParams: SyncInterceptParams, callback: NoRespCb) => void): void;
+
+  /**
+   * Sets custom global hashing method for determining if objects were changed.
+   * 
+   * @param datasetId 
+   * @param hashFunction allows to perform hashing for array of hashes returned for specific datasets
+   */
+  function setGlobalHashFn(datasetId: string, hashFunction: (target: string[]) => string): void;
+
+  /**
+   * Sets custom dataset hashing method for determining if objects were changed.
+   * 
+   * @param datasetId 
+   * @param hashFunction  allows to perform hashing for dataset
+   */
+  function setRecordHashFn(datasetId: string, hashFunction: (target: any) => string): void;
 }
 export = SyncCloud;

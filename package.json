@@ -1,7 +1,7 @@
 {
   "name": "fh-sync",
-  "version": "1.0.1",
-  "description": "JSON data syncronisation server",
+  "version": "1.0.2",
+  "description": "FeedHenry Data Synchronization Server",
   "main": "lib/index.js",
   "dependencies": {
     "async": "2.1.5",
@@ -28,6 +28,7 @@
     "sinon": "^1.17.5",
     "valid-url": "1.0.9"
   },
+  "types":"./types/fh-sync.d.ts",
   "scripts": {
     "docs": "./node_modules/.bin/jsdoc -d docs/api ./lib",
     "pretest": "./scripts/pretest.sh",

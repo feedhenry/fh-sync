@@ -1,6 +1,6 @@
 {
   "name": "fh-sync",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "FeedHenry Data Synchronization Server",
   "main": "index.js",
   "dependencies": {

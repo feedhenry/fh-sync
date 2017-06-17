@@ -9,12 +9,13 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "body-parser": "^1.17.2",
+    "async": "~2.4.1",
+    "body-parser": "~1.17.2",
     "cookie-parser": "~1.4.3",
-    "cors": "^2.8.3",
+    "cors": "~2.8.3",
     "debug": "~2.6.3",
     "express": "~4.15.3",
-    "fh-sync": "^1.0.0-RC1",
+    "fh-sync": "~1.0.0-RC1",
     "morgan": "~1.8.1"
   }
 }

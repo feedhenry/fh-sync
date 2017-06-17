@@ -12,7 +12,8 @@ var data = {
     }
   }
 
-var datalistHandler = function (dataset_id, query_params, cb, meta_data) {
+var datalistHandler = function (dataset_id, query_params, meta_data, cb) {
+  console.log('listing items for dataset "%s"', dataset_id);
   return cb(null, data);
 }
 

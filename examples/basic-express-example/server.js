@@ -47,7 +47,9 @@ function startApplicationServer (err) {
   });
 
   app.listen(3000, function () {
-    console.log('Example app listening on port 3000!')
+    console.log('\nExample app listening on port 3000!');
+    console.log('\nRunthe following from a terminal to get records via sync:');
+    console.log('curl http://localhost:3000/sync/messages -X POST --data \'{"fn": "syncRecords"}\' -H "content-type:application/json"\n')
   });
 }
 

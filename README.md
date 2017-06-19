@@ -17,10 +17,19 @@ https://redis.io/topics/quickstart
 
 ## Example Server
 
-To run the example server issue the following command in this repository:
+To run the example server start MongoDB and Redis locally on their default ports
+then issue the following commands in this repository:
 
 ```
-npm run example
+cd examples/basic-express-example/
+npm install
+node server.js
+```
+
+When the server has started try making the following cURL request:
+
+```
+curl http://localhost:3000/sync/messages -X POST --data '{"fn": "syncRecords"}' -H "content-type:application/json"
 ```
 
 ## Usage

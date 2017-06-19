@@ -30,7 +30,6 @@
   },
   "types": "./types/fh-sync.d.ts",
   "scripts": {
-    "example": "cd examples/basic-express-example/ && npm i && node server.js",
     "doc": "typedoc --includeDeclarations --excludeExternals --out docs/api ./types/fh-sync.d.ts",
     "pretest": "./scripts/pretest.sh",
     "test": "grunt fh:unit mochaTest:integration",

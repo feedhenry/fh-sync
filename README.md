@@ -3,17 +3,34 @@
 Node.js implementation of the FeedHenry Data Syncronisation Server.
 To be used in conjunction with the FeedHenry Data Syncronisation Client.
 
-## Dependencies 
+## Dependencies
 
-You will need a local Mongodb server and Redis server. For information on setting up these 
+You will need a local Mongodb server and Redis server. For information on setting up these
 
 Mongodb see
 
 https://docs.mongodb.com/manual/installation/
 
-Redis see 
+Redis see
 
 https://redis.io/topics/quickstart
+
+## Example Server
+
+To run the example server start MongoDB and Redis locally on their default ports
+then issue the following commands in this repository:
+
+```
+cd examples/basic-express-example/
+npm install
+node server.js
+```
+
+When the server has started try making the following cURL request:
+
+```
+curl http://localhost:3000/sync/messages -X POST --data '{"fn": "syncRecords"}' -H "content-type:application/json"
+```
 
 ## Usage
 
@@ -60,4 +77,3 @@ npm install -g grunt-cli
 ```
 
 Then to run the tests use ```npm test```
-

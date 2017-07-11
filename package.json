@@ -1,6 +1,6 @@
 {
   "name": "fh-sync",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FeedHenry Data Synchronization Server",
   "main": "index.js",
   "dependencies": {
@@ -10,7 +10,7 @@
     "fh-component-metrics": "2.7.0",
     "mongodb": "2.1.18",
     "mongodb-lock": "0.4.0",
-    "mongodb-queue": "2.2.0",
+    "mongodb-queue": "david-martin/mongodb-queue#ttl-index-01",
     "parse-duration": "0.1.1",
     "redis": "2.6.5",
     "underscore": "1.7.0"

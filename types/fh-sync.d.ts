@@ -89,7 +89,7 @@ declare module SyncCloud {
         max: number;
     }
 
-    type StandardCb<T> = (err: Error | string | undefined, res: T | undefined) => void;
+    type StandardCb<T> = (err: Error | string | undefined, res?: T | undefined) => void;
     type NoRespCb = (err: Error | string | undefined) => void;
 
     /**

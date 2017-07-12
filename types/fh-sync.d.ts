@@ -133,7 +133,7 @@ declare module SyncCloud {
      * @param redisUrl
      * @param cb
      */
-    function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, cb: StandardCb<void>): void;
+    function connect(mongoDBConnectionUrl: string, mongoDBConnectionOption: any, redisUrl: string, callback: (err: any, mongoDbClient?: any, redisClient?: any) => void): void;
 
     /**
      * Initialize sync for specific dataset

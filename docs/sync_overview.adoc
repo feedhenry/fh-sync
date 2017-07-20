@@ -1,5 +1,3 @@
-include::shared/attributes.adoc[]
-
 [[data-sync-framework]]
 = Data Sync Framework
 
@@ -229,7 +227,7 @@ Use the following handlers to deal with collisions:
 You can provide the handler function overrides for dealing with data collisions. Options include:
 
 * Store the collision record for manual resolution by a data administrator at a later date.
-* Discard the update which caused the collision. To achieve this, the `handleCollision()` function would simply not do anything with the collision record passed to it. 
+* Discard the update which caused the collision. To achieve this, the `handleCollision()` function would simply not do anything with the collision record passed to it.
 +
 WARNING: This may result in data loss as the update which caused the collision would be discarded by the Cloud App.
 +

@@ -245,7 +245,7 @@ module.exports = {
         async.apply(storage.saveUpdate, DATASETID, ack1),
         async.apply(storage.saveUpdate, DATASETID, ack2),
         function checkSyncUpdatesCreated(callback) {
-          storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
+          storage.listUpdates(DATASETID, {cuid: TESTCUID}, null, function(err, updates){
             assert.ok(!err);
             assert.equal(updates.length, 2);
             callback();
@@ -253,7 +253,7 @@ module.exports = {
         },
         async.apply(storage.findAndDeleteUpdate, DATASETID, ack1),
         function checkSyncUpdatesRemoved(callback) {
-          storage.listUpdates(DATASETID, {cuid: TESTCUID}, function(err, updates){
+          storage.listUpdates(DATASETID, {cuid: TESTCUID}, null, function(err, updates){
             assert.ok(!err);
             assert.equal(updates.length, 1);
             delete updates[0]._id;

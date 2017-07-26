@@ -27,7 +27,7 @@ module.exports = {
         schedulerInterval: 100, 
         schedulerLockName: 'test:syncApi:lock', 
         useCache: true,
-        cuidGenerator: function(params) {
+        cuidProducer: function(params) {
           return params.__fh.cuid + params.query_params.user;
         }
     });

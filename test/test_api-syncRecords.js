@@ -2,6 +2,7 @@ var assert = require('assert');
 var sinon = require('sinon');
 var _ = require('underscore');
 var syncRecordsModule = require('../lib/api-syncRecords');
+var syncUtils = require('../lib/util');
 
 var syncStorage = {
   readDatasetClientWithRecords: sinon.stub(),
@@ -11,6 +12,10 @@ var syncStorage = {
 
 var pendingQueue = {
   search: sinon.stub()
+};
+
+var config = {
+  cuidProducer: syncUtils.getCuid
 };
 
 module.exports = {
@@ -58,7 +63,7 @@ module.exports = {
     syncStorage.listUpdates.yieldsAsync(null, appliedUpdates);
     pendingQueue.search.yieldsAsync(null, pendingChanges);
 
-    var syncRecords = syncRecordsModule(syncStorage, pendingQueue);
+    var syncRecords = syncRecordsModule(syncStorage, pendingQueue, config);
     var params = {
       clientRecs: clientRecords,
       _fh: {
@@ -89,7 +94,7 @@ module.exports = {
 
     var clientRecords = {};
 
-    var syncRecords = syncRecordsModule(syncStorage, pendingQueue);
+    var syncRecords = syncRecordsModule(syncStorage, pendingQueue, config);
     var params = {
       clientRecs: clientRecords,
       _fh: {

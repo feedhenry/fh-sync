@@ -51,7 +51,7 @@ module.exports = {
 
   'test api sync success': function(done) {
     var apiSync = apiSyncModule(interceptors, ackQueue, pendingQueue, syncStorage, {
-      cuidGenerator: cuidGenerator
+      cuidProducer: cuidGenerator
     });
     var acknowledgements = [{
       type: 'action',

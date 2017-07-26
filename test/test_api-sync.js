@@ -40,13 +40,19 @@ var resetStubs = function(){
   ackQueue.addMany.reset();
 };
 
+var cuidGenerator = function(params) {
+  return params.__fh.cuid + "_" + params.meta_data.clientId;
+};
+
 module.exports = {
   'beforeEach': function(){
     resetStubs();
   },
 
   'test api sync success': function(done) {
-    var apiSync = apiSyncModule(interceptors, ackQueue, pendingQueue, syncStorage, {});
+    var apiSync = apiSyncModule(interceptors, ackQueue, pendingQueue, syncStorage, {
+      cuidProducer: cuidGenerator
+    });
     var acknowledgements = [{
       type: 'action',
       hash: 'ackhash',
@@ -60,7 +66,9 @@ module.exports = {
     }];
     var params = {
       query_params: {},
-      meta_data: {},
+      meta_data: {
+        clientId: 'client1'
+      },
       acknowledgements: acknowledgements,
       pending: pending,
       __fh: {
@@ -98,17 +106,17 @@ module.exports = {
       var ackItems = ackQueue.addMany.args[0][0];
       assert.equal(ackItems.length, 1);
       assert.equal(ackItems[0].datasetId, DATASETID);
-      assert.equal(ackItems[0].cuid, params.__fh.cuid);
+      assert.equal(ackItems[0].cuid, cuidGenerator(params));
 
       assert.ok(pendingQueue.addMany.calledOnce);
       var pendingItems = pendingQueue.addMany.args[0][0];
       assert.equal(pendingItems.length, 1);
       assert.equal(pendingItems[0].datasetId, DATASETID);
-      assert.equal(pendingItems[0].cuid, params.__fh.cuid);
+      assert.equal(pendingItems[0].cuid, cuidGenerator(params));
       assert.ok(pendingItems[0].meta_data);
 
       assert.ok(syncStorage.listUpdates.calledOnce);
-      assert.ok(syncStorage.listUpdates.calledWith(DATASETID, {cuid: params.__fh.cuid}));
+      assert.ok(syncStorage.listUpdates.calledWith(DATASETID, {cuid: cuidGenerator(params)}));
 
       assert.ok(interceptors.responseInterceptor.calledOnce);
 

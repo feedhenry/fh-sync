@@ -26,7 +26,11 @@ module.exports = {
         ackWorkerInterval: 100, 
         schedulerInterval: 100, 
         schedulerLockName: 'test:syncApi:lock', 
-        useCache: true});
+        useCache: true,
+        cuidProducer: function(params) {
+          return params.__fh.cuid + params.query_params.user;
+        }
+    });
       async.series([
         async.apply(sync.api.connect, mongoDBUrl, null, redisUrl),
         async.apply(sync.api.init, DATASETID, {syncFrequency: 1}),

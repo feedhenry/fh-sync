@@ -1,7 +1,7 @@
 # fh-sync
 
 Node.js implementation of the FeedHenry Data Syncronisation Server.
-To be used in conjunction with the FeedHenry Data Syncronisation Client.
+To be used in conjunction with the [FeedHenry Data Syncronisation Client](https://github.com/trepel/fh-sync-js).
 
 ## Dependencies
 
@@ -14,6 +14,11 @@ https://docs.mongodb.com/manual/installation/
 Redis see
 
 https://redis.io/topics/quickstart
+
+
+## Running on Openshift
+
+The simplest way to run sync server on Openshift is to use [Feedhenry Sync Server](https://github.com/feedhenry/fh-sync-server). It includes Openshift template that sets up Redis and Mongo, and creates the running sync server instance. It is also possible to use the repository for running sync server locally.
 
 ## Example Server
 
@@ -77,3 +82,9 @@ npm install -g grunt-cli
 ```
 
 Then to run the tests use ```npm test```
+
+# Cordova client template
+
+The [Feedhenry Cordova Sync Template](https://github.com/feedhenry-templates/feedhenry-cordova-sync-app) can be used to create client application talking to the sync server.
+
+

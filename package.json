@@ -1,12 +1,12 @@
 {
   "name": "fh-sync",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "FeedHenry Data Synchronization Server",
   "main": "index.js",
   "dependencies": {
     "async": "2.1.5",
     "backoff": "2.5.0",
-    "debug": "2.6.3",
+    "debug": "2.6.9",
     "fh-component-metrics": "2.7.0",
     "mongodb": "2.1.18",
     "mongodb-lock": "0.4.0",

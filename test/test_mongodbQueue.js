@@ -51,7 +51,7 @@ module.exports = {
     });
 
     var MongodbQueue = proxyquire('../lib/mongodbQueue', {
-      'mongodb-queue': function(){
+      'fh-mongodb-queue': function(){
         return mockMongodbQueue
       }
     });

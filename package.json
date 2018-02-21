@@ -8,9 +8,9 @@
     "backoff": "2.5.0",
     "debug": "2.6.9",
     "fh-component-metrics": "2.7.0",
+    "fh-mongodb-queue": "3.3.0",
     "mongodb": "2.1.18",
     "mongodb-lock": "0.4.0",
-    "mongodb-queue": "git+https://github.com/david-martin/mongodb-queue.git#ttl-index-01",
     "parse-duration": "0.1.1",
     "redis": "2.6.5",
     "underscore": "1.7.0"
